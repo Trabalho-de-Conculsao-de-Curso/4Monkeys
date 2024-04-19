@@ -32,38 +32,54 @@ class MarcaController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'nome' => 'required']);
+
+        if(Marca::query()->create($request->all())){
+            return response()->redirectTo('/marcas');
+        }
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Marca $marca)
+    public function show(Request $request)
     {
-        //
+        $search = $request->input('search');
+        $results = Marca::where('nome','like',"%$search%")->get();
+        return view('marcas.searchMarca', compact('results'));
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Marca $marca)
+    public function edit($id)
     {
-        //
+        $marca= Marca::find($id);
+        return view('marcas.editMarca',compact('marca'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Marca $marca)
+    public function update(Request $request, $id)
     {
-        //
+        $marca = Marca::find($id);
+        $marca->update($request->all());
+        return redirect()->route('marcas.index');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Marca $marca)
+    public function destroy($id)
     {
-        //
+        $delete = Marca::FindOrFail($id);
+        if (request()->has('_token')){
+            $delete->delete();
+            return redirect()->route('marcas.index');
+        } else {
+            return redirect()->route('marcas.index');
+        }
     }
 }

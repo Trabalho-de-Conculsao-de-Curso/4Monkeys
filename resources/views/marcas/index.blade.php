@@ -12,6 +12,12 @@
         <div>
             <a href="/marcas/create">Cadastrar Nova Marca</a>
         </div>
+        <div>
+            <form action="{{ url('marcas/search') }}" method="GET">
+                <input type="text" name="search" placeholder="Procurar usuário">
+                <button type="submit">Search</button>
+            </form>
+        </div>
         <table border="1">
             <thead>
             <th>ID</th>
@@ -26,9 +32,14 @@
                         <td>{{$marca->nome}}</td>
                         <td>{{$marca->created_at}}</td>
                         <td>
-                            <a href="">Editar</a>
+                            <a href="{{url("marcas/$marca->id/edit")}}">Editar</a>
                             <br>
-                            <a href="">Apagar</a>
+                            <form method="POST" action="{{url("marcas/$marca->id")}}">
+                                <input type="hidden" name="_token" value="{{ csrf_token() }}" />
+                                @method('DELETE')
+                                <button type="submit" onclick="return confirm('Tem certeza que deseja excluir? {{$marca->nome}} ?')"> Excluir</button>
+
+                            </form>
                         </td>
                     </tr>
                 @endforeach
