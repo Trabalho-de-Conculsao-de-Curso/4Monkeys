@@ -8,6 +8,7 @@
 <body class="font-sans antialiased dark:bg-black dark:text-white/50">
 
 <div>
+    <button><a href="/produtos">Home</a></button>
     <form action="/produtos" method="POST">
         <div>
             <label for="nome">Nome</label>
