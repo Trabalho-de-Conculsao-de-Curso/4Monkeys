@@ -20,7 +20,7 @@ class ProdutoFactory extends Factory
             'nome'=> $this->faker->word(),
             'marca'=> $this->faker->company(),
             'especificacoes'=> $this->faker->sentence(),
-            'preco'=> $this->faker->randomFloat(4, 10, 1000),
+            'preco'=> $this->faker->randomFloat(2, 10, 1000),
             'lojasOnline'=> json_encode(['Loja A', 'Loja B', 'Loja C'])
         ];
     }
