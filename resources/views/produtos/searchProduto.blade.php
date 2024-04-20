@@ -10,7 +10,7 @@
 <div>
     <h1>Busca</h1>
     <div>
-        <a href="/produtos/create">Cadastrar Novo marcas</a>
+        <a href="/produtos/create">Cadastrar Novo produto</a>
         <br>
         <br>
         <button><a href="/produtos">Home</a></button>

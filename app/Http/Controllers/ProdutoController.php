@@ -84,16 +84,24 @@ class ProdutoController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Produto $produto)
+    public function update( Request $request,$id)
     {
-        //
+        $produto = Produto::find($id);
+        $produto->update($request->all());
+        return redirect()->route('produtos.index');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Produto $produto)
+    public function destroy($id)
     {
-        //
+        $delete = Produto::FindOrFail($id);
+        if (request()->has('_token')){
+            $delete->delete();
+            return redirect()->route('produtos.index');
+        } else {
+            return redirect()->route('produtos.index');
+        }
     }
 }
