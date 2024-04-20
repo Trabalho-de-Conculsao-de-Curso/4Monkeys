@@ -6,15 +6,12 @@
     <title>Crud das Entidades</title>
 </head>
 <body class="font-sans antialiased dark:bg-black dark:text-white/50">
-<h1>Lista de Marcas</h1>
+<h1>Lista de Produtos</h1>
 
 <div>
     <div>
-        <a href="/produtos/create">Cadastrar Novo Produto<a>
-    </div>
-    <div>
-        <form action="{{ url('marcas/search') }}" method="GET">
-            <input type="text" name="search" placeholder="Procurar usuário">
+        <form action="{{ url('/produtos/search') }}" method="GET">
+            <input type="text" name="search" placeholder="Procurar produto">
             <button type="submit">Search</button>
         </form>
     </div>
@@ -40,9 +37,9 @@
                     <td>{{$produto->lojasOnline}}</td>
                     <td>{{$produto->created_at}}</td>
                     <td>
-                        <a href="{{url("marcas/$produto->id/edit")}}">Editar</a>
+                        <a href="{{url("produtos/$produto->id/edit")}}">Editar</a>
                         <br>
-                        <form method="POST" action="{{url("marcas/$produto->id")}}">
+                        <form method="POST" action="{{url("produtos/$produto->id")}}">
                             <input type="hidden" name="_token" value="{{ csrf_token() }}" />
                             @method('DELETE')
                             <button type="submit" onclick="return confirm('Tem certeza que deseja excluir? {{$produto->nome}} ?')"> Excluir</button>

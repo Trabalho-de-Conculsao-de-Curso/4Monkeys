@@ -58,17 +58,27 @@ class ProdutoController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Produto $produto)
+    public function show(Request $request)
     {
-        //
+        $search = $request->input('search');
+
+        $results = Produto::where(function($query) use ($search) {
+            $query->where('nome', 'like', "%$search%")
+                ->orWhere('marca', 'like', "%$search%")
+                ->orWhere('especificacoes', 'like', "%$search%")
+                ->orWhere('lojasOnline', 'like', "%$search%");
+            // Adicione mais campos aqui conforme necessário
+        })->get();
+        return view('produtos.searchProduto', compact('results'));
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Produto $produto)
+    public function edit($id)
     {
-        //
+        $produto= Produto::find($id);
+        return view('produtos.editProduto',compact('produto'));
     }
 
     /**
