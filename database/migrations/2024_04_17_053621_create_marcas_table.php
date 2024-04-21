@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use \app\Models\Produto;
 
 return new class extends Migration
 {
@@ -13,8 +14,9 @@ return new class extends Migration
     {
         Schema::create('marcas', function (Blueprint $table) {
             $table->id();
-            $table->timestamps();
+            $table->foreignIdFor(Produto::class);
             $table->string('nome', 120);
+            $table->timestamps();
         });
     }
 

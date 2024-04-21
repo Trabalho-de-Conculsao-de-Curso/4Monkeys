@@ -18,4 +18,8 @@ class Produto extends Model
         'created_at',
         'updated_at',
     ];
+
+    public function marca(){
+        return $this->hasMany(Marca::class);
+    }
 }

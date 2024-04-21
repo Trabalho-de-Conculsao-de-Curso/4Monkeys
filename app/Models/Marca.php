@@ -9,9 +9,14 @@ class Marca extends Model
 {
     use HasFactory;
 
+    protected $table = 'marcas';
     protected $fillable = [
         'nome',
         'created_at',
         'updated_at',
     ];
+
+    public function produto(){
+        return $this->belongsTo(Produto::class);
+    }
 }

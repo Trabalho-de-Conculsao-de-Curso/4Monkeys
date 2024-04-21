@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Marca;
 use App\Models\Produto;
 use Illuminate\Http\Request;
 
@@ -16,6 +17,8 @@ class ProdutoController extends Controller
         return view('produtos.index', [
             'produtos' => $produtos
         ]);
+
+
     }
 
     /**
@@ -36,23 +39,31 @@ class ProdutoController extends Controller
             'marca' => 'required',
             'especificacoes' => 'required',
             'preco' => 'required',
-            'lojasOnline'=>'required'
+            'lojasOnline' => 'required'
         ]);
 
-        $produto = Produto::create([
-            'nome' => $request->input('nome'),
-            'marca' => $request->input('marca'),
-            'especificacoes' => $request->input('especificacoes'),
-            'preco' => $request->input('preco'),
-            'lojasOnline' => $request->input('lojasOnline'),
-        ]);
+        $produto = new Produto();
+        $produto ->nome = $request ->input('nome');
+        $produto ->marca = $request ->input('marca');
+        $produto ->especificacoes = $request ->input('especificacoes');
+        $produto ->preco = $request ->input('preco');
+        $produto ->lojasOnline = $request ->input('lojasOnline');
+        $produto ->save();
 
-        if($produto){
-            // Redireciona após a conclusão
-            return redirect('/produtos');
+        $marca = new Marca();
+        $marca->nome = $request->input('marca');
+        $marca->produto_id = $produto->id;
+        $marca->save();
+
+        // Verifique se o produto foi criado com sucesso
+        if ($produto) {
+            return redirect('/produtos')->with('success', 'Produto criado com sucesso.');
         } else {
-            // Trate o erro, se a criação do produto falhar
+            // Se houver algum erro ao criar o produto, redirecione de volta com uma mensagem de erro
+            return back()->withInput()->with('error', 'Erro ao criar o produto.');
         }
+
+
     }
 
     /**
@@ -67,7 +78,6 @@ class ProdutoController extends Controller
                 ->orWhere('marca', 'like', "%$search%")
                 ->orWhere('especificacoes', 'like', "%$search%")
                 ->orWhere('lojasOnline', 'like', "%$search%");
-            // Adicione mais campos aqui conforme necessário
         })->get();
         return view('produtos.searchProduto', compact('results'));
     }
