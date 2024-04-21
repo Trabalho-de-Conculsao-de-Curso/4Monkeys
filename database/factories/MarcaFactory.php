@@ -2,6 +2,8 @@
 
 namespace Database\Factories;
 
+use App\Models\Marca;
+use App\Models\Produto;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -14,10 +16,11 @@ class MarcaFactory extends Factory
      *
      * @return array<string, mixed>
      */
+    protected $model = Marca::class;
     public function definition(): array
     {
         return [
-            'nome'          => fake()->name
+            'nome' => $this->faker->unique()->company,
         ];
     }
 }

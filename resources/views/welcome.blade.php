@@ -8,7 +8,7 @@
     <body class="font-sans antialiased dark:bg-black dark:text-white/50">
         <h1>Lista de Entidades</h1>
         <div>
-            <a href="/marcas">Marcas</a>
+            <a href="/produtos">Produtos</a>
         </div>
 
     </body>

@@ -9,6 +9,7 @@
 <h1>Lista de Produtos</h1>
 
 <div>
+    <a href="/produtos/create">Cadastrar Novo produto</a>
     <div>
         <form action="{{ url('/produtos/search') }}" method="GET">
             <input type="text" name="search" placeholder="Procurar produto">
