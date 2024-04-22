@@ -19,8 +19,10 @@ class MarcaFactory extends Factory
     protected $model = Marca::class;
     public function definition(): array
     {
+        $produto = Produto::factory()->create();
         return [
-            'nome' => $this->faker->unique()->company,
+            'nome' => $produto->nome,
+            'produto_id' => $produto->id,
         ];
     }
 }
