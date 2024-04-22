@@ -14,11 +14,6 @@ class relacionamentoSeeder extends Seeder
      */
     public function run(): void
     {
-        $marcas = Marca::factory()->count(2)->create();
-
-
-        $marcas->each(function ($marca) {
-            Produto::factory()->count(1)->create(['marca_id' => $marca->id]);
-        });
+        Marca::factory()->create();
     }
 }
