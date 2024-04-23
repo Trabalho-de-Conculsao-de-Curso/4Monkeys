@@ -11,7 +11,7 @@ class Produto extends Model
 
     protected $fillable = [
         'nome',
-        'marca',
+        'marca_id',
         'especificacoes',
         'preco',
         'lojasOnline',
@@ -20,6 +20,6 @@ class Produto extends Model
     ];
 
     public function marca(){
-        return $this->hasMany(Marca::class);
+        return $this->belongsTo(Marca::class, 'marca_id');
     }
 }
