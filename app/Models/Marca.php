@@ -12,11 +12,13 @@ class Marca extends Model
     protected $table = 'marcas';
     protected $fillable = [
         'nome',
+        'qualidade',
+        'garantia',
         'created_at',
         'updated_at',
     ];
 
     public function produto(){
-        return $this->belongsTo(Produto::class);
+        return $this->hasMany(Produto::class);
     }
 }

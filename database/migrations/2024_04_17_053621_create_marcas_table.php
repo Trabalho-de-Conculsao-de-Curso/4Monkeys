@@ -14,8 +14,9 @@ return new class extends Migration
     {
         Schema::create('marcas', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(Produto::class);
             $table->string('nome', 120);
+            $table->string('qualidade', 120);
+            $table->string('garantia', 120);
             $table->timestamps();
         });
     }

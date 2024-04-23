@@ -14,6 +14,6 @@ class relacionamentoSeeder extends Seeder
      */
     public function run(): void
     {
-        Marca::factory()->create();
+        Produto::factory()->create();
     }
 }
