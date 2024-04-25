@@ -14,18 +14,32 @@
             <label for="nome">Nome</label>
             <input type="text" name="nome" id="nome" required>
         </div>
+            <h3>Marca campos</h3>
         <div>
-            <label for="marca">Marca</label>
-            <input type="text" name="marca" id="marca" required>
+            <label for="marca_nome">Nome</label>
+            <input type="text" name="marca_nome" id="marca_nome" required>
         </div>
+
+        <div>
+            <label for="marca_qualidade">Qualidade</label>
+            <input type="text" name="marca_qualidade" id="marca_qualidade" required>
+        </div>
+
+        <div>
+            <label for="marca_garantia">Garantia</label>
+            <input type="text" name="marca_garantia" id="marca_garantia" required>
+        </div>
+        <h3>Especificaçẽs campos</h3>
         <div>
             <label for="especificacoes">Especificacoes</label>
             <input type="text" name="especificacoes" id="especificacoes" required>
         </div>
+        <h3>Preço campos</h3>
         <div>
             <label for="preco">Preço</label>
             <input type="number" name="preco" id="preco" required>
         </div>
+        <h3>Lojas Online campos</h3>
         <div>
             <label for="lojasOnline">Lojas Online</label>
             <input type="text" name="lojasOnline" id="lojasOnline" required>

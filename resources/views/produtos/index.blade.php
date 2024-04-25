@@ -32,7 +32,7 @@
                 <tr>
                     <td>{{$produto->id}}</td>
                     <td>{{$produto->nome}}</td>
-                    <td>{{$produto->marca}}</td>
+                    <td>{{$produto->marca->nome}}</td>
                     <td>{{$produto->especificacoes}}</td>
                     <td>{{$produto->preco}}</td>
                     <td>{{$produto->lojasOnline}}</td>
