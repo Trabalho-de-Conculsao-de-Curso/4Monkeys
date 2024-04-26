@@ -65,10 +65,17 @@ class ProdutoController extends Controller
 
         $results = Produto::where(function($query) use ($search) {
             $query->where('nome', 'like', "%$search%")
-                ->orWhere('marca', 'like', "%$search%")
                 ->orWhere('especificacoes', 'like', "%$search%")
+                ->orWhere('preco', 'like', "%$search%")
                 ->orWhere('lojasOnline', 'like', "%$search%");
-        })->get();
+        })
+            ->orWhereHas('marca', function($query) use ($search) {
+                $query->where('nome', 'like', "%$search%")
+                    ->orWhere('qualidade', 'like', "%$search%")
+                    ->orWhere('garantia', 'like', "%$search%");
+            })
+            ->get();
+
         return view('produtos.searchProduto', compact('results'));
     }
 
@@ -84,7 +91,6 @@ class ProdutoController extends Controller
     {
         $produto = Produto::find($id);
         $produto->update($request->all());
-
         $marca = Marca::find($produto->marca_id);
         $marca->update([
             'nome' => $request->input('marca_nome'),
@@ -101,9 +107,11 @@ class ProdutoController extends Controller
      */
     public function destroy($id)
     {
-        $delete = Produto::FindOrFail($id);
+
         if (request()->has('_token')){
-            $delete->delete();
+            $produto = Produto::findOrFail($id);
+
+            $produto->delete();
             return redirect()->route('produtos.index');
         } else {
             return redirect()->route('produtos.index');
