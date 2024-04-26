@@ -4,17 +4,17 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Produto;
 
 class LojasOnline extends Model
 {
     use HasFactory;
 
-    protected $table = 'LojasOnline';
+    protected $table = 'lojas_onlines';
     protected $fillable = [
         'id',
-        'loja',
+        'nome',
         'url',
-        'disponibilidade',
         'created_at',
         'updated_at',
     ];
