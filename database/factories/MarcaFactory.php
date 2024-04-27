@@ -21,7 +21,7 @@ class MarcaFactory extends Factory
     {
 
         return [
-            'nome' => $this->faker->word(),
+            'nome' => $this->faker->word,
             'qualidade' => $this->faker->randomElement(['Alta', 'Média', 'Baixa']),
             'garantia' => $this->faker->randomElement(['1 ano', '2 anos', 'Sem garantia']),
         ];

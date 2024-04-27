@@ -17,6 +17,14 @@
                 <input type="text" name="nome" id="nome" value="{{$marca->nome}}" required>
             </div>
             <div>
+                <label for="qualidade">Qualidade</label>
+                <input type="text" name="qualidade" id="qualidade" value="{{$marca->qualidade}}" required>
+            </div>
+            <div>
+                <label for="garantia">Garantia</label>
+                <input type="text" name="garantia" id="garantia" value="{{$marca->garantia}}" required>
+            </div>
+            <div>
                 <input type="submit" value="Editar">
                 <input type="hidden" name="_token" value="{{ csrf_token() }}" />
             </div>
