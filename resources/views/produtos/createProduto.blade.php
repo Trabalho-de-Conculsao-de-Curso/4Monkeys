@@ -9,7 +9,7 @@
 
 <div>
     <button><a href="/produtos">Home</a></button>
-    <form action="/produtos" method="POST">
+    <form action="/produtos/" method="POST">
         <div>
             <label for="nome">Nome</label>
             <input type="text" name="nome" id="nome" required>

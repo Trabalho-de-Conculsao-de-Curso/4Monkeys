@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('produtos', function (Blueprint $table) {
             $table->id();
             $table->string('nome');
-            $table->foreignId('marca_id')->constrained()->onDelete('cascade');
+            $table->foreignId('marca_id')->nullable()->constrained()->unique()->onDelete('cascade');
             $table->string('especificacoes');
             $table->decimal('preco', 10, 2);
             $table->json('lojasOnline');

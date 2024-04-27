@@ -60,12 +60,10 @@ test('Possivel deletar Produto sem deletar Marca', function () {
     $this->assertDatabaseHas('marcas', ['id' => $marca->id]);
 });
 
-test('Possivel acessar Marca pelo Produto', function () {
-    $marca = Marca::factory()->create();
+test('it can access the associated Marca from a Produto and vice versa', function () {
+    $marca = Marca::class;
     $produto = Produto::factory()->create(['marca_id' => $marca->id]);
 
-    // Acessa a marca associada ao produto
-    $marcaDoProduto = $produto->marca;
-
-    $this->assertEquals($marca->id, $marcaDoProduto->id);
+    $this->assertEquals($marca->id, $produto->marca-->id);
+    $this->assertTrue($marca->produtos->contains($produto));
 });

@@ -11,11 +11,10 @@ class ProdutoController extends Controller
 
     public function index()
     {
-        $produtos= Produto::all();
+        $produtos = Produto::with('marca')->get();
         return view('produtos.index', [
             'produtos' => $produtos
         ]);
-
 
     }
 
@@ -37,22 +36,26 @@ class ProdutoController extends Controller
             'lojasOnline' => 'required'
         ]);
 
-        $marca = new Marca();
-        $marca -> nome = $request->input('marca_nome');
-        $marca -> qualidade = $request->input('marca_qualidade');
-        $marca -> garantia = $request->input('marca_garantia');
-        $marca -> save();
 
         $produto = new Produto();
-        $produto ->nome = $request ->input('nome');
-        $produto ->marca_id = $marca ->id;
-        $produto ->especificacoes = $request ->input('especificacoes');
-        $produto ->preco = $request ->input('preco');
-        $produto ->lojasOnline = $request ->input('lojasOnline');
+        $produto->nome = $request->input('nome');
+        $produto->especificacoes = $request->input('especificacoes');
+        $produto->preco = $request->input('preco');
+        $produto->lojasOnline = $request->input('lojasOnline');
+        $produto->save();
+
+        // Criar e salvar a marca associada ao produto
+        $marca = new Marca();
+        $marca->nome = $request->input('marca_nome');
+        $marca->qualidade = $request->input('marca_qualidade');
+        $marca->garantia = $request->input('marca_garantia');
+        $marca->produto_id = $produto->id; // Associar o ID do produto à marca
+        $marca->save();
+
+        // Atualizar o marca_id no produto com o ID da marca
         $produto->marca_id = $marca->id;
-        $produto ->save();
 
-
+        $produto->save();
 
         return redirect('/produtos');
 
