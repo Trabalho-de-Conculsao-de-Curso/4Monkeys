@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('nome', 120);
             $table->string('qualidade', 120);
             $table->string('garantia', 120);
-            $table->foreignId('produto_id')->constrained()->unique()->onDelete('cascade');
+            $table->foreignId('produto_id')->nullable()->constrained()->unique()->onDelete('cascade');
             $table->timestamps();
         });
     }

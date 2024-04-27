@@ -10,6 +10,8 @@
         <div>
             <a href="/produtos">Produtos</a>
         </div>
-
+        <div>
+            <a href="/marcas">Marcas</a>
+        </div>
     </body>
 </html>

@@ -19,7 +19,6 @@ return new class extends Migration
             $table->decimal('preco', 10, 2);
             $table->json('lojasOnline');
             $table->timestamps();
-
         });
     }
 
