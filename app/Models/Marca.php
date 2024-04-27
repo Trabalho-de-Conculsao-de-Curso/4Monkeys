@@ -10,23 +10,17 @@ class Marca extends Model
     use HasFactory;
 
     protected $table = 'marcas';
+
     protected $fillable = [
         'nome',
         'qualidade',
         'garantia',
+        'produto_id',
         'created_at',
         'updated_at',
     ];
-    public static function boot()
-    {
-        parent::boot();
 
-        // Deleta os produtos associados quando uma marca é excluída
-        static::deleting(function($marca) {
-            $marca->produto()->delete();
-        });
-    }
     public function produto(){
-        return $this->hasMany(Produto::class);
+        return $this->belongsTo(Produto::class, 'produto_id');
     }
 }
