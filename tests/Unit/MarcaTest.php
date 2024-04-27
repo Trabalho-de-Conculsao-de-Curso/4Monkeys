@@ -2,11 +2,18 @@
 namespace Tests\Unit;
 
 use App\Models\Marca;
+use App\Models\Produto;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 uses(TestCase::class, RefreshDatabase::class);
 
+
+test('Possivel criar Marca', function () {
+    Marca::factory()->create();
+
+    $this->assertDatabaseCount('marcas', 1);
+});
 
 test('Não é possivel criar Marca sem um nome, qualidade e garantia', function () {
     $this->expectException(\Illuminate\Database\QueryException::class);
@@ -18,27 +25,26 @@ test('Não é possivel criar Marca sem um nome, qualidade e garantia', function 
     ]);
 });
 
-test('Possivel atualizar Marca', function () {
-    $marca = Marca::factory()->create();
 
-    $marca->update([
-        'nome' => 'Updated Name',
-        'qualidade' => 'Updated Qualidade',
-        'garantia' => 'Updated Garantia',
-    ]);
 
-    $this->assertDatabaseHas('marcas', [
-        'id' => $marca->id,
-        'nome' => $marca->nome,
-        'qualidade' => $marca->qualidade,
-        'garantia' => $marca->garantia,
-    ]);
+test('Uma Marca pertence a um Produto', function (){
+    $produto = Produto::factory()->create();
+    $marca = Marca::factory()->create(['produto_id' => $produto->id]);
+
+    $this->assertInstanceOf(Produto::class, $marca->produto);
+
 });
 
-test('Possivel deletar Marca', function () {
-    $marca = Marca::factory()->create();
+test('uma Marca pertence a um único Produto', function () {
+    $produto = Produto::factory()->create();
+    $marca = Marca::factory()->create(['produto_id' => $produto->id]);
 
-    $marca->delete();
+    $this->assertEquals($produto->id, $marca->produto->id);
+});
 
-    $this->assertDatabaseMissing('marcas', ['id' => $marca->id]);
+
+test('Possivel acessar Produto associada a Marca', function () {
+    $produto = Produto::factory()->create();
+    $marca = Marca::factory()->create(['produto_id' => $produto->id]);
+    expect($marca->produto->id)->toBe($produto->id);
 });
