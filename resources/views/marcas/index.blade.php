@@ -22,6 +22,8 @@
             <thead>
             <th>ID</th>
             <th>Nome</th>
+            <th>Qualidade</th>
+            <th>Garantia</th>
             <th>Criado Em</th>
             <th>Ações</th>
             </thead>
@@ -30,6 +32,8 @@
                     <tr>
                         <td>{{$marca->id}}</td>
                         <td>{{$marca->nome}}</td>
+                        <td>{{$marca->qualidade}}</td>
+                        <td>{{$marca->garantia}}</td>
                         <td>{{$marca->created_at}}</td>
                         <td>
                             <a href="{{url("marcas/$marca->id/edit")}}">Editar</a>
