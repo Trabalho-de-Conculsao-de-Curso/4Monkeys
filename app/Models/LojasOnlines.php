@@ -10,7 +10,7 @@ class LojasOnlines extends Model
 {
     use HasFactory;
 
-    protected $table = 'lojas_onlines';
+    protected $table = 'lojasonlines';
     protected $fillable = [
         'id',
         'nome',
