@@ -5,6 +5,8 @@ namespace Database\Seeders;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\Produto;
+use App\Models\LojasOnlines;
+
 
 class ProdutoSeeder extends Seeder
 {

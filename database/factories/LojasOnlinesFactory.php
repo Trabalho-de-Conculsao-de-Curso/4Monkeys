@@ -1,6 +1,8 @@
 <?php
 
 namespace Database\Factories;
+use App\Models\LojasOnlines;
+use App\Models\Produto;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -16,7 +18,7 @@ class LojasOnlinesFactory extends Factory
      * @return array<string, mixed>
      */
 
-    protected $model = LojasOnline::class;
+    protected $model = LojasOnlines::class;
     public function definition(): array
     {
         return [

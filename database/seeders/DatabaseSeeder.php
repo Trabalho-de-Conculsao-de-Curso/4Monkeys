@@ -4,6 +4,8 @@ namespace Database\Seeders;
 
 use App\Models\User;
 use App\Models\Produto;
+use App\Models\LojasOnlines;
+
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 

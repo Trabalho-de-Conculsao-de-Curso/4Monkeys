@@ -22,7 +22,7 @@ class ProdutoFactory extends Factory
     public function definition(): array
     {
 
-        $lojasOnlines = LojasOnline::factory()->create();
+        $lojasOnlines = LojasOnlines::factory()->create();
         return [
             'nome' => $this->faker->word(),
             'marca' => $this->faker->company(),
