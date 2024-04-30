@@ -16,14 +16,12 @@ test('Possivel criar Produto', function () {
 });
 
 test('Possivel criar Produto com atributos validos', function () {
-    $marca = Marca::factory()->create();
 
     $produto = Produto::factory()->create([
         'nome' => 'Test Produto',
         'especificacoes' => 'Test Especificacoes',
         'preco' => 100,
         'lojasOnline' => json_encode(['Loja A', 'Loja B']),
-        'marca_id' => $marca->id,
     ]);
 
     $this->assertDatabaseHas('produtos', [
@@ -31,19 +29,19 @@ test('Possivel criar Produto com atributos validos', function () {
         'especificacoes' => 'Test Especificacoes',
         'preco' => 100,
         'lojasOnline' => json_encode(['Loja A', 'Loja B']),
-        'marca_id' => $marca->id,
+        'marca_id' => $produto->marca->id,
     ]);
 });
 
 test('Possivel acessar Marca associada a Produto', function () {
-    $marca = Marca::factory()->create();
-    $produto = Produto::factory()->create(['marca_id' => $marca->id]);
-    expect($produto->marca->id)->toBe($marca->id);
+
+    $produto = Produto::factory()->create();
+    expect($produto->marca->id)->toBe($produto->marca->id);
 });
 
 test('um Produto pertence a uma Marca', function () {
-    $marca = Marca::factory()->create();
-    $produto = Produto::factory()->create(['marca_id' => $marca->id]);
+
+    $produto = Produto::factory()->create();
 
     $this->assertInstanceOf(Marca::class, $produto->marca);
 });
