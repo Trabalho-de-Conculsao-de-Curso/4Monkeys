@@ -22,6 +22,7 @@ class ProdutoFactory extends Factory
         $marca = Marca::factory()->create();
         return [
             'nome' => $this->faker->word,
+            'marca_id' => $marca->id,
             'especificacoes' => $this->faker->sentence(),
             'preco' => $this->faker->randomFloat(2, 10, 1000),
             'lojasOnline'=> json_encode(['Loja A', 'Loja B', 'Loja C']),

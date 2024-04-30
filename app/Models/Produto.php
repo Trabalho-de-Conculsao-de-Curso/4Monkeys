@@ -22,4 +22,9 @@ class Produto extends Model
     public function marca(){
         return $this->belongsTo(Marca::class, 'marca_id');
     }
+
+    public static function search($term)
+    {
+        return self::where('nome', 'like', '%' . $term . '%');
+    }
 }

@@ -7,7 +7,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 
-it('Possivel criar Produto', function () {
+it('Possivel criar Produto associado a Marc', function () {
 
     $produto = Produto::factory()->create([
         'nome' => 'Produto de Teste',
@@ -20,64 +20,52 @@ it('Possivel criar Produto', function () {
     expect($produto->especificacoes)->toBe('Especificações do Produto de Teste');
     expect($produto->preco)->toBe(100);
     expect($produto->lojasOnline)->toBe('Loja A, Loja B');
+    expect($produto->id)->toBe($produto->marca->id);
 });
 
-it('Possivel atualizar Produto', function () {
+it('Possivel atualizar Produto e campos de Marca', function () {
 
     $produto = Produto::factory()->create();
+    $marca = $produto->marca;
+
     $produto->update([
         'nome' => 'Novo Nome do Produto',
         'preco' => 200,
     ]);
+    $marca->update([
+        'nome' => 'Novo Nome da Marca',
+        'qualidade'=>'Nova Qualidade de Marca',
+        'garantia'=>'Nova Garantia de Marca',
+    ]);
+
     $produto->refresh();
 
     expect($produto->nome)->toBe('Novo Nome do Produto');
     expect($produto->preco)->toBe(200);
-});
-
-it('Possivel deletar Produto', function () {
-
-    $produto = Produto::factory()->create();
-    $produto->delete();
-
-    expect(Produto::find($produto->id))->toBeNull();
-});
-
-it('Possivel criar Produto associado a Marca', function () {
-    // Cria uma nova marca
-    $marca = Marca::factory()->create();
-
-    // Cria um novo produto associado à marca criada
-    $produto = Produto::factory()->create(['marca_id' => $marca->id]);
-
-    // Verifica se o produto foi criado corretamente
-    expect($produto->marca_id)->toBe($marca->id);
-});
-
-it('Possivel atualizar Produto associado a Marca', function () {
-
-    $marca = Marca::factory()->create();
-    $produto = Produto::factory()->create();
-
-    $produto->update(['marca_id' => $marca->id]);
-    $produto->refresh();
-
-    expect($produto->marca_id)->toBe($marca->id);
+    expect($produto->marca->nome)->toBe('Novo Nome da Marca');
+    expect($produto->marca->qualidade)->toBe('Nova Qualidade de Marca');
+    expect($produto->marca->garantia)->toBe('Nova Garantia de Marca');
 });
 
 it('Possivel deletar Produto e Marca associada', function () {
-    // Cria uma nova marca
+
     $produto = Produto::factory()->create();
+    $marca = $produto->marca;
 
-    // Cria um novo produto associado à marca criada
-    $marca = Marca::factory()->create(['produto_id' => $produto->id]);
-
-    // Deleta o produto
     $produto->delete();
 
-    // Verifica se o produto foi removido do banco de dados
     expect(Produto::find($produto->id))->toBeNull();
+    expect(Produto::find($marca->id))->toBeNull();
+});
 
-    // Verifica se a marca associada foi removida do banco de dados
-    expect(Marca::find($marca->id))->toBeNull();
+it('Possivel realizar busca ', function () {
+
+    Produto::factory()->create(['nome' => 'Produto A']);
+    Produto::factory()->create(['nome' => 'Produto B']);
+    Produto::factory()->create(['nome' => 'Produto C']);
+
+    $results = Produto::search('Produto A')->get();
+
+    $this->assertCount(1, $results);
+    $this->assertEquals('Produto A', $results->first()->nome);
 });
