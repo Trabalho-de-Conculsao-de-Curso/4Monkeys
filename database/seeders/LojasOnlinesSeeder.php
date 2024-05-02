@@ -10,10 +10,10 @@ use App\Models\Produto;
 class LojasOnlinesSeeder extends Seeder
 {
     /**
-     * Run the database seeds.
+     * Executa as sementes do banco de dados.
      */
     public function run(): void
     {
-        //
+        // LojasOnlines::factory()->create();
     }
 }
