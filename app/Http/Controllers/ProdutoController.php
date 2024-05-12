@@ -37,28 +37,27 @@ class ProdutoController extends Controller
         ]);
 
 
+        $marca = Marca::where('nome', $request->input('marca_nome'))->first();
+
+        // Se a marca não existir, criar uma nova marca
+        if (!$marca) {
+            $marca = new Marca();
+            $marca->nome = $request->input('marca_nome');
+            $marca->qualidade = $request->input('marca_qualidade');
+            $marca->garantia = $request->input('marca_garantia');
+            $marca->save();
+        }
+
+        // Criar o produto associado à marca
         $produto = new Produto();
         $produto->nome = $request->input('nome');
         $produto->especificacoes = $request->input('especificacoes');
         $produto->preco = $request->input('preco');
         $produto->lojasOnline = $request->input('lojasOnline');
-        $produto->save();
-
-        // Criar e salvar a marca associada ao produto
-        $marca = new Marca();
-        $marca->nome = $request->input('marca_nome');
-        $marca->qualidade = $request->input('marca_qualidade');
-        $marca->garantia = $request->input('marca_garantia');
-        $marca->produto_id = $produto->id; // Associar o ID do produto à marca
-        $marca->save();
-
-        // Atualizar o marca_id no produto com o ID da marca
         $produto->marca_id = $marca->id;
-
         $produto->save();
 
         return redirect('/produtos');
-
     }
 
 
@@ -113,8 +112,8 @@ class ProdutoController extends Controller
 
         if (request()->has('_token')){
             $produto = Produto::findOrFail($id);
-
             $produto->delete();
+            $produto->marca()->delete();
             return redirect()->route('produtos.index');
         } else {
             return redirect()->route('produtos.index');

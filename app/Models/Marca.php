@@ -15,12 +15,11 @@ class Marca extends Model
         'nome',
         'qualidade',
         'garantia',
-        'produto_id',
         'created_at',
         'updated_at',
     ];
 
     public function produto(){
-        return $this->belongsTo(Produto::class, 'produto_id');
+        return $this->belongsTo(Produto::class);
     }
 }
