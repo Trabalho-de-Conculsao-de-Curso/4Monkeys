@@ -4,6 +4,9 @@ namespace Tests\Unit;
 use App\Models\Marca;
 use App\Models\Produto;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use function Pest\Laravel\assertDatabaseCount;
+use function Pest\Laravel\assertDatabaseHas;
+
 use Tests\TestCase;
 
 uses(TestCase::class, RefreshDatabase::class);
@@ -26,25 +29,29 @@ test('Não é possivel criar Marca sem um nome, qualidade e garantia', function 
 });
 
 
+test('Um Produto pode ter várias Marcas', function (){
 
-test('Uma Marca pertence a um Produto', function (){
     $produto = Produto::factory()->create();
-    $marca = Marca::factory()->create(['produto_id' => $produto->id]);
+    $marcas = Marca::factory(count: 3)->create();
+    foreach ($marcas as $marca) {
+        $produto->marca_id = $marca->id;
+        $produto->save();
+    }
 
-    $this->assertInstanceOf(Produto::class, $marca->produto);
-
-});
-
-test('uma Marca pertence a um único Produto', function () {
-    $produto = Produto::factory()->create();
-    $marca = Marca::factory()->create(['produto_id' => $produto->id]);
-
-    $this->assertEquals($produto->id, $marca->produto->id);
+    //Verifica se tem 4 pois na factory de produto ja cria uma marca associada
+    assertDatabaseCount('marcas', 4);
+    foreach ($marcas as $marca) {
+        assertDatabaseHas('marcas', ['id' => $marca->id]);
+    }
 });
 
 
 test('Possivel acessar Produto associada a Marca', function () {
-    $produto = Produto::factory()->create();
-    $marca = Marca::factory()->create(['produto_id' => $produto->id]);
-    expect($marca->produto->id)->toBe($produto->id);
+
+    $produtos = Produto::factory()->count(3)->create();
+
+    foreach ($produtos as $produto) {
+        $marca = (new Marca)->find($produto->marca_id);
+        expect($marca->produtos)->toContain($produto);
+    }
 });

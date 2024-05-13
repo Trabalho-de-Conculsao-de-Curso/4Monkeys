@@ -46,11 +46,5 @@ test('um Produto pertence a uma Marca', function () {
     $this->assertInstanceOf(Marca::class, $produto->marca);
 });
 
-test('um Produto tem apenas uma Marca', function () {
-    $produto = Produto::factory()->create();
-    $marca = Marca::factory()->create(['produto_id' => $produto->id]);
-
-    $this->assertEquals($produto->id, $marca->produto->id);
-});
 
 
