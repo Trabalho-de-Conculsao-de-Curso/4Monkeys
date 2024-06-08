@@ -39,7 +39,7 @@
                     <td>{{ $produto->id }}</td>
                     <td>{{ $produto->nome }}</td>
                     <td>{{ $produto->marca->nome }}</td>
-                    <td>{{ $produto->especificacoes}}</td>
+                    <td>{{ $produto->especificacoes->detalhes}}</td>
                     <td>{{ $produto->preco}}</td>
                     <td>{{ $produto->lojasOnline}}</td>
                     <td>{{ $produto->created_at}}</td>
