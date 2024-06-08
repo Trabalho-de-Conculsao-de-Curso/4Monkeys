@@ -38,8 +38,12 @@
         </div>
         <h3>Preço campos</h3>
         <div>
-            <label for="preco">Preço</label>
-            <input type="text" name="preco" id="preco" value="{{$produto->preco}}" required>
+            <label for="preco_valor">Valor</label>
+            <input type="text" name="preco_valor" id="preco_valor" value="{{$produto->preco->valor}}" required>
+        </div>
+        <div>
+            <label for="preco_moeda">Moeda</label>
+            <input type="text" name="preco_moeda" id="preco_moeda" value="{{$produto->preco->moeda}}" required>
         </div>
         <h3>Lojas Online campos</h3>
         <div>

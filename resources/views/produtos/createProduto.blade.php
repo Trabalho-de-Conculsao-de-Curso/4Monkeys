@@ -37,7 +37,12 @@
         <h3>Preço campos</h3>
         <div>
             <label for="preco">Preço</label>
-            <input type="number" name="preco" id="preco" required>
+            <input type="number" name="preco_valor" id="preco_valor" required>
+        </div>
+        <br>
+        <div>
+            <label for="moeda">Moeda</label>
+            <input type="text" name="preco_moeda" id="preco_moeda" required>
         </div>
         <h3>Lojas Online campos</h3>
         <div>

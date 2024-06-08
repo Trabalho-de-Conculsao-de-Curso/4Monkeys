@@ -13,7 +13,7 @@ class Produto extends Model
         'nome',
         'marca_id',
         'especificacoes',
-        'preco',
+        'preco_id',
         'lojasOnline',
         'created_at',
         'updated_at',
@@ -21,6 +21,10 @@ class Produto extends Model
 
     public function marca(){
         return $this->belongsTo(Marca::class);
+    }
+
+    public function preco(){
+        return $this->belongsTo(Preco::class);
     }
 
     public static function search($term)

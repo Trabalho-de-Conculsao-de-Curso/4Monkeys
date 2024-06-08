@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Marca;
+use App\Models\Preco;
 use App\Models\Produto;
 use Illuminate\Http\Request;
 
@@ -11,7 +12,7 @@ class ProdutoController extends Controller
 
     public function index()
     {
-        $produtos = Produto::with('marca')->get();
+        $produtos = Produto::with('marca', 'preco')->get();
         return view('produtos.index', [
             'produtos' => $produtos
         ]);
@@ -32,12 +33,14 @@ class ProdutoController extends Controller
             'marca_qualidade' => 'required',
             'marca_garantia' => 'required',
             'especificacoes' => 'required',
-            'preco' => 'required',
+            'preco_valor' => 'required',
+            'preco_moeda' => 'required',
             'lojasOnline' => 'required'
         ]);
 
 
         $marca = Marca::where('nome', $request->input('marca_nome'))->first();
+        $preco = Preco::where('valor', $request->input('preco_valor'))->first();
 
         // Se a marca não existir, criar uma nova marca
         if (!$marca) {
@@ -48,13 +51,22 @@ class ProdutoController extends Controller
             $marca->save();
         }
 
-        // Criar o produto associado à marca
+
+        // Se o preco não existir, criar um novo preco
+        if (!$preco) {
+            $preco = new Preco();
+            $preco->valor = $request->input('preco_valor');
+            $preco->moeda = $request->input('preco_moeda');
+            $preco->save();
+        }
+
+        // Criar o produto
         $produto = new Produto();
         $produto->nome = $request->input('nome');
         $produto->especificacoes = $request->input('especificacoes');
-        $produto->preco = $request->input('preco');
         $produto->lojasOnline = $request->input('lojasOnline');
         $produto->marca_id = $marca->id;
+        $produto->preco_id = $preco->id;
         $produto->save();
 
         return redirect('/produtos');
@@ -101,6 +113,13 @@ class ProdutoController extends Controller
 
         ]);
 
+        $marca = Preco::find($produto->preco_id);
+        $marca->update([
+            'valor' => $request->input('preco_valor'),
+            'moeda' => $request->input('preco_moeda'),
+
+        ]);
+
         return redirect()->route('produtos.index');
     }
 
@@ -114,6 +133,7 @@ class ProdutoController extends Controller
             $produto = Produto::findOrFail($id);
             $produto->delete();
             $produto->marca()->delete();
+            $produto->preco()->delete();
             return redirect()->route('produtos.index');
         } else {
             return redirect()->route('produtos.index');

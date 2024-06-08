@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('nome');
             $table->foreignId('marca_id')->nullable()->constrained()->unique()->onDelete('cascade');
             $table->string('especificacoes');
-            $table->decimal('preco', 10, 2);
+            $table->foreignId('preco_id')->nullable()->constrained()->unique()->onDelete('cascade');
             $table->json('lojasOnline');
             $table->timestamps();
         });
