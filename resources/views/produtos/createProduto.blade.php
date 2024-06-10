@@ -31,8 +31,8 @@
         </div>
         <h3>Especificaçẽs campos</h3>
         <div>
-            <label for="especificacoes">Especificacoes</label>
-            <input type="text" name="especificacoes" id="especificacoes" required>
+            <label for="especificacoes">Detalhes</label>
+            <input type="text" name="especificacoes_detalhes" id="especificacoes_detalhes" required>
         </div>
         <h3>Preço campos</h3>
         <div>

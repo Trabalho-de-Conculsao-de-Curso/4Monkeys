@@ -33,8 +33,8 @@
 
         <h3>Especificações campos</h3>
         <div>
-            <label for="especificacoes">Especificações</label>
-            <input type="text" name="especificacoes" id="especificacoes" value="{{$produto->especificacoes}}" required>
+            <label for="especificacoes_detalhes">Especificações</label>
+            <input type="text" name="especificacoes_detalhes" id="especificacoes_detalhes" value="{{$produto->especificacoes->detalhes}}" required>
         </div>
         <h3>Preço campos</h3>
         <div>
