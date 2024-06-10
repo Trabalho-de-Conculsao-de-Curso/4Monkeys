@@ -23,6 +23,10 @@ class Produto extends Model
         return $this->belongsTo(Marca::class);
     }
 
+    public function especificacoes(){
+        return $this->belongsTo(Especificacoes::class);
+    }
+
     public static function search($term)
     {
         return self::where('nome', 'like', '%' . $term . '%');
