@@ -27,6 +27,10 @@ class Produto extends Model
         return $this->belongsTo(Especificacoes::class);
     }
 
+    public function lojaOnline(){
+        return $this->belongsTo(Especificacoes::class);
+    }
+
     public static function search($term)
     {
         return self::where('nome', 'like', '%' . $term . '%');

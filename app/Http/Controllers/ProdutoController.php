@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Especificacoes;
+use App\Models\LojaOnline;
 use App\Models\Marca;
 use App\Models\Produto;
 use Illuminate\Http\Request;
@@ -34,12 +35,14 @@ class ProdutoController extends Controller
             'marca_garantia' => 'required',
             'especificacoes_detalhes' => 'required',
             'preco' => 'required',
-            'lojasOnline' => 'required'
+            'nomeLojaOnline' => 'required',
+            'urlLojaOnline' => 'required'
         ]);
 
 
         $marca = Marca::where('nome', $request->input('marca_nome'))->first();
         $especificacoes = Especificacoes::where('detalhes', $request->input('especificacoes_detalhes'))->first();
+        $lojaOnline = LojaOnline::where('nome', $request->input('nomeLojaOnline'))->first();
 
         // Se a marca não existir, criar uma nova marca
         if (!$marca) {
@@ -56,6 +59,13 @@ class ProdutoController extends Controller
             $especificacoes->save();
         }
 
+        if (!$lojaOnline) {
+            $lojaOnline = new LojaOnline();
+            $lojaOnline->nome = $request->input('nomeLojaOnline');
+            $lojaOnline->urlLoja = $request->input('urlLojaOnline');
+            $lojaOnline->save();
+        }
+
 
 
         // Criar o produto associado à marca
@@ -63,7 +73,7 @@ class ProdutoController extends Controller
         $produto->nome = $request->input('nome');
         $produto->especificacoes_id = $especificacoes->id;
         $produto->preco = $request->input('preco');
-        $produto->lojasOnline = $request->input('lojasOnline');
+        $produto->lojaOnline = $lojaOnline->id;
         $produto->marca_id = $marca->id;
         $produto->save();
 
@@ -120,6 +130,12 @@ class ProdutoController extends Controller
             'detalhes' => $request->input('especificacoes_detalhes'),
         ]);
 
+        $lojaOnline = LojaOnline::find($produto->lojaOnline);
+        print_r($lojaOnline);
+        $lojaOnline->update([
+            'nome' => $request->input('nomeLojaOnline'),
+            'urlLoja' => $request->input('urlLojaOnline'),
+        ]);
 
 
 
@@ -137,6 +153,7 @@ class ProdutoController extends Controller
             $produto->delete();
             $produto->marca()->delete();
             $produto->especificacoes()->delete();
+            $produto->lojaOnline()->delete();
             return redirect()->route('produtos.index');
         } else {
             return redirect()->route('produtos.index');

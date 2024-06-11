@@ -43,8 +43,12 @@
         </div>
         <h3>Lojas Online campos</h3>
         <div>
-            <label for="lojasOnline">lojas Online</label>
-            <input type="text" name="lojasOnline" id="lojasOnline" value="{{$produto->lojasOnline}}" required>
+            <label for="nomeLojaOnline">lojas Online</label>
+            <input type="text" name="nomeLojaOnline" id="nomeLojaOnline" value="{{$produto->lojaOnline}}" required>
+        </div>
+        <div>
+            <label for="urlLojaOnline">URL Loja Online</label>
+            <input type="text" name="urlLojaOnline" id="urlLojaOnline" value="{{$produto->lojaOnline}}" required>
         </div>
         <div>
             <input type="submit" value="Editar">
