@@ -3,6 +3,7 @@
 use App\Http\Controllers\MarcaController;
 use App\Http\Controllers\ProdutoController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SoftwareController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -21,5 +22,6 @@ Route::middleware('auth')->group(function () {
 
 Route::resource('/marcas', MarcaController::class);
 Route::resource('/produtos', ProdutoController::class);
+Route::resource('/softwares', SoftwareController::class);
 
 require __DIR__.'/auth.php';

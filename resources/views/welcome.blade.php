@@ -13,5 +13,8 @@
         <div>
             <a href="/marcas">Marcas</a>
         </div>
+        <div>
+            <a href="/softwares">Softwares</a>
+        </div>
     </body>
 </html>
