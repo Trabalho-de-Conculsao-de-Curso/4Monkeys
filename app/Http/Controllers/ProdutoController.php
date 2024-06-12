@@ -38,23 +38,17 @@ class ProdutoController extends Controller
         ]);
 
 
-        $marca = Marca::where('nome', $request->input('marca_nome'))->first();
-        $especificacoes = Especificacoes::where('detalhes', $request->input('especificacoes_detalhes'))->first();
 
-        // Se a marca não existir, criar uma nova marca
-        if (!$marca) {
             $marca = new Marca();
             $marca->nome = $request->input('marca_nome');
             $marca->qualidade = $request->input('marca_qualidade');
             $marca->garantia = $request->input('marca_garantia');
             $marca->save();
-        }
 
-        if (!$especificacoes) {
             $especificacoes = new Especificacoes();
             $especificacoes->detalhes = $request->input('especificacoes_detalhes');
             $especificacoes->save();
-        }
+
 
 
 

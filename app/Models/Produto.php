@@ -27,6 +27,11 @@ class Produto extends Model
         return $this->belongsTo(Especificacoes::class);
     }
 
+    public function produtoFinais()
+    {
+        return $this->belongsToMany(ProdutoFinal::class, 'produto_final_produto');
+    }
+
     public static function search($term)
     {
         return self::where('nome', 'like', '%' . $term . '%');
