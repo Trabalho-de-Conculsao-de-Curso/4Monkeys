@@ -22,7 +22,8 @@
         <th>Nome</th>
         <th>Marca</th>
         <th>Especificação</th>
-        <th>Preço</th>
+        <th>Valor</th>
+        <th>Moeda</th>
         <th>Lojas Onlines</th>
         <th>Criado Em</th>
         <th>Ações</th>
@@ -34,7 +35,8 @@
                     <td>{{$produto->nome}}</td>
                     <td>{{$produto->marca->nome}}</td>
                     <td>{{$produto->especificacoes->detalhes}}</td>
-                    <td>{{$produto->preco}}</td>
+                    <td>{{$produto->preco->valor}}</td>
+                    <td>{{$produto->preco->moeda}}</td>
                     <td>{{$produto->lojasOnline}}</td>
                     <td>{{$produto->created_at}}</td>
                     <td>

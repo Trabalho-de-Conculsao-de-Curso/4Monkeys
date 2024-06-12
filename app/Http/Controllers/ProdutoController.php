@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Especificacoes;
 use App\Models\Marca;
+use App\Models\Preco;
 use App\Models\Produto;
 use Illuminate\Http\Request;
 
@@ -12,7 +13,7 @@ class ProdutoController extends Controller
 
     public function index()
     {
-        $produtos = Produto::with('marca','especificacoes')->get();
+        $produtos = Produto::with('marca','especificacoes', 'preco')->get();
         return view('produtos.index', [
             'produtos' => $produtos
         ]);
@@ -33,28 +34,32 @@ class ProdutoController extends Controller
             'marca_qualidade' => 'required',
             'marca_garantia' => 'required',
             'especificacoes_detalhes' => 'required',
-            'preco' => 'required',
+            'preco_valor' => 'required',
+            'preco_moeda' => 'required',
             'lojasOnline' => 'required'
         ]);
 
 
         $marca = Marca::where('nome', $request->input('marca_nome'))->first();
         $especificacoes = Especificacoes::where('detalhes', $request->input('especificacoes_detalhes'))->first();
+        $preco = Preco::where('valor', $request->input('preco_valor'))->first();
 
-        // Se a marca não existir, criar uma nova marca
-        if (!$marca) {
+        // Cria uma nova Marca, Especificacoes, Preco
             $marca = new Marca();
             $marca->nome = $request->input('marca_nome');
             $marca->qualidade = $request->input('marca_qualidade');
             $marca->garantia = $request->input('marca_garantia');
             $marca->save();
-        }
 
-        if (!$especificacoes) {
             $especificacoes = new Especificacoes();
             $especificacoes->detalhes = $request->input('especificacoes_detalhes');
             $especificacoes->save();
-        }
+
+            $preco = new Preco();
+            $preco->valor = $request->input('preco_valor');
+            $preco->moeda = $request->input('preco_moeda');
+            $preco->save();
+
 
 
 
@@ -62,7 +67,8 @@ class ProdutoController extends Controller
         $produto = new Produto();
         $produto->nome = $request->input('nome');
         $produto->especificacoes_id = $especificacoes->id;
-        $produto->preco = $request->input('preco');
+        $produto->marca_id = $marca->id;
+        $produto->preco_id = $preco->id;
         $produto->lojasOnline = $request->input('lojasOnline');
         $produto->marca_id = $marca->id;
         $produto->save();
@@ -98,7 +104,7 @@ class ProdutoController extends Controller
 
     public function edit($id)
     {
-        $produto= Produto::with('marca','especificacoes')->find($id);
+        $produto= Produto::with('marca','especificacoes', 'preco')->find($id);
         return view('produtos.editProduto',compact('produto'));
     }
 
@@ -120,7 +126,12 @@ class ProdutoController extends Controller
             'detalhes' => $request->input('especificacoes_detalhes'),
         ]);
 
+        $marca = Preco::find($produto->preco_id);
+        $marca->update([
+            'valor' => $request->input('preco_valor'),
+            'moeda' => $request->input('preco_moeda'),
 
+        ]);
 
 
         return redirect()->route('produtos.index');
@@ -137,6 +148,7 @@ class ProdutoController extends Controller
             $produto->delete();
             $produto->marca()->delete();
             $produto->especificacoes()->delete();
+            $produto->preco()->delete();
             return redirect()->route('produtos.index');
         } else {
             return redirect()->route('produtos.index');
