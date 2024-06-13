@@ -2,14 +2,21 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Produto;
 use App\Models\ProdutoFinal;
+use App\Models\Software;
+use App\Services\GeminiAPIService;
 use Illuminate\Http\Request;
 
 class ProdutoFinalController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    protected $geminiAPIService;
+
+    public function __construct(GeminiAPIService $geminiAPIService)
+    {
+        $this->geminiAPIService = $geminiAPIService;
+    }
+
     public function index()
     {
         //
@@ -20,12 +27,38 @@ class ProdutoFinalController extends Controller
      */
     public function create()
     {
-        //
+        $softwares = Software::all();
+        return view('home', compact('softwares'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
+    public function selecionar(Request $request)
+    {
+        $softwaresSelecionados = Software::find($request->input('softwares'));
+        $produtos = Produto::all();
+
+        // Preparar dados para enviar ao GeminiAPI
+        $softwaresData = $softwaresSelecionados->toArray();
+        $produtosData = $produtos->toArray();
+
+        // Obter recomendações do GeminiAPI
+        $recommendations = $this->geminiAPIService->getRecommendations($softwaresData, $produtosData);
+
+        $produtoFinals = [];
+        foreach ($recommendations as $categoria => $recommendation) {
+            $produtoFinal = new ProdutoFinal();
+            $produtoFinal->nome = 'Produto Final ' . ucfirst($categoria);
+            $produtoFinal->categoria = $categoria;
+            $produtoFinal->save();
+
+            $produtosCategoria = Produto::whereIn('id', $recommendation['produtos'])->get();
+            $produtoFinal->produtos()->attach($produtosCategoria);
+            $produtoFinal->softwares()->attach($softwaresSelecionados);
+
+            $produtoFinals[$categoria] = $produtoFinal;
+        }
+
+        return view('resultado', compact('produtoFinals'));
+    }
     public function store(Request $request)
     {
         //
