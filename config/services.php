@@ -31,4 +31,9 @@ return [
         ],
     ],
 
+    'gemini' => [
+        'api_url' => env('GEMINI_API_URL'),
+        'api_key' => env('GEMINI_API_KEY'),
+    ],
+
 ];
