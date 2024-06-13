@@ -14,10 +14,10 @@ return new class extends Migration
         Schema::create('produtos', function (Blueprint $table) {
             $table->id();
             $table->string('nome');
-            $table->foreignId('marca_id')->nullable()->constrained()->unique()->onDelete('cascade');
-            $table->foreignId('especificacoes_id')->nullable()->constrained()->unique()->onDelete('cascade');
+            $table->foreignId('marca_id')->nullable()->constrained('marcas')->unique()->onDelete('cascade');
+            $table->foreignId('especificacoes_id')->nullable()->constrained('especificacoes')->unique()->onDelete('cascade');
+            $table->foreignId('loja_online_id')->nullable()->constrained('loja_online')->unique()->onDelete('cascade');;
             $table->decimal('preco', 10, 2);
-            $table->string('lojaOnline');
             $table->timestamps();
         });
     }

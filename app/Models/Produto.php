@@ -14,7 +14,7 @@ class Produto extends Model
         'marca_id',
         'especificacoes',
         'preco',
-        'lojasOnline',
+        'loja_online_id',
         'created_at',
         'updated_at',
     ];
@@ -28,7 +28,7 @@ class Produto extends Model
     }
 
     public function lojaOnline(){
-        return $this->belongsTo(Especificacoes::class);
+        return $this->belongsTo(LojaOnline::class);
     }
 
     public static function search($term)

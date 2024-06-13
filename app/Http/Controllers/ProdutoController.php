@@ -13,7 +13,7 @@ class ProdutoController extends Controller
 
     public function index()
     {
-        $produtos = Produto::with('marca','especificacoes')->get();
+        $produtos = Produto::with('marca','especificacoes', 'lojaOnline')->get();
         return view('produtos.index', [
             'produtos' => $produtos
         ]);
@@ -35,45 +35,37 @@ class ProdutoController extends Controller
             'marca_garantia' => 'required',
             'especificacoes_detalhes' => 'required',
             'preco' => 'required',
-            'nomeLojaOnline' => 'required',
+            'lojasOnline' => 'required',
             'urlLojaOnline' => 'required'
         ]);
 
 
         $marca = Marca::where('nome', $request->input('marca_nome'))->first();
         $especificacoes = Especificacoes::where('detalhes', $request->input('especificacoes_detalhes'))->first();
-        $lojaOnline = LojaOnline::where('nome', $request->input('nomeLojaOnline'))->first();
+        $lojaOnline = LojaOnline::where('nome', $request->input('lojasOnline'))->first();
 
         // Se a marca não existir, criar uma nova marca
-        if (!$marca) {
-            $marca = new Marca();
-            $marca->nome = $request->input('marca_nome');
-            $marca->qualidade = $request->input('marca_qualidade');
-            $marca->garantia = $request->input('marca_garantia');
-            $marca->save();
-        }
+        $marca = new Marca();
+        $marca->nome = $request->input('marca_nome');
+        $marca->qualidade = $request->input('marca_qualidade');
+        $marca->garantia = $request->input('marca_garantia');
+        $marca->save();
 
-        if (!$especificacoes) {
-            $especificacoes = new Especificacoes();
-            $especificacoes->detalhes = $request->input('especificacoes_detalhes');
-            $especificacoes->save();
-        }
+        $especificacoes = new Especificacoes();
+        $especificacoes->detalhes = $request->input('especificacoes_detalhes');
+        $especificacoes->save();
 
-        if (!$lojaOnline) {
-            $lojaOnline = new LojaOnline();
-            $lojaOnline->nome = $request->input('nomeLojaOnline');
-            $lojaOnline->urlLoja = $request->input('urlLojaOnline');
-            $lojaOnline->save();
-        }
-
-
-
+        $lojaOnline = new LojaOnline();
+        $lojaOnline->nome = $request->input('lojasOnline');
+        $lojaOnline->urlLoja = $request->input('urlLojaOnline');
+        $lojaOnline->save();
+        
         // Criar o produto associado à marca
         $produto = new Produto();
         $produto->nome = $request->input('nome');
         $produto->especificacoes_id = $especificacoes->id;
         $produto->preco = $request->input('preco');
-        $produto->lojaOnline = $lojaOnline->id;
+        $produto->loja_online_id = $lojaOnline->id;
         $produto->marca_id = $marca->id;
         $produto->save();
 
@@ -108,7 +100,7 @@ class ProdutoController extends Controller
 
     public function edit($id)
     {
-        $produto= Produto::with('marca','especificacoes')->find($id);
+        $produto= Produto::with('marca','especificacoes','lojaOnline')->find($id);
         return view('produtos.editProduto',compact('produto'));
     }
 
@@ -130,14 +122,11 @@ class ProdutoController extends Controller
             'detalhes' => $request->input('especificacoes_detalhes'),
         ]);
 
-        $lojaOnline = LojaOnline::find($produto->lojaOnline);
-        print_r($lojaOnline);
+        $lojaOnline = LojaOnline::find($produto->loja_online_id);
         $lojaOnline->update([
-            'nome' => $request->input('nomeLojaOnline'),
+            'nome' => $request->input('lojasOnline'),
             'urlLoja' => $request->input('urlLojaOnline'),
         ]);
-
-
 
         return redirect()->route('produtos.index');
     }

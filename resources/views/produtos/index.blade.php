@@ -24,6 +24,7 @@
         <th>Especificação</th>
         <th>Preço</th>
         <th>Lojas Online</th>
+        <th>URL Loja Online</th>
         <th>Criado Em</th>
         <th>Ações</th>
         </thead>
@@ -35,7 +36,8 @@
                     <td>{{$produto->marca->nome}}</td>
                     <td>{{$produto->especificacoes->detalhes}}</td>
                     <td>{{$produto->preco}}</td>
-                    <td>{{$produto->lojaOnline}}</td>
+                    <td>{{$produto->lojaOnline->nome}}</td>
+                    <td>{{$produto->lojaOnline->urlLoja}}</td>
                     <td>{{$produto->created_at}}</td>
                     <td>
                         <a href="{{url("produtos/$produto->id/edit")}}">Editar</a>
