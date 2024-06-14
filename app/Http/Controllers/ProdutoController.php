@@ -47,7 +47,7 @@ class ProdutoController extends Controller
         $preco = Preco::where('valor', $request->input('preco_valor'))->first();
         $lojaOnline = LojaOnline::where('nome', $request->input('lojasOnline'))->first();
 
-        // Cria uma nova Marca, Especificacoes, Preco
+        // Cria uma nova Marca, Especificacoes, Preco, LojaOnline
         $marca = new Marca();
         $marca->nome = $request->input('marca_nome');
         $marca->qualidade = $request->input('marca_qualidade');
@@ -74,8 +74,8 @@ class ProdutoController extends Controller
         // Criar o produto associado à marca
         $produto = new Produto();
         $produto->nome = $request->input('nome');
-        $produto->especificacoes_id = $especificacoes->id;
         $produto->marca_id = $marca->id;
+        $produto->especificacoes_id = $especificacoes->id;
         $produto->preco_id = $preco->id;
         $produto->loja_online_id = $lojaOnline->id;
 
