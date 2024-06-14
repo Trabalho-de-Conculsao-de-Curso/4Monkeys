@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\Marca;
+
 use App\Models\Preco;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -14,30 +14,204 @@ class PrecoSeeder extends Seeder
      */
     public function run(): void
     {
-        $precos = [
-            ['valor' => 332400, 'moeda' => 'BRL'], // AMD Threadripper 1900X 1
-            ['valor' => 58220, 'moeda' => 'BRL'], // AMD Ryzen 5 5500 2
-            ['valor' => 83160, 'moeda' => 'BRL'], // AMD Ryzen 5 5600G 3
-            ['valor' => 112000, 'moeda' => 'BRL'], // AMD Ryzen 7 5700X 4
-            ['valor' => 78000, 'moeda' => 'BRL'], // AMD Ryzen 5 5600 5
-            ['valor' => 16452, 'moeda' => 'BRL'], // Intel Core i5-3470 6
-            ['valor' => 179999, 'moeda' => 'BRL'], // Placa-mãe ASUS PRIME X399-A E-ATX 1
-            ['valor' => 35999, 'moeda' => 'BRL'], // Placa Mãe MSI B450M-A Pro Max 2
-            ['valor' => 74970, 'moeda' => 'BRL'], // Placa Mãe Gigabyte B550M AORUS Elite, Chipset B550 3
-            ['valor' => 599,99, 'moeda' => 'BRL'], // Placa Mãe SuperFrame B450M Legendary Series Chipset B450 4
-            ['valor' => 44999, 'moeda' => 'BRL'], // PLACA MAE GIGABYTE A520M DS3H V2 5
-            ['valor' => 34125, 'moeda' => 'BRL'], //Gigabyte GA-B75M-D3H 6
-            ['valor' => 332400, 'moeda' => 'BRL'], //
-            ['valor' => 332400, 'moeda' => 'BRL'], //
-            ['valor' => 332400, 'moeda' => 'BRL'], //
-            ['valor' => 332400, 'moeda' => 'BRL'], //
-            ['valor' => 332400, 'moeda' => 'BRL'], //
-            ['valor' => 332400, 'moeda' => 'BRL'], //
-            ['valor' => 332400, 'moeda' => 'BRL'], //
-            ['valor' => 332400, 'moeda' => 'BRL'], //
-        ];
+        Preco::create([
+            'valor' => '379999',
+            'moeda' => 'Real',
+        ]);
 
-        foreach ($precos as $preco)
-            Preco::create($preco);
+        Preco::create([
+            'valor' => '95999',
+            'moeda' => 'Real',
+        ]);
+
+        Preco::create([
+            'valor' => '245999',
+            'moeda' => 'Real',
+        ]);
+
+        Preco::create([
+            'valor' => '299999',
+            'moeda' => 'Real',
+        ]);
+
+        Preco::create([
+            'valor' => '89999',
+            'moeda' => 'Real',
+        ]);
+
+        Preco::create([
+            'valor' => '38999',
+            'moeda' => 'Real',
+        ]);
+
+        Preco::create([
+            'valor' => '44990',
+            'moeda' => 'Real',
+        ]);
+
+        Preco::create([
+            'valor' => '47990',
+            'moeda' => 'Real',
+        ]);
+
+        Preco::create([
+            'valor' => '68999',
+            'moeda' => 'Real',
+        ]);
+
+        Preco::create([
+            'valor' => '18999',
+            'moeda' => 'Real',
+        ]);
+
+        Preco::create([
+            'valor' => '88999',
+            'moeda' => 'Real',
+        ]);
+
+        Preco::create([
+            'valor' => '44890',
+            'moeda' => 'Real',
+        ]);
+
+        Preco::create([
+            'valor' => '15799',
+            'moeda' => 'Real',
+        ]);
+
+        Preco::create([
+            'valor' => '27990',
+            'moeda' => 'Real',
+        ]);
+
+        Preco::create([
+            'valor' => '16999',
+            'moeda' => 'Real',
+        ]);
+
+        Preco::create([
+            'valor' => '24999',
+            'moeda' => 'Real',
+        ]);
+
+        Preco::create([
+            'valor' => '12330',
+            'moeda' => 'Real',
+        ]);
+
+        Preco::create([
+            'valor' => '6499',
+            'moeda' => 'Real',
+        ]);
+
+        Preco::create([
+            'valor' => '43999',
+            'moeda' => 'Real',
+        ]);
+
+        Preco::create([
+            'valor' => '16999',
+            'moeda' => 'Real',
+        ]);
+
+        Preco::create([
+            'valor' => '7020',
+            'moeda' => 'Real',
+        ]);
+
+        Preco::create([
+            'valor' => '15399',
+            'moeda' => 'Real',
+        ]);
+
+        Preco::create([
+            'valor' => '9999',
+            'moeda' => 'Real',
+        ]);
+
+        Preco::create([
+            'valor' => '4457',
+            'moeda' => 'Real',
+        ]);
+
+        Preco::create([
+            'valor' => '68999',
+            'moeda' => 'Real',
+        ]);
+
+        Preco::create([
+            'valor' => '23999',
+            'moeda' => 'Real',
+        ]);
+
+        Preco::create([
+            'valor' => '127899',
+            'moeda' => 'Real',
+        ]);
+
+        Preco::create([
+            'valor' => '45999',
+            'moeda' => 'Real',
+        ]);
+
+        Preco::create([
+            'valor' => '12999',
+            'moeda' => 'Real',
+        ]);
+
+        Preco::create([
+            'valor' => '23205',
+            'moeda' => 'Real',
+        ]);
+
+        Preco::create([
+            'valor' => '37990',
+            'moeda' => 'Real',
+        ]);
+
+        Preco::create([
+            'valor' => '29799',
+            'moeda' => 'Real',
+        ]);
+
+        Preco::create([
+            'valor' => '57999',
+            'moeda' => 'Real',
+        ]);
+
+        Preco::create([
+            'valor' => '18499',
+            'moeda' => 'Real',
+        ]);
+
+        Preco::create([
+            'valor' => '156999',
+            'moeda' => 'Real',
+        ]);
+
+        Preco::create([
+            'valor' => '50999',
+            'moeda' => 'Real',
+        ]);
+
+        Preco::create([
+            'valor' => '64999',
+            'moeda' => 'Real',
+        ]);
+
+        Preco::create([
+            'valor' => '39999',
+            'moeda' => 'Real',
+        ]);
+
+        Preco::create([
+            'valor' => '19999',
+            'moeda' => 'Real',
+        ]);
+
+        Preco::create([
+            'valor' => '25999',
+            'moeda' => 'Real',
+        ]);
     }
 }
