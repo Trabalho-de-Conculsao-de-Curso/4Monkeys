@@ -28,8 +28,10 @@
             <th>Nome</th>
             <th>Marca</th>
             <th>Especificações</th>
-            <th>Preço</th>
+            <th>Valor</th>
+            <th>Moeda</th>
             <th>Lojas Online</th>
+            <th>URL Loja Online</th>
             <th>Criado em</th>
             <th>Editado em</th>
             </thead>
@@ -40,8 +42,10 @@
                     <td>{{ $produto->nome }}</td>
                     <td>{{ $produto->marca->nome }}</td>
                     <td>{{ $produto->especificacoes->detalhes}}</td>
-                    <td>{{ $produto->preco}}</td>
-                    <td>{{ $produto->lojasOnline}}</td>
+                    <td>{{$produto->preco->valor}}</td>
+                    <td>{{$produto->preco->moeda}}</td>
+                    <td>{{$produto->lojaOnline->nome}}</td>
+                    <td>{{$produto->lojaOnline->urlLoja}}</td>
                     <td>{{ $produto->created_at}}</td>
                     <td>{{ $produto->updated_at}}</td>
                     <td>
