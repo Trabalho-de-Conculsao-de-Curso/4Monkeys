@@ -40,17 +40,24 @@ class ProdutoFinalController extends Controller
         $softwaresData = $softwaresSelecionados->toArray();
         $produtosData = $produtos->toArray();
 
-        // Obter recomendações do GeminiAPI
-        $recommendations = $this->geminiAPIService->getRecommendations($softwaresData, $produtosData);
 
+        // Obter recomendações do GeminiAPI
+        $response = $this->geminiAPIService->getRecommendations($softwaresData, $produtosData);
+        dd($response);
+        $recommendations = $response['choices']; // Acessar o array 'choices' da resposta
+
+
+        // Melhorar logica
+        // Aqui você deve processar as recomendações para criar os produtos finais
         $produtoFinals = [];
-        foreach ($recommendations as $categoria => $recommendation) {
+        foreach ($recommendations as $choice) {
+            $categoria = $choice['category'];
             $produtoFinal = new ProdutoFinal();
             $produtoFinal->nome = 'Produto Final ' . ucfirst($categoria);
             $produtoFinal->categoria = $categoria;
             $produtoFinal->save();
 
-            $produtosCategoria = Produto::whereIn('id', $recommendation['produtos'])->get();
+            $produtosCategoria = Produto::whereIn('id', $choice['produto_ids'])->get();
             $produtoFinal->produtos()->attach($produtosCategoria);
             $produtoFinal->softwares()->attach($softwaresSelecionados);
 

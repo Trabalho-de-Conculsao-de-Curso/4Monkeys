@@ -1,6 +1,7 @@
 <?php
 namespace App\Services;
 
+use Gemini\Laravel\Facades\Gemini;
 use Illuminate\Support\Facades\Http;
 
 
@@ -28,17 +29,15 @@ class GeminiAPIService
         'prompt' => $prompt
         ]);
 
-        if ($response->successful()) {
-            return $response->json();
+        if ( $response = Gemini::geminiPro()->generateContent([$prompt])) {
+            return $response;
         }
 
         throw new \Exception('Erro ao se comunicar com a API do Gemini');
 
         // $prompt = $this->generatePrompt($softwares, $produtos);
-        //        $response = Gemini::geminiPro()->generateContent([$prompt]);
         //
-        //
-        //            return $response;
+        // return $response;
     }
 
     protected function generatePrompt(array $softwares, array $produtos)
