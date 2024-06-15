@@ -44,7 +44,7 @@ class ProdutoFinalController extends Controller
         // Obter recomendações do GeminiAPI
         $response = $this->geminiAPIService->getRecommendations($softwaresData, $produtosData);
         dd($response);
-        $recommendations = $response['choices']; // Acessar o array 'choices' da resposta
+        $recommendations = $response; // Acessar o array 'choices' da resposta
 
 
         // Melhorar logica
