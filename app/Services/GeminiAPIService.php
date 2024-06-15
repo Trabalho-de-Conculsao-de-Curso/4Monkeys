@@ -1,6 +1,7 @@
 <?php
 namespace App\Services;
 
+use App\Models\Produto;
 use Gemini\Laravel\Facades\Gemini;
 use Illuminate\Support\Facades\Http;
 
@@ -21,23 +22,18 @@ class GeminiAPIService
     {
         $prompt = $this->generatePrompt($softwares, $produtos);
 
-
         $response = Http::withHeaders([
-        'Authorization' => 'Bearer ' . $this->apiKey,
-        'Content-Type' => 'application/json'
+            'Authorization' => 'Bearer ' . $this->apiKey,
+            'Content-Type' => 'application/json'
         ])->post($this->apiUrl, [
-        'prompt' => $prompt
+            'prompt' => $prompt,
+            'model'
         ]);
-
         if ( $response = Gemini::geminiPro()->generateContent([$prompt])) {
             return $response;
         }
 
-        throw new \Exception('Erro ao se comunicar com a API do Gemini');
 
-        // $prompt = $this->generatePrompt($softwares, $produtos);
-        //
-        // return $response;
     }
 
     protected function generatePrompt(array $softwares, array $produtos)
@@ -52,10 +48,16 @@ class GeminiAPIService
 
         $prompt .= "\nProdutos Disponíveis:\n";
         foreach ($produtos as $produto) {
-        $prompt .= "- Nome: {$produto['nome']}, Preço: {$produto['preco']}, Marca: {$produto['marca_id']}, Especificações: {$produto['especificacoes_id']}\n";
+            // Assumindo que $produto é um array de dados, você precisará consultar as relações
+            $produtoModel = Produto::find($produto['id']);
+            $marcaNome = $produtoModel->marca->nome;
+            $especificacoes = $produtoModel->especificacoes->detalhes;
+            $preco = $produtoModel->preco->valor;
+
+            $prompt .= "- Nome: {$produto['nome']}, Preço: {$preco}, Marca: {$marcaNome}, Especificações: {$especificacoes}\n";
         }
 
-        $prompt .= "\nMonte os desktops bronze, silver e gold garantindo que cada um contenha os componentes essenciais e compátiveis (CPU, GPU, Memória, Fonte, Placa mãe, Cooler) e que o preço total esteja dentro de uma faixa razoável para cada categoria.";
+        $prompt .= "\nMonte os desktops bronze, silver e gold garantindo que cada um contenha os componentes essenciais e compátiveis (CPU, GPU, RAM, Fonte, MOTHERBOARD, Cooler, HD ou SSD) e que o preço total esteja dentro de uma faixa razoável para cada categoria.";
 
         return $prompt;
     }
