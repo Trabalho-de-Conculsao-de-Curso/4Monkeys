@@ -41,31 +41,42 @@ class ProdutoFinalController extends Controller
         $produtosData = $produtos->toArray();
 
 
-        // Obter recomendações do GeminiAPI
-        $response = $this->geminiAPIService->getRecommendations($softwaresData, $produtosData);
-        dd($response);
-        $recommendations = $response; // Acessar o array 'choices' da resposta
+            $recommendations = $this->geminiAPIService->getRecommendations($softwaresData, $produtosData);
+       dd($recommendations);
 
 
-        // Melhorar logica
-        // Aqui você deve processar as recomendações para criar os produtos finais
         $produtoFinals = [];
-        foreach ($recommendations as $choice) {
-            $categoria = $choice['category'];
+
+        foreach ($recommendations['desktops'] as $desktop) {
             $produtoFinal = new ProdutoFinal();
-            $produtoFinal->nome = 'Produto Final ' . ucfirst($categoria);
-            $produtoFinal->categoria = $categoria;
+            $produtoFinal->nome = 'Produto Final ' . ucfirst($desktop['categoria']);
+            $produtoFinal->categoria = $desktop['categoria'];
+            $produtoFinal->preco_total = $desktop['total'];
+            $produtoFinal->cpu = $desktop['componentes']['CPU'] ?? null;
+            $produtoFinal->gpu = $desktop['componentes']['GPU'] ?? null;
+            $produtoFinal->ram = $desktop['componentes']['RAM'] ?? null;
+            $produtoFinal->fonte = $desktop['componentes']['Fonte'] ?? null;
+            $produtoFinal->placa_mae = $desktop['componentes']['MOTHERBOARD'] ?? null;
+            $produtoFinal->cooler = $desktop['componentes']['Cooler'] ?? null;
             $produtoFinal->save();
 
-            $produtosCategoria = Produto::whereIn('id', $choice['produto_ids'])->get();
-            $produtoFinal->produtos()->attach($produtosCategoria);
-            $produtoFinal->softwares()->attach($softwaresSelecionados);
+            foreach ($desktop['componentes'] as $nomeComponente => $detalhesComponente) {
+                if (in_array($nomeComponente, ['CPU', 'GPU', 'RAM', 'Fonte', 'MOTHERBOARD', 'Cooler'])) {
+                    $produto = Produto::where('nome', $detalhesComponente)->first();
 
-            $produtoFinals[$categoria] = $produtoFinal;
+                    if ($produto) {
+                        $produtoFinal->produtos()->attach($produto);
+                    }
+                }
+            }
+
+            $produtoFinal->softwares()->attach($softwaresSelecionados);
+            $produtoFinals[] = $produtoFinal;
         }
 
-        return view('resultado', compact('produtoFinals'));
-    }
+        return view('resultados', compact('produtoFinals'));
+        }
+
     public function store(Request $request)
     {
         //
