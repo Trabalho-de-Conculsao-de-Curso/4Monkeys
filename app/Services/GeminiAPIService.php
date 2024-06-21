@@ -4,6 +4,7 @@ namespace App\Services;
 use App\Models\Produto;
 use Gemini\Laravel\Facades\Gemini;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 
 class GeminiAPIService
@@ -41,7 +42,7 @@ class GeminiAPIService
         // Gerar o prompt que será enviado para a API do Gemini
         $prompt = "Baseado nos seguintes produtos e suas especificações, e nos softwares selecionados, monte 3 desktops categorizados como bronze, silver e gold.\n\n";
         $prompt .= "Retorne os dados estruturados no seguinte formato JSON:\n\n";
-        $prompt .= "{ \"desktops\": [ { \"categoria\": \"bronze\", \"componentes\": { \"CPU\": \"Intel Core I5 3470 3ª Geração\", \"GPU\": \"GEFORCE GT 1030 2GB DDR4\", \"RAM\": \"Memória Oxy, 8GB, 1333MHz, DDR3\", \"Fonte\": \"Fonte Brazil PC Bpc-230, ATX 230W Real\", \"MOTHERBOARD\": \"PLACA MAE TGT H61 M.2, DDR3, SOCKET LGA1155\", \"Cooler\": \"COOLER PARA PROCESSADOR PCYES LORX, RAINBOW, 92MM\", \"HD\": \"SSD WD GREEN, 240GB, 2.5, SATA III 6GB/S\" }, \"total\": 71900 }, { \"categoria\": \"silver\", \"componentes\": { \"CPU\": \"Intel Core i5 12400F\", \"GPU\": \"GALAX GEFORCE GTX 1650 EX PLUS 4GB GDDR6\", \"RAM\": \"Memória DDR4 Kingston Fury Beast, 8GB, 3200Mhz, Black\", \"Fonte\": \"Fonte Gamemax GS600, 600W, 80 Plus White\", \"MOTHERBOARD\": \"Placa Mãe ASRock H610M-HVS, Chipset H610, Intel LGA 1700\", \"Cooler\": \"COOLER DEEPCOOL GAMMAXX SERIES AG400 WH, ARGB, 120MM\", \"HD\": \"SSD Kingston NV2, 500GB, M.2 NVMe\" }, \"total\": 247886 }, { \"categoria\": \"gold\", \"componentes\": { \"CPU\": \"AMD Ryzen 9 7950X3D\", \"GPU\": \"GALAX GEFORCE RTX 4060 TI 1-CLICK OC, 8GB, GDDR6\", \"RAM\": \"Memória RAM Kingston Fury Beast, RGB, 32GB, 6000MHz, DDR5\", \"Fonte\": \"Fonte XPG Kyber, 750W, 80 Plus Gold\", \"MOTHERBOARD\": \"Placa Mãe Asus Rog Strix X670E-A Gaming Wi-Fi, AMD X670, AM5\", \"Cooler\": \"Water Cooler Gigabyte Aorus Liquid Cooler 240, RGB, 240mm\", \"HD\": \"SSD KINGSTON NV2, 1TB, M.2 2280, PCIE NVME\" }, \"total\": 852955 } ] }";
+        $prompt .= "{ \"desktops\": [ { \"categoria\": \"bronze\", \"componentes\": { \"CPU\": \"Intel Core I5 3470 3ª Geração\", \"GPU\": \"GEFORCE GT 1030 2GB DDR4\", \"RAM\": \"Memória Oxy 8GB 1333MHz DDR3\", \"Fonte\": \"Fonte Brazil PC Bpc-230 ATX 230W Real\", \"MOTHERBOARD\": \"PLACA MAE TGT H61 M.2 DDR3 SOCKET LGA1155\", \"Cooler\": \"COOLER PARA PROCESSADOR PCYES LORX RAINBOW 92MM\", \"HD\": \"SSD WD GREEN 240GB 2.5 SATA III 6GB/S\" }, \"total\": 71900 }, { \"categoria\": \"silver\", \"componentes\": { \"CPU\": \"Intel Core i5 12400F\", \"GPU\": \"GALAX GEFORCE GTX 1650 EX PLUS 4GB GDDR6\", \"RAM\": \"Memória DDR4 Kingston Fury Beast 8GB 3200Mhz Black\", \"Fonte\": \"Fonte Gamemax GS600 600W 80 Plus White\", \"MOTHERBOARD\": \"Placa Mãe ASRock H610M-HVS Chipset H610 Intel LGA 1700\", \"Cooler\": \"COOLER DEEPCOOL GAMMAXX SERIES AG400 WH ARGB 120MM\", \"HD\": \"SSD Kingston NV2 500GB M.2 NVMe\" }, \"total\": 247886 }, { \"categoria\": \"gold\", \"componentes\": { \"CPU\": \"AMD Ryzen 9 7950X3D\", \"GPU\": \"GALAX GEFORCE RTX 4060 TI 1-CLICK OC 8GB GDDR6\", \"RAM\": \"Memória RAM Kingston Fury Beast RGB 32GB 6000MHz DDR5\", \"Fonte\": \"Fonte XPG Kyber 750W 80 Plus Gold\", \"MOTHERBOARD\": \"Placa Mãe Asus Rog Strix X670E-A Gaming Wi-Fi AMD X670 AM5\", \"Cooler\": \"Water Cooler Gigabyte Aorus Liquid Cooler 240 RGB 240mm\", \"HD\": \"SSD KINGSTON NV2 1TB M.2 2280 PCIE NVME\" }, \"total\": 852955 } ] }";
         foreach ($softwares as $software) {
         $prompt .= "- {$software['nome']}\n";
         }
@@ -68,10 +69,20 @@ class GeminiAPIService
         foreach ($candidates as $candidate) {
             $content = $candidate->content->parts[0]->text ?? null;
             if ($content) {
-                $decodedContent = json_decode($content, true);
+                Log::info('Resposta da API Gemini: ' . $content);
+
+                $cleanContent = preg_replace('/```json|```/', '', $content);
+                $cleanContent = trim($cleanContent);
+
+
+                Log::info('Tentando decodificar o seguinte JSON: ' . $cleanContent);
+                $decodedContent = json_decode($cleanContent, true);
+
                 if (json_last_error() === JSON_ERROR_NONE) {
+                    Log::info('JSON decodificado com sucesso: ' . print_r($decodedContent, true));
                     return $decodedContent;
                 } else {
+                    Log::error('Erro ao decodificar o JSON: ' . json_last_error_msg());
                     throw new \Exception('Erro ao decodificar a resposta JSON: ' . json_last_error_msg());
                 }
             }
