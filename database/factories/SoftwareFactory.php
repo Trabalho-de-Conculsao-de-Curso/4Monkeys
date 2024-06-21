@@ -2,27 +2,24 @@
 
 namespace Database\Factories;
 
-use App\Models\LojaOnline;
+use App\Models\Software;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Marca>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Software>
  */
-class LojaOnlineFactory extends Factory
+class SoftwareFactory extends Factory
 {
     /**
      * Define the model's default state.
      *
      * @return array<string, mixed>
      */
-    protected $model = LojaOnline::class;
     public function definition(): array
     {
-
         return [
             'nome' => $this->faker->word,
-            'urlLoja' => $this->faker->randomElement(['ZZZ', 'XXXX', 'YYYY']),
-
+            'descricao' => $this->faker->randomElement(['XXX', 'YYY', 'ZZZ']),
         ];
     }
 }
