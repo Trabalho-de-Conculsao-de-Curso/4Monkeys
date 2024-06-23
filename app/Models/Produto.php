@@ -13,8 +13,8 @@ class Produto extends Model
         'nome',
         'marca_id',
         'especificacoes_id',
-        'preco',
-        'lojasOnline',
+        'preco_id',
+        'loja_online_id',
         'created_at',
         'updated_at',
     ];
@@ -25,6 +25,19 @@ class Produto extends Model
 
     public function especificacoes(){
         return $this->belongsTo(Especificacoes::class);
+    }
+
+    public function preco(){
+        return $this->belongsTo(Preco::class);
+    }
+
+    public function lojaOnline(){
+        return $this->belongsTo(LojaOnline::class);
+    }
+
+    public function produtoFinais()
+    {
+        return $this->belongsToMany(ProdutoFinal::class, 'produto_final_produto', 'produto_id', 'produto_final_id');
     }
 
     public static function search($term)
