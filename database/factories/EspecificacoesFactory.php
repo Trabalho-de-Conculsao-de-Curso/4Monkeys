@@ -2,27 +2,27 @@
 
 namespace Database\Factories;
 
-use App\Models\Marca;
+use App\Models\Especificacoes;
+use App\Models\Produto;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Marca>
  */
-class MarcaFactory extends Factory
+class EspecificacoesFactory extends Factory
 {
     /**
      * Define the model's default state.
      *
      * @return array<string, mixed>
      */
-    protected $model = Marca::class;
+    protected $model = Especificacoes::class;
     public function definition(): array
     {
 
         return [
-            'nome' => $this->faker->word,
-            'qualidade' => $this->faker->randomElement(['Alta', 'Média', 'Baixa']),
-            'garantia' => $this->faker->randomElement(['1 ano', '2 anos', 'Sem garantia']),
+            'detalhes' => $this->faker->randomElement(['XXXX', 'YYYY', 'ZZZZ']),
+
         ];
     }
 }
