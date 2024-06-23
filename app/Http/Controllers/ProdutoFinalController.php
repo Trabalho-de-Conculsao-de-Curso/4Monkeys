@@ -42,7 +42,6 @@ class ProdutoFinalController extends Controller
 
 
             $recommendations = $this->geminiAPIService->getRecommendations($softwaresData, $produtosData);
-       dd($recommendations);
 
 
         $produtoFinals = [];
@@ -60,21 +59,13 @@ class ProdutoFinalController extends Controller
             $produtoFinal->cooler = $desktop['componentes']['Cooler'] ?? null;
             $produtoFinal->save();
 
-            foreach ($desktop['componentes'] as $nomeComponente => $detalhesComponente) {
-                if (in_array($nomeComponente, ['CPU', 'GPU', 'RAM', 'Fonte', 'MOTHERBOARD', 'Cooler'])) {
-                    $produto = Produto::where('nome', $detalhesComponente)->first();
-
-                    if ($produto) {
-                        $produtoFinal->produtos()->attach($produto);
-                    }
-                }
-            }
-
-            $produtoFinal->softwares()->attach($softwaresSelecionados);
             $produtoFinals[] = $produtoFinal;
+
+
+
         }
 
-        return view('resultados', compact('produtoFinals'));
+        return view('resultado', compact('produtoFinals'));
         }
 
     public function store(Request $request)
