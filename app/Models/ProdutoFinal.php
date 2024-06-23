@@ -9,21 +9,21 @@ class ProdutoFinal extends Model
 {
     use HasFactory;
 
-    protected $table = 'produto_final';
+
 
     protected $fillable = [
         'nome',
         'categoria'
 
     ];
-
+    protected $table = 'produto_final';
     public function produtos()
     {
-        return $this->belongsToMany(Produto::class, 'produto_final_produto');
+        return $this->belongsToMany(Produto::class, 'produto_final_produto', 'produto_final_id', 'produto_id');
     }
 
     public function softwares()
     {
-        return $this->belongsToMany(Software::class, 'produto_final_software');
+        return $this->belongsToMany(Software::class, 'produto_final_software', 'produto_final_id', 'software_id');
     }
 }

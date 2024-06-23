@@ -35,6 +35,11 @@ class Produto extends Model
         return $this->belongsTo(LojaOnline::class);
     }
 
+    public function produtoFinais()
+    {
+        return $this->belongsToMany(ProdutoFinal::class, 'produto_final_produto', 'produto_id', 'produto_final_id');
+    }
+
     public static function search($term)
     {
         return self::where('nome', 'like', '%' . $term . '%');

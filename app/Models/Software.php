@@ -17,6 +17,6 @@ class Software extends Model
 
     public function produtoFinais()
     {
-        return $this->belongsToMany(ProdutoFinal::class, 'produto_final_software');
+        return $this->belongsToMany(ProdutoFinal::class, 'produto_final_software', 'software_id', 'produto_final_id');
     }
 }

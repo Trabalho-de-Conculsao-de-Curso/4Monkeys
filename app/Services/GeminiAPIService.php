@@ -39,12 +39,25 @@ class GeminiAPIService
 
     protected function generatePrompt(array $softwares, array $produtos)
     {
-        // Gerar o prompt que será enviado para a API do Gemini
-        $prompt = "Baseado nos seguintes produtos e suas especificações, e nos softwares selecionados, monte 3 desktops categorizados como bronze, silver e gold.\n\n";
-        $prompt .= "Retorne os dados estruturados no seguinte formato JSON:\n\n";
-        $prompt .= "{ \"desktops\": [ { \"categoria\": \"bronze\", \"componentes\": { \"CPU\": \"Intel Core I5 3470 3ª Geração\", \"GPU\": \"GEFORCE GT 1030 2GB DDR4\", \"RAM\": \"Memória Oxy 8GB 1333MHz DDR3\", \"Fonte\": \"Fonte Brazil PC Bpc-230 ATX 230W Real\", \"MOTHERBOARD\": \"PLACA MAE TGT H61 M.2 DDR3 SOCKET LGA1155\", \"Cooler\": \"COOLER PARA PROCESSADOR PCYES LORX RAINBOW 92MM\", \"HD\": \"SSD WD GREEN 240GB 2.5 SATA III 6GB/S\" }, \"total\": 71900 }, { \"categoria\": \"silver\", \"componentes\": { \"CPU\": \"Intel Core i5 12400F\", \"GPU\": \"GALAX GEFORCE GTX 1650 EX PLUS 4GB GDDR6\", \"RAM\": \"Memória DDR4 Kingston Fury Beast 8GB 3200Mhz Black\", \"Fonte\": \"Fonte Gamemax GS600 600W 80 Plus White\", \"MOTHERBOARD\": \"Placa Mãe ASRock H610M-HVS Chipset H610 Intel LGA 1700\", \"Cooler\": \"COOLER DEEPCOOL GAMMAXX SERIES AG400 WH ARGB 120MM\", \"HD\": \"SSD Kingston NV2 500GB M.2 NVMe\" }, \"total\": 247886 }, { \"categoria\": \"gold\", \"componentes\": { \"CPU\": \"AMD Ryzen 9 7950X3D\", \"GPU\": \"GALAX GEFORCE RTX 4060 TI 1-CLICK OC 8GB GDDR6\", \"RAM\": \"Memória RAM Kingston Fury Beast RGB 32GB 6000MHz DDR5\", \"Fonte\": \"Fonte XPG Kyber 750W 80 Plus Gold\", \"MOTHERBOARD\": \"Placa Mãe Asus Rog Strix X670E-A Gaming Wi-Fi AMD X670 AM5\", \"Cooler\": \"Water Cooler Gigabyte Aorus Liquid Cooler 240 RGB 240mm\", \"HD\": \"SSD KINGSTON NV2 1TB M.2 2280 PCIE NVME\" }, \"total\": 852955 } ] }";
+
         foreach ($softwares as $software) {
-        $prompt .= "- {$software['nome']}\n";
+            $prompt = "- {$software['nome']}\n";
+            $prompt .= "- {$software['descricao']}\n";
+
+            // Gerar o prompt que será enviado para a API do Gemini
+            $prompt .= "Avalie a descrição dos softwares selecionados e baseie-se nelas para a montagem dos desktops.\n\n";
+            $prompt .= "Baseado nos seguintes produtos e suas especificações de acordo com os requisitos dos softwares, monte 3 desktops categorizados como bronze, silver e gold. Os requisitos de desempenho para cada categoria são:\n";
+            $prompt .= "- Bronze: no mínimo 30 a 59 fps\n";
+            $prompt .= "- Silver: no mínimo 60 a 119 fps\n";
+            $prompt .= "- Gold: no mínimo 120 ou mais fps\n\n";
+            //  $prompt .= "Crie outro Json mostrando todas as etapas realizadas durante esta pesquisa\n\n";
+            $prompt .= "Certifique-se de que todos os componentes são compatíveis entre si e que cada desktop inclui os seguintes componentes essenciais: CPU, GPU, RAM, Fonte, MOTHERBOARD, Cooler, HD ou SSD.\n\n";
+            $prompt .= "Retorne os dados estruturados no seguinte formato JSON:\n\n";
+            $prompt .= "{ \"desktops\": [ { \"categoria\": \"bronze\", \"componentes\": { \"CPU\": \"Produto analisado\", \"GPU\": \"Produto analisado\", \"RAM\": \"Produto analisado\", \"Fonte\": \"Produto analisado\", \"MOTHERBOARD\": \"Produto analisado\", \"Cooler\": \"Produto analisado\", \"HD\": \"Produto analisado\" }, \"total\": VALOR_DA_SOMA_TOTAL_DOS_ITENS_SELECIONADOS }, { \"categoria\": \"silver\", \"componentes\": { \"CPU\": \"Produto analisado\", \"GPU\": \"Produto analisado\", \"RAM\": \"Produto analisado\", \"Fonte\": \"Produto analisado\", \"MOTHERBOARD\": \"Produto analisado\", \"Cooler\": \"Produto analisado\", \"HD\": \"Produto analisado\" }, \"total\": VALOR_DA_SOMA_TOTAL_DOS_ITENS_SELECIONADOS }, { \"categoria\": \"gold\", \"componentes\": { \"CPU\": \"Produto analisado\", \"GPU\": \"Produto analisado\", \"RAM\": \"Produto analisado\", \"Fonte\": \"Produto analisado\", \"MOTHERBOARD\": \"Produto analisado\", \"Cooler\": \"Produto analisado\", \"HD\": \"Produto analisado\" }, \"total\": VALOR_DA_SOMA_TOTAL_DOS_ITENS_SELECIONADOS } ] }\n\n";
+            $prompt .= "Realize a soma dos preços da CPU, GPU, RAM, Fonte, MOTHERBOARD, Cooler, HD ou SSD de cada desktop (Bronze, Silver Gold) individualmente de acordo com os valores informados no cadastro do produto.\n";
+            $prompt .= "Garanta a integridade e consistência de todas as informaçoes\n\n";
+            $prompt .= "Softwares selecionados:\n";
+
         }
 
         $prompt .= "\nProdutos Disponíveis:\n";
@@ -57,7 +70,13 @@ class GeminiAPIService
             $prompt .= "- Nome: {$produto['nome']}, Preço: {$preco}, Marca: {$marcaNome}, Especificações: {$especificacoes}\n";
         }
 
-        $prompt .= "\nMonte os desktops bronze, silver e gold garantindo que cada um contenha os componentes essenciais e compátiveis (CPU, GPU, RAM, Fonte, MOTHERBOARD, Cooler, HD ou SSD) e Analise os preços de todos os produtos e calcule o preço total  para cada categoria e Retorne a resposta em JSON.";
+        $prompt .= "\nMonte os desktops bronze, silver e gold, garantindo que:\n";
+        $prompt .= "- Bronze: execute os softwares selecionados com no mínimo 30 a 59 fps fps\n";
+        $prompt .= "- Silver: execute os softwares selecionados com no mínimo 60 a 119 fps\n";
+        $prompt .= "- Gold: execute os softwares selecionados com no mínimo 120 ou mais fps\n";
+        $prompt .= "Cada desktop deve conter os componentes essenciais e compatíveis (CPU, GPU, RAM, Fonte, MOTHERBOARD, Cooler, HD ou SSD).\n";
+        $prompt .= "Analise os preços de todos os produtos e calcule o preço total para cada categoria, calculando todos os itens CPU, GPU, RAM, Fonte, MOTHERBOARD, Cooler, HD ou SSD de cada desktop individualmente de acordo com os valores informados no cadastro do produto.\n";
+        $prompt .= "Retorne a resposta em JSON no formato especificado acima.\n";
 
         return $prompt;
     }
