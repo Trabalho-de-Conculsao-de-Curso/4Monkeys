@@ -4,24 +4,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Resultados dos Produtos Finais</title>
+    <!-- Adicione o CSS do Tailwind -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
-<body>
-<h1>Resultados dos Produtos Finais</h1>
+<body class="bg-gray-100 text-gray-900">
 
+    <h1 class="text-3xl font-bold mb-8 text-center">Resultados dos Produtos Finais</h1>
+    <div class="container mx-auto py-8 grid grid-cols-3">
+        
 
-    @foreach($produtoFinals as $produtoFinal)
-        <div>
-            <h2>{{ $produtoFinal->nome }} - Categoria: {{ $produtoFinal->categoria }}</h2>
-            <p>Preço Total: R$ {{ number_format($produtoFinal->preco_total, 2, ',', '.') }}</p>
-            <p>CPU: {{ $produtoFinal->cpu }}</p>
-            <p>GPU: {{ $produtoFinal->gpu }}</p>
-            <p>RAM: {{ $produtoFinal->ram }}</p>
-            <p>Fonte: {{ $produtoFinal->fonte }}</p>
-            <p>Placa Mãe: {{ $produtoFinal->placa_mae }}</p>
-            <p>Cooler: {{ $produtoFinal->cooler }}</p>
-        </div>
-        <hr>
-    @endforeach
+        @foreach($produtoFinals as $produtoFinal)
+            <div class="bg-white rounded-lg shadow p-6 mb-6">
+                <h2 class="text-2xl font-semibold mb-4">{{ $produtoFinal->nome }} - Categoria: {{ $produtoFinal->categoria }}</h2>
+                <p class="text-lg mb-2"><span class="font-semibold">Preço Total:</span> R$ {{ number_format($produtoFinal->preco_total, 2, ',', '.') }}</p>
+                <p class="text-lg mb-2"><span class="font-semibold">CPU:</span> {{ $produtoFinal->cpu }}</p>
+                <p class="text-lg mb-2"><span class="font-semibold">GPU:</span> {{ $produtoFinal->gpu }}</p>
+                <p class="text-lg mb-2"><span class="font-semibold">RAM:</span> {{ $produtoFinal->ram }}</p>
+                <p class="text-lg mb-2"><span class="font-semibold">Fonte:</span> {{ $produtoFinal->fonte }}</p>
+                <p class="text-lg mb-2"><span class="font-semibold">Placa Mãe:</span> {{ $produtoFinal->placa_mae }}</p>
+                <p class="text-lg mb-2"><span class="font-semibold">Cooler:</span> {{ $produtoFinal->cooler }}</p>
+                
+            </div>
+        @endforeach
+
+    </div>
 
 </body>
 </html>
