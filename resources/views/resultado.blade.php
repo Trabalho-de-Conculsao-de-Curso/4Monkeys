@@ -6,6 +6,16 @@
     <title>Resultados dos Produtos Finais</title>
     <!-- Adicione o CSS do Tailwind -->
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script>
+        function toggleDetails(id) {
+            var details = document.getElementById('details-' + id);
+            if (details.style.display === 'none') {
+                details.style.display = 'block';
+            } else {
+                details.style.display = 'none';
+            }
+        }
+    </script>
 </head>
 <body class="bg-gray-100 text-gray-900">
 
@@ -14,7 +24,7 @@
         
 
         @foreach($produtoFinals as $produtoFinal)
-            <div class="bg-white rounded-lg shadow p-6 mb-6">
+            <div class="bg-white rounded-lg shadow p-6 mb-6 ml-2">
                 <h2 class="text-2xl font-semibold mb-4">{{ $produtoFinal->nome }} - Categoria: {{ $produtoFinal->categoria }}</h2>
                 <p class="text-lg mb-2"><span class="font-semibold">Preço Total:</span> R$ {{ number_format($produtoFinal->preco_total, 2, ',', '.') }}</p>
                 <p class="text-lg mb-2"><span class="font-semibold">CPU:</span> {{ $produtoFinal->cpu }}</p>
