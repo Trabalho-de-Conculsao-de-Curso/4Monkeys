@@ -15,32 +15,32 @@ class SoftwareSeeder extends Seeder
     {
         Software::create([
             'nome' => 'Valorant',
-            'descricao' => 'Valorant é um FPS tático 5x5 que tem como objetivo plantar ou desarmar a Spike',
+            'descricao' => 'Requisitos minimos para configurações bronze: CPU: Intel Core 2 Duo E8400, GPU: Intel HD 3000, RAM: 4 GB. Requisitos minimos para para configurações prata: CPU: Intel i3-4150, GPU: GeForce GT 730, RAM: 4 GB. Requisitos minimos para para configurações ouro: CPU: Intel i5-9400F 2.90GHz (ou equivalente), GPU: GTX, 1050 Ti (ou equivalente), RAM: 8 GB ',
         ]);
 
         Software::create([
             'nome' => 'PUBG: BATTLEGROUNDS',
-            'descricao' => 'PUBG: BATTLEGROUNDS é um battle royale de tiro que coloca 100 jogadores uns contra os outros até que o último sobreviva.',
+            'descricao' => 'Requisitos minimos para 30 FPS:  CPU: Intel Core i5-4430 / AMD FX-6300, GPU: NVIDIA GeForce GTX 960 2GB / AMD Radeon R7 370 2GB, RAM: 8 GB. Requisitos minimos para 60 FPS: CPU: Intel Core i5-6600K / AMD Ryzen 5 1600, GPU: NVIDIA GeForce GTX 1060 3GB / AMD Radeon RX 580 4GB, RAM: 16 GB. Requisitos minimos para 120 FPS: CPU: Intel Core i7-8700K / AMD Ryzen 7 2700X, GPU: NVIDIA GeForce GTX 1080 Ti 4GB / AMD Radeon RX Vega 64 4GB ,RAM: 16 GB.',
         ]);
 
         Software::create([
             'nome' => 'ELDEN RING',
-            'descricao' => 'Elden Ring é um RPG épico de ação ambientado em um mundo de fantasia sombria.',
+            'descricao' => 'Requisitos minimos para 30 FPS:  CPU: Intel Core i5-4430 / AMD FX-6300, GPU: NVIDIA GeForce GTX 960 2GB / AMD Radeon R7 370 2GB, RAM: 8 GB. Requisitos minimos para 60 FPS: CPU: Intel Core i5-6600K / AMD Ryzen 5 1600, GPU: NVIDIA GeForce GTX 1060 3GB / AMD Radeon RX 580 4GB, RAM: 16 GB. Requisitos minimos para 120 FPS: CPU: Intel Core i7-8700K / AMD Ryzen 7 2700X, GPU: NVIDIA GeForce GTX 1080 Ti 4GB / AMD Radeon RX Vega 64 4GB, RAM: 16 GB.',
         ]);
 
         Software::create([
             'nome' => 'Grand Theft Auto V',
-            'descricao' => 'GTA V, é um jogo eletrônico de ação e aventura lançado em 2013 para o PS3.',
+            'descricao' => 'Requisitos minimos para 30 FPS:  CPU: Intel Core i5-4430 / AMD FX-6300, GPU: NVIDIA GeForce GTX 960 2GB / AMD Radeon R7 370 2GB, RAM: 8 GB. Requisitos minimos para 60 FPS: CPU: Intel Core i5-6600K / AMD Ryzen 5 1600, GPU: NVIDIA GeForce GTX 1060 3GB / AMD Radeon RX 580 4GB, RAM: 16 GB. Requisitos minimos para 120 FPS: CPU: Intel Core i7-8700K / AMD Ryzen 7 2700X, GPU: NVIDIA GeForce GTX 1080 Ti 4GB / AMD Radeon RX Vega 64 4GB, RAM: 16 GB',
         ]);
 
         Software::create([
             'nome' => 'Pacote Office',
-            'descricao' => 'O pacote office facilita processos diários, de modo a possibilitar maior produtividade.',
+            'descricao' => 'Requisitos minimos para 30 FPS:  CPU: Intel Core i3-2100 / AMD A6-3620, GPU: Intel HD Graphics 3000 / AMD Radeon HD 6450, RAM: 4 GB. Requisitos minimos para 60 FPS: CPU: Intel Core i5-2500K / AMD FX-6300, GPU: Intel HD Graphics 4000 / AMD Radeon R7 250, RAM: 8 GB. Requisitos minimos para 120 FPS: CPU: Intel Core i7-3770 / AMD Ryzen 5 1600, GPU: NVIDIA GeForce GTX 1050 Ti / AMD Radeon RX 560, RAM: 16 GB',
         ]);
 
         Software::create([
             'nome' => 'OBS',
-            'descricao' => 'Open Broadcaster Software é um programa de streaming e gravação gratuito e de código aberto mantido pelo OBS Project.',
+            'descricao' => 'Requisitos minimos para 30 FPS: CPU: Intel Core i5-2500K / AMD FX-4300, GPU: NVIDIA GeForce GTX 960 / AMD Radeon R7 370, RAM: 8 GB. Requisitos minimos para 60 FPS: CPU: Intel Core i5-6600K / AMD Ryzen 5 1600, GPU: NVIDIA GeForce GTX 1060 / AMD Radeon RX 580, RAM: 16 GB. Requisitos minimos para 120 FPS: CPU: Intel Core i7-8700K / AMD Ryzen 7 2700X, GPU: NVIDIA GeForce GTX 1080 Ti / AMD Radeon RX Vega 64, RAM: 16 GB',
         ]);
 
         Software::create([

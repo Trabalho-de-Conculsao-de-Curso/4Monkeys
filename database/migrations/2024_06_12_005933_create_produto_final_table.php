@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('cpu')->nullable();
             $table->string('gpu')->nullable();
             $table->string('ram')->nullable();
+            $table->string('hdd')->nullable();
             $table->string('fonte')->nullable();
             $table->string('placa_mae')->nullable();
             $table->string('cooler')->nullable();

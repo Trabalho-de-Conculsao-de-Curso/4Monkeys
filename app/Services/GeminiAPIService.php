@@ -46,15 +46,12 @@ class GeminiAPIService
 
             // Gerar o prompt que será enviado para a API do Gemini
             $prompt .= "Avalie a descrição dos softwares selecionados e baseie-se nelas para a montagem dos desktops.\n\n";
-            $prompt .= "Baseado nos seguintes produtos e suas especificações de acordo com os requisitos dos softwares, monte 3 desktops categorizados como bronze, silver e gold. Os requisitos de desempenho para cada categoria são:\n";
-            $prompt .= "- Bronze: no mínimo 30 a 59 fps\n";
-            $prompt .= "- Silver: no mínimo 60 a 119 fps\n";
-            $prompt .= "- Gold: no mínimo 120 ou mais fps\n\n";
-            //  $prompt .= "Crie outro Json mostrando todas as etapas realizadas durante esta pesquisa\n\n";
+            $prompt .= "Monte 3 desktops categorizados como bronze, silver e gold baseado nos softares escolhidos e suas descrição. Os requisitos de desempenho para cada categoria são:\n";
+            $prompt .= "Crie outro Json mostrando todas as etapas realizadas durante esta pesquisa\n\n";
             $prompt .= "Certifique-se de que todos os componentes são compatíveis entre si e que cada desktop inclui os seguintes componentes essenciais: CPU, GPU, RAM, Fonte, MOTHERBOARD, Cooler, HD ou SSD.\n\n";
             $prompt .= "Retorne os dados estruturados no seguinte formato JSON:\n\n";
             $prompt .= "{ \"desktops\": [ { \"categoria\": \"bronze\", \"componentes\": { \"CPU\": \"Produto analisado\", \"GPU\": \"Produto analisado\", \"RAM\": \"Produto analisado\", \"Fonte\": \"Produto analisado\", \"MOTHERBOARD\": \"Produto analisado\", \"Cooler\": \"Produto analisado\", \"HD\": \"Produto analisado\" }, \"total\": VALOR_DA_SOMA_TOTAL_DOS_ITENS_SELECIONADOS }, { \"categoria\": \"silver\", \"componentes\": { \"CPU\": \"Produto analisado\", \"GPU\": \"Produto analisado\", \"RAM\": \"Produto analisado\", \"Fonte\": \"Produto analisado\", \"MOTHERBOARD\": \"Produto analisado\", \"Cooler\": \"Produto analisado\", \"HD\": \"Produto analisado\" }, \"total\": VALOR_DA_SOMA_TOTAL_DOS_ITENS_SELECIONADOS }, { \"categoria\": \"gold\", \"componentes\": { \"CPU\": \"Produto analisado\", \"GPU\": \"Produto analisado\", \"RAM\": \"Produto analisado\", \"Fonte\": \"Produto analisado\", \"MOTHERBOARD\": \"Produto analisado\", \"Cooler\": \"Produto analisado\", \"HD\": \"Produto analisado\" }, \"total\": VALOR_DA_SOMA_TOTAL_DOS_ITENS_SELECIONADOS } ] }\n\n";
-            $prompt .= "Realize a soma dos preços da CPU, GPU, RAM, Fonte, MOTHERBOARD, Cooler, HD ou SSD de cada desktop (Bronze, Silver Gold) individualmente de acordo com os valores informados no cadastro do produto.\n";
+            $prompt .= "Realize a soma dos Preço: da CPU, GPU, RAM, HDD ou SSD, Fonte, MOTHERBOARD e Cooler de cada desktop (Bronze, Silver Gold) individualmente de acordo com os valores informados no cadastro do produto.\n";
             $prompt .= "Garanta a integridade e consistência de todas as informaçoes\n\n";
             $prompt .= "Softwares selecionados:\n";
 
@@ -70,12 +67,7 @@ class GeminiAPIService
             $prompt .= "- Nome: {$produto['nome']}, Preço: {$preco}, Marca: {$marcaNome}, Especificações: {$especificacoes}\n";
         }
 
-        $prompt .= "\nMonte os desktops bronze, silver e gold, garantindo que:\n";
-        $prompt .= "- Bronze: execute os softwares selecionados com no mínimo 30 a 59 fps fps\n";
-        $prompt .= "- Silver: execute os softwares selecionados com no mínimo 60 a 119 fps\n";
-        $prompt .= "- Gold: execute os softwares selecionados com no mínimo 120 ou mais fps\n";
-        $prompt .= "Cada desktop deve conter os componentes essenciais e compatíveis (CPU, GPU, RAM, Fonte, MOTHERBOARD, Cooler, HD ou SSD).\n";
-        $prompt .= "Analise os preços de todos os produtos e calcule o preço total para cada categoria, calculando todos os itens CPU, GPU, RAM, Fonte, MOTHERBOARD, Cooler, HD ou SSD de cada desktop individualmente de acordo com os valores informados no cadastro do produto.\n";
+        $prompt .= "Os valores estão sendo salvos como int, realize a soma precisa desses valores para apresentação do valor final do desktop da CPU, GPU, RAM, HDD ou SSD, Fonte, MOTHERBOARD e Cooler de cada desktop (Bronze, Silver e Gold) individualmente de acordo com os valores informados no cadastro do produto.\n";
         $prompt .= "Retorne a resposta em JSON no formato especificado acima.\n";
 
         return $prompt;

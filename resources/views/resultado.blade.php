@@ -16,6 +16,7 @@
             <p>CPU: {{ $produtoFinal->cpu }}</p>
             <p>GPU: {{ $produtoFinal->gpu }}</p>
             <p>RAM: {{ $produtoFinal->ram }}</p>
+            <p>HDD: {{ $produtoFinal->hdd }}</p>
             <p>Fonte: {{ $produtoFinal->fonte }}</p>
             <p>Placa Mãe: {{ $produtoFinal->placa_mae }}</p>
             <p>Cooler: {{ $produtoFinal->cooler }}</p>

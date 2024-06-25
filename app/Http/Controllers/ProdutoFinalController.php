@@ -44,6 +44,7 @@ class ProdutoFinalController extends Controller
             $recommendations = $this->geminiAPIService->getRecommendations($softwaresData, $produtosData);
 
 
+
         $produtoFinals = [];
 
         foreach ($recommendations['desktops'] as $desktop) {
@@ -54,6 +55,7 @@ class ProdutoFinalController extends Controller
             $produtoFinal->cpu = $desktop['componentes']['CPU'] ?? null;
             $produtoFinal->gpu = $desktop['componentes']['GPU'] ?? null;
             $produtoFinal->ram = $desktop['componentes']['RAM'] ?? null;
+            $produtoFinal->hdd = $desktop['componentes']['HD'] ?? null;
             $produtoFinal->fonte = $desktop['componentes']['Fonte'] ?? null;
             $produtoFinal->placa_mae = $desktop['componentes']['MOTHERBOARD'] ?? null;
             $produtoFinal->cooler = $desktop['componentes']['Cooler'] ?? null;
