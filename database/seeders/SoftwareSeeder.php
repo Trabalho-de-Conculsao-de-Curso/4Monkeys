@@ -45,22 +45,22 @@ class SoftwareSeeder extends Seeder
 
         Software::create([
             'nome' => 'Adobe Photoshop',
-            'descricao' => 'O Photoshop é um software da multinacional americana Adobe Inc. usado para edição de imagens, criação de arte digital, design gráfico e animações.',
+            'descricao' => 'Requisitos minimos para 30 FPS: CPU: Intel Core i5-4460 / AMD FX-8120, GPU: NVIDIA GeForce GTX 1050 / AMD Radeon R7 250X, RAM: 8 GB. Requisitos minimos para 60 FPS: CPU: Intel Core i7-8700 / AMD Ryzen 5 3600, GPU: NVIDIA GeForce GTX 1660 / AMD Radeon RX 580, RAM: 16 GB. Requisitos minimos para 120 FPS: CPU: Intel Core i9-9900K / AMD Ryzen 7 3700X, GPU: NVIDIA GeForce RTX 2070 / AMD Radeon RX 5700 XT, RAM: 32 GB.',
         ]);
 
         Software::create([
             'nome' => 'Minecraft',
-            'descricao' => 'Minecraft é um jogo eletrônico lançado em 2009 que consiste em sobreviver em um mundo formado (majoritariamente) por blocos cúbicos.',
+            'descricao' => 'Requisitos minimos para 30 FPS: CPU: Intel Core i3-3210 / AMD A8-7600 APU, GPU: Intel HD Graphics 4000 / AMD Radeon R5, RAM: 4 GB. Requisitos minimos para 60 FPS: CPU: Intel Core i5-4690 / AMD A10-7800 APU, GPU: NVIDIA GeForce 700 Series / AMD Radeon Rx 200 Series, RAM: 8 GB. Requisitos minimos para 120 FPS: CPU: Intel Core i7-8700K / AMD Ryzen 7 2700X, GPU: NVIDIA GeForce GTX 1070 / AMD Radeon RX Vega 56, RAM: 16 GB.',
         ]);
 
         Software::create([
             'nome' => 'PhpStorm',
-            'descricao' => 'O PhpStorm fornece uma experiência simplificada para o ciclo de desenvolvimento completo com novos idiomas, como TypeScript, CoffeeScript e Dart.',
+            'descricao' => 'Requisitos minimos para 30 FPS: CPU: Intel Core i3-2100 / AMD FX-4100, GPU: Integrada (Intel HD Graphics 4000 / AMD Radeon HD 6450), RAM: 4 GB. Requisitos minimos para 60 FPS: CPU: Intel Core i5-6500 / AMD Ryzen 5 1500X, GPU: Integrada (Intel HD Graphics 530 / AMD Radeon R7), RAM: 8 GB. Requisitos minimos para 120 FPS:CPU: Intel Core i7-8700 / AMD  Ryzen 7 2700X, GPU: NVIDIA GeForce GTX 1050 / AMD Radeon RX 560, RAM: 16 GB.',
         ]);
 
         Software::create([
             'nome' => 'Visual Studio Code',
-            'descricao' => 'O Visual Studio Code é um editor de código-fonte desenvolvido pela Microsoft, lançado em abril de 2015.',
+            'descricao' => 'Requisitos minimos para 30 FPS: CPU: Intel Core i3-2100 / AMD FX-4100, GPU: Integrada (Intel HD Graphics 4000 / AMD Radeon HD 6450), RAM: 4 GB. Requisitos minimos para 60 FPS: CPU: Intel Core i5-6500 / AMD Ryzen 5 1500X, GPU: Integrada (Intel HD Graphics 530 / AMD Radeon R7), RAM: 8 GB. Requisitos minimos para 120 FPS: CPU: Intel Core i7-8700 / AMD Ryzen 7 2700X, GPU: NVIDIA GeForce GTX 1050 / AMD Radeon RX 560, RAM: 16 GB.',
         ]);
     }
 }
