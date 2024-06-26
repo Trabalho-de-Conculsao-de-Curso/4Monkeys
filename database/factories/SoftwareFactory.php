@@ -18,8 +18,10 @@ class SoftwareFactory extends Factory
     public function definition(): array
     {
         return [
+            'tipo' => $this->faker->randomElement([1, 2, 3]),
             'nome' => $this->faker->word,
             'descricao' => $this->faker->randomElement(['XXX', 'YYY', 'ZZZ']),
+            'requisitos' => $this->faker->randomElement(['XXX', 'YYY', 'ZZZ']),
         ];
     }
 }

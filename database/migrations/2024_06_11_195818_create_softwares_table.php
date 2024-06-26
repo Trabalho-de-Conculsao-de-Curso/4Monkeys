@@ -13,9 +13,10 @@ return new class extends Migration
     {
         Schema::create('softwares', function (Blueprint $table) {
             $table->id();
-            $table->string('nome');
             $table->integer('tipo');// 1 jogos - 2 trabalho - 3 utilitarios
-            $table->text('descricao')->nullable();
+            $table->string('nome');
+            $table->text('descricao');
+            $table->text('requisitos');
             $table->timestamps();
         });
     }

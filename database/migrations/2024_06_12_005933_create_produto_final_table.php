@@ -15,13 +15,14 @@ return new class extends Migration
             $table->id();
             $table->string('nome');
             $table->string('categoria');
-            $table->decimal('preco_total', 10, 2);
-            $table->string('cpu')->nullable();
-            $table->string('gpu')->nullable();
-            $table->string('ram')->nullable();
-            $table->string('fonte')->nullable();
-            $table->string('placa_mae')->nullable();
-            $table->string('cooler')->nullable();
+            $table->integer('preco_total');
+            $table->string('cpu');
+            $table->string('gpu');
+            $table->string('ram');
+            $table->string('hdd');
+            $table->string('fonte');
+            $table->string('placa_mae');
+            $table->string('cooler');
             $table->timestamps();
         });
 
