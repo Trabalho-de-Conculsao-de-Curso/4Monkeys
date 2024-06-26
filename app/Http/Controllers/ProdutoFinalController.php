@@ -41,7 +41,8 @@ class ProdutoFinalController extends Controller
         $produtosData = $produtos->toArray();
 
 
-            $recommendations = $this->geminiAPIService->getRecommendations($softwaresData, $produtosData);
+        $recommendations = $this->geminiAPIService->getRecommendations($softwaresData, $produtosData);
+
 
 
         $produtoFinals = [];
@@ -54,6 +55,7 @@ class ProdutoFinalController extends Controller
             $produtoFinal->cpu = $desktop['componentes']['CPU'] ?? null;
             $produtoFinal->gpu = $desktop['componentes']['GPU'] ?? null;
             $produtoFinal->ram = $desktop['componentes']['RAM'] ?? null;
+            $produtoFinal->hdd = $desktop['componentes']['HD'] ?? null;
             $produtoFinal->fonte = $desktop['componentes']['Fonte'] ?? null;
             $produtoFinal->placa_mae = $desktop['componentes']['MOTHERBOARD'] ?? null;
             $produtoFinal->cooler = $desktop['componentes']['Cooler'] ?? null;
@@ -66,7 +68,7 @@ class ProdutoFinalController extends Controller
         }
 
         return view('resultado', compact('produtoFinals'));
-        }
+    }
 
     public function store(Request $request)
     {

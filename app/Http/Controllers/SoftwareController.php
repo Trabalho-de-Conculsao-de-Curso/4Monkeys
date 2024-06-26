@@ -55,7 +55,7 @@ class SoftwareController extends Controller
      */
     public function edit(Software $software)
     {
-       return view('softwares.editSoftware', compact('software'));
+        return view('softwares.editSoftware', compact('software'));
     }
 
     /**
