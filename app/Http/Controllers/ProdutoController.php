@@ -41,12 +41,6 @@ class ProdutoController extends Controller
             'urlLojaOnline' => 'required'
         ]);
 
-
-        $marca = Marca::where('nome', $request->input('marca_nome'))->first();
-        $especificacoes = Especificacoes::where('detalhes', $request->input('especificacoes_detalhes'))->first();
-        $preco = Preco::where('valor', $request->input('preco_valor'))->first();
-        $lojaOnline = LojaOnline::where('nome', $request->input('lojasOnline'))->first();
-
         // Cria uma nova Marca, Especificacoes, Preco, LojaOnline
         $marca = new Marca();
         $marca->nome = $request->input('marca_nome');
