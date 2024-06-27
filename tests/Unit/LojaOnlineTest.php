@@ -26,11 +26,19 @@ it('possível update Loja', function () {
     expect($updatedLojaOnline->nome)->toBe($newName);
 });
 
-it('possível delet Loja', function () {
+it('possível delet Loja através do controlador Produto', function () {
+    // Cria uma loja online
     $lojaOnline = LojaOnline::factory()->create();
 
-    $lojaOnline->delete();
+    // Cria um produto associado à loja online
+    $produto = Produto::factory()->create(['loja_online_id' => $lojaOnline->id]);
 
+    // Simula uma requisição ao controlador de Produto para deletar a loja online associada
+    $request = new Request();
+    $produtoController = new ProdutoController();
+    $produtoController->destroy($request, $produto->id);
+
+    // Verifica se a loja online foi deletada
     $deletedLojaOnline = LojaOnline::find($lojaOnline->id);
     expect($deletedLojaOnline)->toBeNull();
 });
