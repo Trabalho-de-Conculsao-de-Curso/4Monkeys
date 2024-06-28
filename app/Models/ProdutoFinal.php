@@ -20,8 +20,8 @@ class ProdutoFinal extends Model
         return $this->belongsToMany(Produto::class, 'produto_final_produto', 'produto_final_id', 'produto_id');
     }*/
 
-    public function softwares()
+    /*public function softwares() Mateus V. 28/06/2024  Desvinculando de Software
     {
         return $this->belongsToMany(Software::class, 'produto_final_software', 'produto_final_id', 'software_id');
-    }
+    }*/
 }

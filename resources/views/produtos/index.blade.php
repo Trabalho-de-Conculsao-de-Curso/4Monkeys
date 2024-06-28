@@ -52,17 +52,16 @@
                         </td>
                         <td class="py-2 px-3">{{ $produto->created_at }}</td>
                         <td class="py-2 px-3">
-                            <div class="border-solid border-2 border-blue-600 rounded mb-1">
-                                <a href="{{ url("produtos/$produto->id/edit") }}" class="border-1 text-blue-500 hover:text-blue-100">Editar</a>
+                            <div class="border-blue-600 rounded mb-1">
+                                <a href="{{ url("produtos/$produto->id/edit") }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">Editar</a>
                             </div>
                            
                             <form method="POST" action="{{ url("produtos/$produto->id") }}">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" 
-                                    class="text-white bg-red-800 hover:bg-red-600 focus:ring-4 
-                                    focus:ring-blue-300 font-medium rounded-lg text-xs px-3 py-1.5 me-2 
-                                    mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+                                     class="bg-red-500 hover:bg-red-700 text-white mt-2
+                                        font-bold py-2 px-3.5 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
                                     onclick="return confirm('Tem certeza que deseja excluir? {{ $produto->nome }} ?')">Excluir</button>
                             </form>
                         </td>
