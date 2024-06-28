@@ -26,16 +26,22 @@
         <table border="1">
             <thead>
             <th>ID</th>
+            <th>Tipo</th>
             <th>Nome</th>
-            <th>Criado em</th>
-            <th>Editado em</th>
+            <th>Descrição</th>
+            <th>Requisitos</th>
+            <th>Criado Em</th>
+            <th>Ações</th>
             </thead>
             <tbody>
             @foreach ($results as $software
 )
                 <tr>
-                    <td>{{ $software->id }}</td>
-                    <td>{{ $software->nome }}</td>
+                    <td>{{$software->id}}</td>
+                    <td>{{$software->tipo}}</td>
+                    <td>{{$software->nome}}</td>
+                    <td>{{$software->descricao}}</td>
+                    <td>{{$software->requisitos}}</td>
                     <td>{{ $software->created_at}}</td>
                     <td>{{ $software->updated_at}}</td>
                     <td>

@@ -41,12 +41,6 @@ class ProdutoController extends Controller
             'urlLojaOnline' => 'required'
         ]);
 
-
-        $marca = Marca::where('nome', $request->input('marca_nome'))->first();
-        $especificacoes = Especificacoes::where('detalhes', $request->input('especificacoes_detalhes'))->first();
-        $preco = Preco::where('valor', $request->input('preco_valor'))->first();
-        $lojaOnline = LojaOnline::where('nome', $request->input('lojasOnline'))->first();
-
         // Cria uma nova Marca, Especificacoes, Preco, LojaOnline
         $marca = new Marca();
         $marca->nome = $request->input('marca_nome');
@@ -88,11 +82,9 @@ class ProdutoController extends Controller
     public function show(Request $request)
     {
         $search = $request->input('search');
-
         $results = Produto::where(function($query) use ($search) {
-            $query->where('nome', 'like', "%$search%")
-                ->orWhere('preco', 'like', "%$search%")
-                ->orWhere('lojasOnline', 'like', "%$search%");
+            $query->where('nome', 'like', "%$search%");
+
         })
             ->orWhereHas('marca', function($query) use ($search) {
                 $query->where('nome', 'like', "%$search%")
@@ -104,6 +96,17 @@ class ProdutoController extends Controller
                 $query->where('detalhes', 'like', "%$search%");
 
             })
+
+            ->orWhereHas('lojaOnline', function($query) use ($search) {
+                $query->where('nome', 'like', "%$search%")
+                    ->orWhere('urlLoja', 'like', "%$search%");
+            })
+
+            ->orWhereHas('preco', function($query) use ($search) {
+                $query->where('valor', 'like', "%$search%")
+                    ->orWhere('moeda', 'like', "%$search%");
+            })
+
             ->get();
 
         return view('produtos.searchProduto', compact('results'));

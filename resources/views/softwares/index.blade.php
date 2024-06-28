@@ -21,8 +21,10 @@
     <table border="1">
         <thead>
         <th>ID</th>
+        <th>Tipo</th>
         <th>Nome</th>
         <th>Descrição</th>
+        <th>Requisitos</th>
         <th>Criado Em</th>
         <th>Ações</th>
         </thead>
@@ -30,8 +32,10 @@
             @foreach($softwares as $software)
                 <tr>
                     <td>{{$software->id}}</td>
+                    <td>{{$software->tipo}}</td>
                     <td>{{$software->nome}}</td>
                     <td>{{$software->descricao}}</td>
+                    <td>{{$software->requisitos}}</td>
                     <td>{{$software->created_at}}</td>
                     <td>
                         <a href="{{url("softwares/$software->id/edit")}}">Editar</a>

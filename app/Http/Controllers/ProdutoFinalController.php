@@ -43,8 +43,6 @@ class ProdutoFinalController extends Controller
 
         $recommendations = $this->geminiAPIService->getRecommendations($softwaresData, $produtosData);
 
-
-
         $produtoFinals = [];
 
         foreach ($recommendations['desktops'] as $desktop) {
@@ -62,8 +60,6 @@ class ProdutoFinalController extends Controller
             $produtoFinal->save();
 
             $produtoFinals[] = $produtoFinal;
-
-
 
         }
 
