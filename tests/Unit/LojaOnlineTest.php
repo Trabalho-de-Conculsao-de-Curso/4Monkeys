@@ -2,7 +2,13 @@
 
 // tests/Unit/LojaOnlineTest.php
 
+
 use App\Models\LojaOnline;
+use App\Models\Software;
+use App\Models\Marca;
+use App\Models\Produto;
+use App\Models\Especificacoes;
+use App\Http\Controllers\ProdutoController;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(Tests\TestCase::class, RefreshDatabase::class);

@@ -67,7 +67,7 @@ class ProdutoFinalController extends Controller
 
         }
 
-        return view('resultado', compact('produtoFinals'));
+        return view('resultado', compact('produtoFinal'));
     }
 
     public function store(Request $request)
