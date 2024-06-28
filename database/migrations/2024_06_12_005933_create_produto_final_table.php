@@ -33,12 +33,12 @@ return new class extends Migration
             $table->timestamps();
         });*/
 
-        Schema::create('produto_final_software', function (Blueprint $table) {
+        /*Schema::create('produto_final_software', function (Blueprint $table) {
             $table->id();
             $table->foreignId('produto_final_id')->constrained()->onDelete('cascade');
             $table->foreignId('software_id')->constrained('softwares')->onDelete('cascade');
             $table->timestamps();
-        });
+        });*/
     }
 
     /**
