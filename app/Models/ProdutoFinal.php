@@ -12,13 +12,13 @@ class ProdutoFinal extends Model
     protected $fillable = [
         'nome',
         'categoria'
-
     ];
     protected $table = 'produto_final';
-    public function produtos()
+    
+    /*public function produtos() -- Mateus 28/06/2024 desvinculando de produtos
     {
         return $this->belongsToMany(Produto::class, 'produto_final_produto', 'produto_final_id', 'produto_id');
-    }
+    }*/
 
     public function softwares()
     {

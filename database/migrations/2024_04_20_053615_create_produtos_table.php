@@ -17,7 +17,8 @@ return new class extends Migration
             $table->foreignId('marca_id')->nullable()->constrained()->unique('marcas')->onDelete('cascade');
             $table->foreignId('especificacoes_id')->nullable()->constrained('especificacoes')->unique()->onDelete('cascade');
             $table->foreignId('preco_id')->nullable()->constrained('precos')->unique()->onDelete('cascade');
-            $table->foreignId('loja_online_id')->nullable()->constrained('loja_online')->unique()->onDelete('cascade');;            $table->timestamps();
+            $table->foreignId('loja_online_id')->nullable()->constrained('loja_online')->unique()->onDelete('cascade');            
+            $table->timestamps();
         });
     }
 

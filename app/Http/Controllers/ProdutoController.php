@@ -62,9 +62,6 @@ class ProdutoController extends Controller
         $lojaOnline->urlLoja = $request->input('urlLojaOnline');
         $lojaOnline->save();
 
-
-
-
         // Criar o produto associado à marca
         $produto = new Produto();
         $produto->nome = $request->input('nome');
@@ -82,9 +79,11 @@ class ProdutoController extends Controller
     public function show(Request $request)
     {
         $search = $request->input('search');
-        $results = Produto::where(function($query) use ($search) {
-            $query->where('nome', 'like', "%$search%");
 
+        $results = Produto::where(function($query) use ($search) {
+            $query->where('nome', 'like', "%$search%")
+                ->orWhere('preco', 'like', "%$search%")
+                ->orWhere('lojasOnline', 'like', "%$search%");
         })
             ->orWhereHas('marca', function($query) use ($search) {
                 $query->where('nome', 'like', "%$search%")

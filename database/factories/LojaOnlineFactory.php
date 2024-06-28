@@ -22,7 +22,6 @@ class LojaOnlineFactory extends Factory
         return [
             'nome' => $this->faker->word,
             'urlLoja' => $this->faker->randomElement(['ZZZ', 'XXXX', 'YYYY']),
-
         ];
     }
 }
