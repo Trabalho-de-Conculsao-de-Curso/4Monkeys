@@ -14,7 +14,7 @@ class ProdutoFinal extends Model
         'categoria'
 
     ];
-    protected $table = 'produto_finals';
+    protected $table = 'produto_final';
     public function produtos()
     {
         return $this->belongsToMany(Produto::class, 'produto_final_produto', 'produto_final_id', 'produto_id');
