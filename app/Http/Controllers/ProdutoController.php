@@ -82,11 +82,9 @@ class ProdutoController extends Controller
     public function show(Request $request)
     {
         $search = $request->input('search');
-
         $results = Produto::where(function($query) use ($search) {
-            $query->where('nome', 'like', "%$search%")
-                ->orWhere('preco', 'like', "%$search%")
-                ->orWhere('lojasOnline', 'like', "%$search%");
+            $query->where('nome', 'like', "%$search%");
+
         })
             ->orWhereHas('marca', function($query) use ($search) {
                 $query->where('nome', 'like', "%$search%")
@@ -98,6 +96,17 @@ class ProdutoController extends Controller
                 $query->where('detalhes', 'like', "%$search%");
 
             })
+
+            ->orWhereHas('lojaOnline', function($query) use ($search) {
+                $query->where('nome', 'like', "%$search%")
+                    ->orWhere('urlLoja', 'like', "%$search%");
+            })
+
+            ->orWhereHas('preco', function($query) use ($search) {
+                $query->where('valor', 'like', "%$search%")
+                    ->orWhere('moeda', 'like', "%$search%");
+            })
+
             ->get();
 
         return view('produtos.searchProduto', compact('results'));
