@@ -3,9 +3,10 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <title>Crud das Entidades</title>
 </head>
-<body class="font-sans antialiased dark:bg-black dark:text-white/50">
+<body class="bg-gray-100 text-gray-900">
 
 <div>
     <h1>Busca</h1>
@@ -54,7 +55,9 @@
                         <form method="POST" action="{{url("produtos/$produto->id")}}">
                             <input type="hidden" name="_token" value="{{ csrf_token() }}" />
                             @method('DELETE')
-                            <button type="submit" onclick="return confirm('Tem certeza que deseja excluir? {{$produto->nome}} ?')"> Excluir</button>
+                            <button
+                            class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+                            type="submit" onclick="return confirm('Tem certeza que deseja excluir? {{$produto->nome}} ?')"> Excluir</button>
                         </form>
                     </td>
                 </tr>
@@ -65,8 +68,6 @@
         <p>Nenhum produto encontrado.</p>
     @endif
 </div>
-
-
 
 </body>
 </html>
