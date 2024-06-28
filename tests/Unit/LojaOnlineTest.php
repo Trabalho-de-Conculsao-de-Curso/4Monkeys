@@ -3,6 +3,7 @@
 // tests/Unit/LojaOnlineTest.php
 
 use App\Models\LojaOnline;
+use App\Http\Controllers\ProdutoController;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(Tests\TestCase::class, RefreshDatabase::class);
