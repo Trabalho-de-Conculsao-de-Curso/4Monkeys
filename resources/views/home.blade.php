@@ -13,13 +13,23 @@
                 details.style.display = 'none';
             }
         }
+
+        function validateForm(event) {
+            var checkboxes = document.querySelectorAll('input[name="softwares[]"]');
+            var isChecked = Array.from(checkboxes).some(checkbox => checkbox.checked);
+
+            if (!isChecked) {
+                event.preventDefault();
+                alert("Por favor, selecione pelo menos um software.");
+            }
+        }
     </script>
 </head>
 <body class="bg-gray-100 text-gray-900">
     <div class="container mx-auto py-8">
         <h1 class="text-3xl font-bold mb-8 text-center">Seleção de Softwares</h1>
 
-        <form action="{{ route('home.selecionar') }}" method="POST" class="bg-white rounded-lg shadow p-6">
+        <form action="{{ route('home.selecionar') }}" method="POST" class="bg-white rounded-lg shadow p-6" onsubmit="validateForm(event)">
             @csrf
             <h2 class="text-2xl font-semibold mb-4">Selecione os Softwares Desejados:</h2>
             <div class="mb-6 grid grid-cols-1 md:grid-cols-3 gap-6">

@@ -12,7 +12,9 @@ class Software extends Model
     protected $table = 'softwares';
     protected $fillable = [
         'nome',
-        'descricao'
+        'tipo',
+        'descricao',
+        'requisitos'
     ];
 
     public function produtoFinais()
