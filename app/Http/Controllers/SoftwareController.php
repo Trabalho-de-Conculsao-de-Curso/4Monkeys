@@ -46,7 +46,13 @@ class SoftwareController extends Controller
     public function show(Request $request)
     {
         $search = $request->input('search');
-        $results = Software::where('nome','like',"%$search%")->get();
+        $results = Software::where('nome', 'like', "%$search%")
+            ->orWhere('descricao', 'like', "%$search%")
+            ->orWhere('requisitos', 'like', "%$search%")
+            ->get();
+
+
+
         return view('softwares.searchSoftware', compact('results'));
     }
 
