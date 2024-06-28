@@ -1,6 +1,10 @@
 <?php
 
 use App\Models\Software;
+use App\Models\LojaOnline;
+use App\Models\Marca;
+use App\Models\Produto;
+use App\Models\Especificacoes;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(Tests\TestCase::class, RefreshDatabase::class);
