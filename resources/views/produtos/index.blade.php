@@ -55,11 +55,11 @@
                             <div class="border-blue-600 rounded mb-1">
                                 <a href="{{ url("produtos/$produto->id/edit") }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">Editar</a>
                             </div>
-                           
+
                             <form method="POST" action="{{ url("produtos/$produto->id") }}">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" 
+                                <button type="submit"
                                      class="bg-red-500 hover:bg-red-700 text-white mt-2
                                         font-bold py-2 px-3.5 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
                                     onclick="return confirm('Tem certeza que deseja excluir? {{ $produto->nome }} ?')">Excluir</button>
@@ -69,6 +69,10 @@
                     @endforeach
                 </tbody>
             </table>
+        </div>
+
+        <div class="mt-4">
+            {{ $produtos->links() }}
         </div>
     </div>
 </body>
