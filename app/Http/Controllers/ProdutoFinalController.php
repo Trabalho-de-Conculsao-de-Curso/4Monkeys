@@ -48,7 +48,7 @@ class ProdutoFinalController extends Controller
             $produtoFinal = new ProdutoFinal();
             $produtoFinal->nome = 'Produto Final ' . ucfirst($desktop['categoria']);
             $produtoFinal->categoria = $desktop['categoria'];
-            $produtoFinal->preco_total = $desktop['total']; // Certifique-se de que estamos usando o valor correto aqui
+            $produtoFinal->preco_total = $desktop['total'];
             $produtoFinal->cpu = $desktop['componentes']['CPU'] ?? null;
             $produtoFinal->gpu = $desktop['componentes']['GPU'] ?? null;
             $produtoFinal->ram = $desktop['componentes']['RAM'] ?? null;
