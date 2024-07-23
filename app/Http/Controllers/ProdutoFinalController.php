@@ -40,7 +40,6 @@ class ProdutoFinalController extends Controller
         $softwaresData = $softwaresSelecionados->toArray();
         $produtosData = $produtos->toArray();
 
-
         $recommendations = $this->geminiAPIService->getRecommendations($softwaresData, $produtosData);
 
         $produtoFinals = [];
@@ -49,7 +48,7 @@ class ProdutoFinalController extends Controller
             $produtoFinal = new ProdutoFinal();
             $produtoFinal->nome = 'Produto Final ' . ucfirst($desktop['categoria']);
             $produtoFinal->categoria = $desktop['categoria'];
-            $produtoFinal->preco_total = $desktop['total'];
+            $produtoFinal->preco_total = $desktop['total']; // Certifique-se de que estamos usando o valor correto aqui
             $produtoFinal->cpu = $desktop['componentes']['CPU'] ?? null;
             $produtoFinal->gpu = $desktop['componentes']['GPU'] ?? null;
             $produtoFinal->ram = $desktop['componentes']['RAM'] ?? null;
@@ -60,11 +59,11 @@ class ProdutoFinalController extends Controller
             $produtoFinal->save();
 
             $produtoFinals[] = $produtoFinal;
-
         }
 
         return view('resultado', compact('produtoFinals'));
     }
+
 
     public function store(Request $request)
     {
