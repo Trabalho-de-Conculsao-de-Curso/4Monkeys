@@ -28,7 +28,7 @@ class GeminiAPIService
             'Content-Type' => 'application/json'
         ])->post($this->apiUrl, [
             'prompt' => $prompt,
-            'model'
+            'model' =>'text-davinci-003'
         ]);
         if ($response = Gemini::geminiPro()->generateContent([$prompt])) {
             $recommendations = $this->parseResponse($response);
@@ -38,18 +38,18 @@ class GeminiAPIService
 
     protected function generatePrompt(array $softwares, array $produtos)
     {
-        $prompt = "Avalie os requisitos dos softwares selecionados e baseie-se nelas para a montagem dos desktops.\n\n";
-        $prompt .= "Monte 3 desktops categorizados como bronze, silver e gold baseado nos softwares escolhidos e seus requisitos.\n";
-        $prompt .= "Crie um arquivo tipo Json mostrando todos os produtos necessarios para que um desktop atenda os requisitos das categorias de acordo com os produtos cadastrados no banco\n\n";
+        $prompt = "Avalie os requisitos de desempenho dos softwares selecionados e utilize esses requisitos para montar três desktops categorizados como bronze, silver e gold.\n\n";
+        $prompt .= "Monte os desktops de forma que atendam aos requisitos mínimos dos softwares escolhidos, focando na custo-efetividade dos componentes utilizados.\n";
+        $prompt .= "Crie um arquivo JSON mostrando todos os produtos necessários para que cada desktop atenda os requisitos das categorias de acordo com os produtos cadastrados no banco de dados.\n\n";
         $prompt .= "Certifique-se de que todos os componentes são compatíveis entre si e que cada desktop inclui os seguintes componentes essenciais: CPU, GPU, RAM, HD ou SSD, Fonte, MOTHERBOARD e Cooler.\n\n";
-        $prompt .= "Retorne os dados estruturados no seguinte formato JSON:\n\n";
-        $prompt .= "{ \"desktops\": [ { \"categoria\": \"bronze\", \"componentes\": { \"CPU\": \"Produto analisado\", \"GPU\": \"Produto analisado\", \"RAM\": \"Produto analisado\", \"Fonte\": \"Produto analisado\", \"MOTHERBOARD\": \"Produto analisado\", \"Cooler\": \"Produto analisado\", \"HD\": \"Produto analisado\" }, \"total\": VALOR_DA_SOMA_TOTAL_DOS_ITENS_SELECIONADOS }, { \"categoria\": \"silver\", \"componentes\": { \"CPU\": \"Produto analisado\", \"GPU\": \"Produto analisado\", \"RAM\": \"Produto analisado\", \"Fonte\": \"Produto analisado\", \"MOTHERBOARD\": \"Produto analisado\", \"Cooler\": \"Produto analisado\", \"HD\": \"Produto analisado\" }, \"total\": VALOR_DA_SOMA_TOTAL_DOS_ITENS_SELECIONADOS }, { \"categoria\": \"gold\", \"componentes\": { \"CPU\": \"Produto analisado\", \"GPU\": \"Produto analisado\", \"RAM\": \"Produto analisado\", \"Fonte\": \"Produto analisado\", \"MOTHERBOARD\": \"Produto analisado\", \"Cooler\": \"Produto analisado\", \"HD\": \"Produto analisado\" }, \"total\": VALOR_DA_SOMA_TOTAL_DOS_ITENS_SELECIONADOS } ] }\n\n";
+        $prompt .= "Retorne os dados estruturados no seguinte formato JSON, mantendo apenas as especificações dos componentes e removendo qualquer informação adicional:\n\n";
+        $prompt .= "{ \"desktops\": [ { \"categoria\": \"bronze\", \"componentes\": { \"CPU\": \"Especificação do Produto\", \"GPU\": \"Especificação do Produto\", \"RAM\": \"Especificação do Produto\", \"Fonte\": \"Especificação do Produto\", \"MOTHERBOARD\": \"Especificação do Produto\", \"Cooler\": \"Especificação do Produto\", \"HD\": \"Especificação do Produto\" }, \"total\": VALOR_DA_SOMA_TOTAL_DOS_ITENS_SELECIONADOS }, { \"categoria\": \"silver\", \"componentes\": { \"CPU\": \"Especificação do Produto\", \"GPU\": \"Especificação do Produto\", \"RAM\": \"Especificação do Produto\", \"Fonte\": \"Especificação do Produto\", \"MOTHERBOARD\": \"Especificação do Produto\", \"Cooler\": \"Especificação do Produto\", \"HD\": \"Especificação do Produto\" }, \"total\": VALOR_DA_SOMA_TOTAL_DOS_ITENS SELECIONADOS }, { \"categoria\": \"gold\", \"componentes\": { \"CPU\": \"Especificação do Produto\", \"GPU\": \"Especificação do Produto\", \"RAM\": \"Especificação do Produto\", \"Fonte\": \"Especificação do Produto\", \"MOTHERBOARD\": \"Especificação do Produto\", \"Cooler\": \"Especificação do Produto\", \"HD\": \"Especificação do Produto\" }, \"total\": VALOR_DA_SOMA TOTAL_DOS_ITENS SELECIONADOS } ] }\n\n";
         $prompt .= "Garanta a integridade e consistência de todas as informações.\n\n";
-        $prompt .= "Softwares selecionados:\n";
+        $prompt .= "Softwares selecionados e seus requisitos:\n";
 
         foreach ($softwares as $software) {
-            $prompt .= "- {$software['nome']}\n";
-            $prompt .= "- {$software['requisitos']}\n";
+            $prompt .= "- Nome: {$software['nome']}\n";
+            $prompt .= "  Requisitos de desempenho: {$software['requisitos']}\n";
         }
 
         $prompt .= "\nProdutos Disponíveis:\n";
@@ -59,8 +59,14 @@ class GeminiAPIService
             $especificacoes = $produtoModel->especificacoes->detalhes;
             $preco = $produtoModel->preco->valor;
 
-            $prompt .= "- Nome: {$produto['nome']}, Preço: {$preco}, Marca: {$marcaNome}, Especificações: {$especificacoes}\n";
+            $prompt .= "- Nome: {$produto['nome']}, Preço: R$ {$preco}, Marca: {$marcaNome}, Especificações: {$especificacoes}\n";
         }
+
+        $prompt .= "\nDicas adicionais:\n";
+        $prompt .= "- Priorize componentes com melhor relação custo-benefício.\n";
+        $prompt .= "- Para a categoria bronze, escolha componentes que atendam aos requisitos mínimos dos softwares com o menor custo.\n";
+        $prompt .= "- Para a categoria silver, escolha componentes que ofereçam um bom equilíbrio entre desempenho e custo.\n";
+        $prompt .= "- Para a categoria gold, escolha componentes de alta performance, mas ainda mantendo a preocupação com o custo-efetividade.\n";
 
         return $prompt;
     }
@@ -83,7 +89,8 @@ class GeminiAPIService
 
                 if (json_last_error() === JSON_ERROR_NONE) {
                     Log::info('JSON decodificado com sucesso: ' . print_r($decodedContent, true));
-                    return $decodedContent;
+                    $normalizedContent = $this->normalizeComponentNames($decodedContent);
+                    return $normalizedContent;
                 } else {
                     Log::error('Erro ao decodificar o JSON: ' . json_last_error_msg());
                     throw new \Exception('Erro ao decodificar a resposta JSON: ' . json_last_error_msg());
@@ -94,6 +101,39 @@ class GeminiAPIService
         throw new \Exception('Resposta da API do Gemini não está no formato esperado');
 
     }
+
+
+    protected function normalizeComponentNames($decodedContent){
+
+        foreach ($decodedContent['desktops'] as &$desktop) {
+            foreach ($desktop['componentes'] as $key => &$component) {
+                $component = $this->extractSpecifications($component);
+            }
+        }
+        return $decodedContent;
+    }
+
+
+    protected function extractSpecifications($componentName){
+        $patterns=[
+            '/CPU\s*/i',
+            '/Processador\s*/i',
+            '/Memória\s*/i',
+            '/Fonte\s*/i',
+            '/PLACA DE VIDEO\s*/i',
+            '/PLACA MAE\s*/i',
+            '/Placa Mãe \s*/i',
+            '/COOLER PARA\s*/i',
+            '/Water Cooler \s*/i',
+            '/Water\s*/i',
+        ];
+
+        $cleanName = preg_replace($patterns, "", $componentName);
+        return trim($cleanName);
+    }
+
+
+
 
     public function calculateTotals($desktops)
     {
