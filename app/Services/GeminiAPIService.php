@@ -63,7 +63,7 @@ class GeminiAPIService
         }
 
         $prompt .= "\nDicas adicionais:\n";
-        $prompt .= "- Priorize componentes com melhor relação custo-benefício.\n";
+        $prompt .= "- Priorize componentes com melhor relação custo-efetividade.\n";
         $prompt .= "- Para a categoria bronze, escolha componentes que atendam aos requisitos mínimos dos softwares com o menor custo.\n";
         $prompt .= "- Para a categoria silver, escolha componentes que ofereçam um bom equilíbrio entre desempenho e custo.\n";
         $prompt .= "- Para a categoria gold, escolha componentes de alta performance, mas ainda mantendo a preocupação com o custo-efetividade.\n";

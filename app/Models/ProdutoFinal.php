@@ -14,7 +14,14 @@ class ProdutoFinal extends Model
         'categoria'
     ];
     protected $table = 'produto_final';
-    
+
+    public function getPrecoTotalFormatado()
+    {
+        // Divide o preço total por 100 e formata o valor
+        $precoTotal = $this->preco_total / 100;
+        return number_format($precoTotal, 2, ',', '.');
+    }
+
     /*public function produtos() -- Mateus 28/06/2024 desvinculando de produtos
     {
         return $this->belongsToMany(Produto::class, 'produto_final_produto', 'produto_final_id', 'produto_id');
