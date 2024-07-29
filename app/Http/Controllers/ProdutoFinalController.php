@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Produto;
-use App\Models\ProdutoFinal;
+use App\Models\ProdutoFinals;
 use App\Models\Software;
 use App\Services\GeminiAPIService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class ProdutoFinalController extends Controller
 {
@@ -40,65 +42,104 @@ class ProdutoFinalController extends Controller
         $softwaresData = $softwaresSelecionados->toArray();
         $produtosData = $produtos->toArray();
 
-        $recommendations = $this->geminiAPIService->getRecommendations($softwaresData, $produtosData);
+        do {
+            DB::beginTransaction();
 
-        $produtoFinals = [];
+            try {
+                $produtoNaoEncontrado = false;
+                $generatedProdutoFinalIds = [];
 
-        foreach ($recommendations['desktops'] as $desktop) {
-            $produtoFinal = new ProdutoFinal();
-            $produtoFinal->nome = 'Produto Final ' . ucfirst($desktop['categoria']);
-            $produtoFinal->categoria = $desktop['categoria'];
-            $produtoFinal->preco_total = $desktop['total'];
-            $produtoFinal->cpu = $desktop['componentes']['CPU'] ?? null;
-            $produtoFinal->gpu = $desktop['componentes']['GPU'] ?? null;
-            $produtoFinal->ram = $desktop['componentes']['RAM'] ?? null;
-            $produtoFinal->hdd = $desktop['componentes']['HD'] ?? null;
-            $produtoFinal->fonte = $desktop['componentes']['Fonte'] ?? null;
-            $produtoFinal->placa_mae = $desktop['componentes']['MOTHERBOARD'] ?? null;
-            $produtoFinal->cooler = $desktop['componentes']['Cooler'] ?? null;
-            $produtoFinal->save();
+                $recommendations = $this->geminiAPIService->getRecommendations($softwaresData, $produtosData);
+                $categoriasExistentes = ['bronze' => false, 'silver' => false, 'gold' => false];
 
-            $produtoFinals[] = $produtoFinal;
-        }
+                foreach ($recommendations['desktops'] as $desktop) {
+                    $category = strtolower($desktop['categoria']);
 
-        return view('resultado', compact('produtoFinals'));
+                    // Verifica se a categoria já foi processada
+                    if (isset($categoriasExistentes[$category]) && $categoriasExistentes[$category]) {
+                        continue;
+                    }
+
+                    $produtoFinal = ProdutoFinals::create([
+                        'nome' => 'Produto Final ' . ucfirst($category),
+                        'categoria' => $category,
+                        'preco_total' => $desktop['total'] / 100 // Dividir por 100 para formatar corretamente
+                    ]);
+
+                    $generatedProdutoFinalIds[] = $produtoFinal->id;
+
+                    // Marca a categoria como processada
+                    $categoriasExistentes[$category] = true;
+
+                    // Associar produtos ao ProdutoFinals
+                    $componentes = $desktop['componentes'];
+                    foreach ($componentes as $componentName) {
+                        $produto = Produto::whereHas('especificacoes', function ($query) use ($componentName) {
+                            $query->where('detalhes', 'like', "%$componentName%");
+                        })->first();
+
+                        if ($produto) {
+                            $produtoFinal->produtos()->attach($produto);
+                            Log::info("Produto: $componentName associado ao ProdutoFinals.");
+                        } else {
+                            Log::warning("Produto não encontrado: $componentName");
+                            $produtoNaoEncontrado = true;
+                            break;
+                        }
+                    }
+
+                    if ($produtoNaoEncontrado) {
+                        ProdutoFinals::destroy($generatedProdutoFinalIds);
+                        Log::info("Produtos finais deletados devido a produtos não encontrados.");
+                        break;
+                    }
+
+                    // Associar softwares ao ProdutoFinals
+                    foreach ($softwaresSelecionados as $softwareSelecionado) {
+                        $software = Software::where('nome', $softwareSelecionado->nome)
+                            ->orWhere('tipo', $softwareSelecionado->tipo)
+                            ->orWhere('descricao', 'like', "%{$softwareSelecionado->descricao}%")
+                            ->first();
+
+                        if ($software) {
+                            $produtoFinal->softwares()->attach($software);
+                            Log::info("Software: {$softwareSelecionado->nome} associado ao ProdutoFinal.");
+                        } else {
+                            Log::warning("Software não encontrado: {$softwareSelecionado->nome}");
+                            $produtoNaoEncontrado = true;
+                            break;
+                        }
+                    }
+
+                    if ($produtoNaoEncontrado) {
+                        ProdutoFinals::destroy($generatedProdutoFinalIds);
+                        Log::info("Produtos finais deletados devido a softwares não encontrados.");
+                        break;
+                    }
+                }
+
+                if (!$produtoNaoEncontrado) {
+                    DB::commit();
+                    $produtoFinals = ProdutoFinals::with('produtos', 'softwares')
+                        ->whereIn('id', $generatedProdutoFinalIds)
+                        ->get();
+
+                    // Retornar a view com os dados
+                    return view('resultado', compact('produtoFinals'));
+                } else {
+                    DB::rollBack();
+                }
+
+            } catch (\Exception $e) {
+                DB::rollBack();
+                Log::error("Erro ao processar: " . $e->getMessage());
+                return redirect()->back()->withErrors('Erro ao processar a seleção.');
+            }
+
+        } while ($produtoNaoEncontrado);
     }
 
 
-    public function store(Request $request)
-    {
-        //
-    }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(ProdutoFinal $produtoFinal)
-    {
-        //
-    }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(ProdutoFinal $produtoFinal)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, ProdutoFinal $produtoFinal)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(ProdutoFinal $produtoFinal)
-    {
-        //
-    }
 }

@@ -35,10 +35,10 @@ class Produto extends Model
         return $this->belongsTo(LojaOnline::class);
     }
 
-    /*public function produtoFinais() --- Mateus28/06/2024 desvinculando de ProdutoFinal
-    { 
-        return $this->belongsToMany(ProdutoFinal::class, 'produto_final_produto', 'produto_id', 'produto_final_id');
-    }*/
+    public function produtoFinais()
+    {
+        return $this->belongsToMany(ProdutoFinals::class, 'produto_final_produto', 'produto_id', 'produto_final_id');
+    }
 
     public static function search($term)
     {
