@@ -17,8 +17,8 @@ class Software extends Model
         'requisitos'
     ];
 
-    /*public function produtoFinais() -- Mateus V. Desvinculando de ProdutoFinal
+    public function produtoFinais()
     {
-        return $this->belongsToMany(ProdutoFinal::class, 'produto_final_software', 'software_id', 'produto_final_id');
-    }*/
+        return $this->belongsToMany(ProdutoFinals::class, 'produto_final_software', 'software_id', 'produto_final_id');
+    }
 }

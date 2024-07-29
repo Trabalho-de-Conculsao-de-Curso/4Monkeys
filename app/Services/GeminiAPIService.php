@@ -143,12 +143,13 @@ class GeminiAPIService
             'gold' => 0,
         ];
 
-        foreach ($desktops as &$desktop) { // Use a referência para modificar o array original
+        foreach ($desktops as &$desktop) {
             $category = $desktop['categoria'];
             $components = $desktop['componentes'];
             $total = 0;
 
             foreach ($components as $componentName) {
+                // Busca pelo produto associado
                 $product = Produto::where('nome', $componentName)
                     ->orWhereHas('especificacoes', function ($query) use ($componentName) {
                         $query->where('detalhes', 'like', "%$componentName%");

@@ -5,30 +5,29 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class ProdutoFinal extends Model
+class ProdutoFinals extends Model
 {
     use HasFactory;
 
     protected $fillable = [
         'nome',
-        'categoria'
+        'categoria',
+        'preco_total'
     ];
-    protected $table = 'produto_final';
+    protected $table = 'produto_finals';
 
     public function getPrecoTotalFormatado()
     {
-        // Divide o preço total por 100 e formata o valor
-        $precoTotal = $this->preco_total / 100;
-        return number_format($precoTotal, 2, ',', '.');
+
+        return number_format($this->preco_total, 2, ',', '.');
     }
 
-    /*public function produtos() -- Mateus 28/06/2024 desvinculando de produtos
+    public function produtos()
     {
         return $this->belongsToMany(Produto::class, 'produto_final_produto', 'produto_final_id', 'produto_id');
-    }*/
-
-    /*public function softwares() Mateus V. 28/06/2024  Desvinculando de Software
+    }
+    public function softwares()
     {
         return $this->belongsToMany(Software::class, 'produto_final_software', 'produto_final_id', 'software_id');
-    }*/
+    }
 }

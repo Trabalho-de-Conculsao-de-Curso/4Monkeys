@@ -24,20 +24,18 @@
 <div class="container mx-auto py-8 grid grid-cols-3">
 
 
-    @foreach($produtoFinals as $produtoFinal)
-        <div class="bg-white rounded-lg shadow p-6 mb-6 ml-2">
-            <h2 class="text-2xl font-semibold mb-4">{{ $produtoFinal->nome }}</h2>
-            <p class="text-lg mb-2">
-                <span class="font-semibold">Preço Total:</span>
-                R$ {{ $produtoFinal->getPrecoTotalFormatado() }}
-            </p>
-            <p class="text-lg mb-2"><span class="font-semibold">CPU:</span> {{ $produtoFinal->cpu }}</p>
-            <p class="text-lg mb-2"><span class="font-semibold">GPU:</span> {{ $produtoFinal->gpu }}</p>
-            <p class="text-lg mb-2"><span class="font-semibold">RAM:</span> {{ $produtoFinal->ram }}</p>
-            <p class="text-lg mb-2"><span class="font-semibold">Armazenamento:</span> {{ $produtoFinal->hdd }}</p>
-            <p class="text-lg mb-2"><span class="font-semibold">Fonte:</span> {{ $produtoFinal->fonte }}</p>
-            <p class="text-lg mb-2"><span class="font-semibold">Placa Mãe:</span> {{ $produtoFinal->placa_mae }}</p>
-            <p class="text-lg mb-2"><span class="font-semibold">Cooler:</span> {{ $produtoFinal->cooler }}</p>
+    @foreach ($produtoFinals as $produtoFinal)
+        <div>
+            <h2>{{ $produtoFinal->nome }}</h2>
+            <p>Categoria: {{ ucfirst($produtoFinal->categoria) }}</p>
+            <p>Preço Total: R$ {{ number_format($produtoFinal->preco_total, 2, ',', '.') }}</p>
+
+            <h3>Componentes</h3>
+            <ul>
+                @foreach ($produtoFinal->produtos as $produto)
+                    <li>{{ $produto->nome }} - {{ $produto->especificacoes->detalhes }}</li>
+                @endforeach
+            </ul>
 
         </div>
     @endforeach
