@@ -213,5 +213,306 @@ class PrecoSeeder extends Seeder
             'valor' => '25999',
             'moeda' => 'Real',
         ]);
+
+        Preco::create([
+            'valor' => '138999',
+            'moeda' => 'Real',
+        ]);
+
+        Preco::create([
+            'valor' => '67999',
+            'moeda' => 'Real',
+        ]);
+
+        Preco::create([
+            'valor' => '39999',
+            'moeda' => 'Real',
+        ]);
+
+        Preco::create([
+            'valor' => '100080',
+            'moeda' => 'Real',
+        ]);
+
+        Preco::create([
+            'valor' => '86299',
+            'moeda' => 'Real',
+        ]);
+
+        Preco::create([
+            'valor' => '68199',
+            'moeda' => 'Real',
+        ]);
+
+        Preco::create([
+            'valor' => '214399',
+            'moeda' => 'Real',
+        ]);
+
+        Preco::create([
+            'valor' => '56099',
+            'moeda' => 'Real',
+        ]);
+
+        Preco::create([
+            'valor' => '126599',
+            'moeda' => 'Real',
+        ]);
+
+        Preco::create([
+            'valor' => '84990',
+            'moeda' => 'Real',
+        ]);
+
+        Preco::create([
+            'valor' => '96999',
+            'moeda' => 'Real',
+        ]);
+
+        Preco::create([
+            'valor' => '34999',
+            'moeda' => 'Real',
+        ]);
+
+        Preco::create([
+            'valor' => '429999',
+            'moeda' => 'Real',
+        ]);
+
+        Preco::create([
+            'valor' => '48286',
+            'moeda' => 'Real',
+        ]);
+
+        Preco::create([
+            'valor' => '65672',
+            'moeda' => 'Real',
+        ]);
+
+        Preco::create([
+            'valor' => '23999',
+            'moeda' => 'Real',
+        ]);
+
+        Preco::create([
+            'valor' => '10999',
+            'moeda' => 'Real',
+        ]);
+
+        Preco::create([
+            'valor' => '25999',
+            'moeda' => 'Real',
+        ]);
+
+        Preco::create([
+            'valor' => '13999',
+            'moeda' => 'Real',
+        ]);
+
+        Preco::create([
+            'valor' => '29199',
+            'moeda' => 'Real',
+        ]);
+
+        Preco::create([
+            'valor' => '34999',
+            'moeda' => 'Real',
+        ]);
+
+        Preco::create([
+            'valor' => '15999',
+            'moeda' => 'Real',
+        ]);
+
+        Preco::create([
+            'valor' => '16999',
+            'moeda' => 'Real',
+        ]);
+
+        Preco::create([
+            'valor' => '16999',
+            'moeda' => 'Real',
+        ]);
+
+        Preco::create([
+            'valor' => '5000',
+            'moeda' => 'Real',
+        ]);
+
+        Preco::create([
+            'valor' => '3000',
+            'moeda' => 'Real',
+        ]);
+
+        Preco::create([
+            'valor' => '16999',
+            'moeda' => 'Real',
+        ]);
+
+        Preco::create([
+            'valor' => '7299',
+            'moeda' => 'Real',
+        ]);
+
+        Preco::create([
+            'valor' => '33099',
+            'moeda' => 'Real',
+        ]);
+
+        Preco::create([
+            'valor' => '28999',
+            'moeda' => 'Real',
+        ]);
+
+        Preco::create([
+            'valor' => '16999',
+            'moeda' => 'Real',
+        ]);
+
+        Preco::create([
+            'valor' => '48499',
+            'moeda' => 'Real',
+        ]);
+
+        Preco::create([
+            'valor' => '39990',
+            'moeda' => 'Real',
+        ]);
+
+        Preco::create([
+            'valor' => '72882',
+            'moeda' => 'Real',
+        ]);
+
+        Preco::create([
+            'valor' => '33725',
+            'moeda' => 'Real',
+        ]);
+
+        Preco::create([
+            'valor' => '56999',
+            'moeda' => 'Real',
+        ]);
+
+        Preco::create([
+            'valor' => '53999',
+            'moeda' => 'Real',
+        ]);
+
+        Preco::create([
+            'valor' => '15299',
+            'moeda' => 'Real',
+        ]);
+
+        Preco::create([
+            'valor' => '36999',
+            'moeda' => 'Real',
+        ]);
+
+        Preco::create([
+            'valor' => '209999',
+            'moeda' => 'Real',
+        ]);
+
+        Preco::create([
+            'valor' => '94999',
+            'moeda' => 'Real',
+        ]);
+
+        Preco::create([
+            'valor' => '51999',
+            'moeda' => 'Real',
+        ]);
+
+        Preco::create([
+            'valor' => '49999',
+            'moeda' => 'Real',
+        ]);
+
+        Preco::create([
+            'valor' => '135999',
+            'moeda' => 'Real',
+        ]);
+
+        Preco::create([
+            'valor' => '129999',
+            'moeda' => 'Real',
+        ]);
+
+        Preco::create([
+            'valor' => '135999',
+            'moeda' => 'Real',
+        ]);
+
+        Preco::create([
+            'valor' => '289999',
+            'moeda' => 'Real',
+        ]);
+
+        Preco::create([
+            'valor' => '419999',
+            'moeda' => 'Real',
+        ]);
+
+        Preco::create([
+            'valor' => '92999',
+            'moeda' => 'Real',
+        ]);
+
+        Preco::create([
+            'valor' => '279999',
+            'moeda' => 'Real',
+        ]);
+
+        Preco::create([
+            'valor' => '46999',
+            'moeda' => 'Real',
+        ]);
+
+        Preco::create([
+            'valor' => '41999',
+            'moeda' => 'Real',
+        ]);
+
+        Preco::create([
+            'valor' => '24999',
+            'moeda' => 'Real',
+        ]);
+
+        Preco::create([
+            'valor' => '8699',
+            'moeda' => 'Real',
+        ]);
+
+        Preco::create([
+            'valor' => '28999',
+            'moeda' => 'Real',
+        ]);
+
+        Preco::create([
+            'valor' => '119999',
+            'moeda' => 'Real',
+        ]);
+
+        Preco::create([
+            'valor' => '90999',
+            'moeda' => 'Real',
+        ]);
+
+        Preco::create([
+            'valor' => '219899',
+            'moeda' => 'Real',
+        ]);
+
+        Preco::create([
+            'valor' => '18999',
+            'moeda' => 'Real',
+        ]);
+
+        Preco::create([
+            'valor' => '27499',
+            'moeda' => 'Real',
+        ]);
+
     }
 }
