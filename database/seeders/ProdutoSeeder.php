@@ -331,7 +331,7 @@ class ProdutoSeeder extends Seeder
             'loja_online_id' => 39,
         ]);
 
-       /* Produto::create([
+        Produto::create([
             'nome' => 'SOURCE',
             'marca_id' => 40,
             'especificacoes_id' => 40,
@@ -817,7 +817,7 @@ class ProdutoSeeder extends Seeder
             'especificacoes_id' => 100,
             'preco_id' => 100,
             'loja_online_id' => 100,
-        ]);*/
+        ]);
 
 
 

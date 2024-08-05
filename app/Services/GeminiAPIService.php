@@ -3,6 +3,7 @@ namespace App\Services;
 
 use App\Models\Produto;
 use Gemini\Laravel\Facades\Gemini;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -21,6 +22,10 @@ class GeminiAPIService
 
     public function getRecommendations(array $softwares, array $produtos)
     {
+        $produtos = Cache::remember('produtos', 60 * 60, function () {
+            return Produto::with('especificacoes', 'preco')->get()->toArray();
+        });
+
         $prompt = $this->generatePrompt($softwares, $produtos);
 
         $response = Http::withHeaders([
@@ -30,9 +35,12 @@ class GeminiAPIService
             'prompt' => $prompt,
             'model' =>'text-davinci-003'
         ]);
-        if ($response = Gemini::geminiPro()->generateContent([$prompt])) {
+        if ($response=Gemini::geminiPro()->generateContent([$prompt])) {
             $recommendations = $this->parseResponse($response);
             return $this->calculateTotals($recommendations['desktops']);
+        } else {
+            Log::error('Erro ao chamar a API do Gemini: ');
+            throw new \Exception('Erro ao chamar a API do Gemini');
         }
     }
 
@@ -51,20 +59,18 @@ class GeminiAPIService
             $prompt .= "- Nome: {$software['nome']}\n";
             $prompt .= "  Requisitos de desempenho: {$software['requisitos']}\n";
         }
-
+        $prompt .= "use apenas os produtos disponiveis:\n";
         $prompt .= "\nProdutos Disponíveis:\n";
         foreach ($produtos as $produto) {
-            $produtoModel = Produto::find($produto['id']);
-            $marcaNome = $produtoModel->marca->nome;
-            $especificacoes = $produtoModel->especificacoes->detalhes;
-            $preco = $produtoModel->preco->valor;
-
-            $prompt .= "- Nome: {$produto['nome']}, Preço: R$ {$preco}, Marca: {$marcaNome}, Especificações: {$especificacoes}\n";
+            $especificacoes = $produto['especificacoes']['detalhes'];
+            $preco = $produto['preco']['valor'];
+            $prompt .= " Garanta que seja passado exatamente as mesmas especificacoes:\n";
+            $prompt .= "- Nome: {$produto['nome']}, Preço: R$ {$preco},Especificações: {$especificacoes}\n";
         }
 
         $prompt .= "\nDicas adicionais:\n";
         $prompt .= "- Priorize componentes com melhor relação custo-efetividade.\n";
-        $prompt .= "- Para a categoria bronze, escolha componentes que atendam aos requisitos mínimos dos softwares com o menor custo.\n";
+        $prompt .= "- Para a categoria bronze, escolha componentes que chegam próximos aos requisitos mínimos dos softwares com o menor custo.\n";
         $prompt .= "- Para a categoria silver, escolha componentes que ofereçam um bom equilíbrio entre desempenho e custo.\n";
         $prompt .= "- Para a categoria gold, escolha componentes de alta performance, mas ainda mantendo a preocupação com o custo-efetividade.\n";
 
@@ -73,6 +79,7 @@ class GeminiAPIService
 
     protected function parseResponse($response)
     {
+
         $candidates = $response->candidates ?? [];
 
         foreach ($candidates as $candidate) {
@@ -89,8 +96,7 @@ class GeminiAPIService
 
                 if (json_last_error() === JSON_ERROR_NONE) {
                     Log::info('JSON decodificado com sucesso: ' . print_r($decodedContent, true));
-                    $normalizedContent = $this->normalizeComponentNames($decodedContent);
-                    return $normalizedContent;
+                    return $decodedContent;
                 } else {
                     Log::error('Erro ao decodificar o JSON: ' . json_last_error_msg());
                     throw new \Exception('Erro ao decodificar a resposta JSON: ' . json_last_error_msg());
@@ -116,16 +122,7 @@ class GeminiAPIService
 
     protected function extractSpecifications($componentName){
         $patterns=[
-            '/CPU\s*/i',
-            '/Processador\s*/i',
-            '/Memória\s*/i',
-            '/Fonte\s*/i',
-            '/PLACA DE VIDEO\s*/i',
-            '/PLACA MAE\s*/i',
-            '/Placa Mãe \s*/i',
-            '/COOLER PARA\s*/i',
-            '/Water Cooler \s*/i',
-            '/Water\s*/i',
+            '/s\s*/i',
         ];
 
         $cleanName = preg_replace($patterns, "", $componentName);
@@ -143,21 +140,30 @@ class GeminiAPIService
             'gold' => 0,
         ];
 
+        // Obter produtos do cache
+        $produtosCache = Cache::get('produtos', []);
+
         foreach ($desktops as &$desktop) {
             $category = $desktop['categoria'];
             $components = $desktop['componentes'];
             $total = 0;
 
             foreach ($components as $componentName) {
-                // Busca pelo produto associado
-                $product = Produto::where('nome', $componentName)
-                    ->orWhereHas('especificacoes', function ($query) use ($componentName) {
-                        $query->where('detalhes', 'like', "%$componentName%");
-                    })
-                    ->first();
+                // Busca pelo produto no cache
+                $produto = collect($produtosCache)->first(function ($produto) use ($componentName) {
+                    return isset($produto['especificacoes']['detalhes']) && is_string($produto['especificacoes']['detalhes']) &&
+                        stripos($produto['especificacoes']['detalhes'], $componentName) !== false;
+                });
 
-                if ($product) {
-                    $price = $product->preco->valor;
+                // Se não encontrado no cache, busca no banco de dados
+                if (!$produto) {
+                    $produto = Produto::whereHas('especificacoes', function ($query) use ($componentName) {
+                        $query->where('detalhes', 'like', "%$componentName%");
+                    })->first();
+                }
+
+                if ($produto) {
+                    $price = $produto['preco']['valor'];
                     Log::info("Produto: $componentName, Preço: $price");
                     $total += $price;
                 } else {
@@ -175,6 +181,7 @@ class GeminiAPIService
             'totals' => $totals,
         ];
     }
+
 
 }
 
