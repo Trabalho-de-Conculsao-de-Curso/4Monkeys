@@ -38,7 +38,7 @@ class ProdutoFinalController extends Controller
         $softwaresSelecionados = Software::find($request->input('softwares'));
         $produtos = Produto::all();
 
-        // Preparar dados para enviar ao GeminiAPI
+        // Preparar dados para enviar ao geminiAPI
         $softwaresData = $softwaresSelecionados->toArray();
         $produtosData = $produtos->toArray();
 
@@ -63,7 +63,7 @@ class ProdutoFinalController extends Controller
                     $produtoFinal = ProdutoFinals::create([
                         'nome' => 'Produto Final ' . ucfirst($category),
                         'categoria' => $category,
-                        'preco_total' => $desktop['total'] / 100 // Dividir por 100 para formatar corretamente
+                        'preco_total' => $desktop['total'] / 100
                     ]);
 
                     $generatedProdutoFinalIds[] = $produtoFinal->id;
@@ -74,15 +74,17 @@ class ProdutoFinalController extends Controller
                     // Associar produtos ao ProdutoFinals
                     $componentes = $desktop['componentes'];
                     foreach ($componentes as $componentName) {
+                        // Busca pelo produto associado
                         $produto = Produto::whereHas('especificacoes', function ($query) use ($componentName) {
                             $query->where('detalhes', 'like', "%$componentName%");
-                        })->first();
+                        })
+                            ->first();
 
                         if ($produto) {
                             $produtoFinal->produtos()->attach($produto);
                             Log::info("Produto: $componentName associado ao ProdutoFinals.");
                         } else {
-                            Log::warning("Produto não encontrado: $componentName");
+                            Log::warning("Produto não encontrado Controller: $componentName");
                             $produtoNaoEncontrado = true;
                             break;
                         }
@@ -94,21 +96,10 @@ class ProdutoFinalController extends Controller
                         break;
                     }
 
-                    // Associar softwares ao ProdutoFinals
+                    // Associar softwares ao ProdutoFinals usando IDs diretamente
                     foreach ($softwaresSelecionados as $softwareSelecionado) {
-                        $software = Software::where('nome', $softwareSelecionado->nome)
-                            ->orWhere('tipo', $softwareSelecionado->tipo)
-                            ->orWhere('descricao', 'like', "%{$softwareSelecionado->descricao}%")
-                            ->first();
-
-                        if ($software) {
-                            $produtoFinal->softwares()->attach($software);
-                            Log::info("Software: {$softwareSelecionado->nome} associado ao ProdutoFinal.");
-                        } else {
-                            Log::warning("Software não encontrado: {$softwareSelecionado->nome}");
-                            $produtoNaoEncontrado = true;
-                            break;
-                        }
+                        $produtoFinal->softwares()->attach($softwareSelecionado->id);
+                        Log::info("Software ID: {$softwareSelecionado->id} associado ao ProdutoFinal.");
                     }
 
                     if ($produtoNaoEncontrado) {
@@ -138,8 +129,4 @@ class ProdutoFinalController extends Controller
 
         } while ($produtoNaoEncontrado);
     }
-
-
-
-
 }
