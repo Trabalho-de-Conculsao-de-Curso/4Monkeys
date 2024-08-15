@@ -33,7 +33,7 @@
             <h3>Componentes</h3>
             <ul>
                 @foreach ($produtoFinal->produtos as $produto)
-                    <li>{{ $produto->nome }} - {{ $produto->especificacoes->detalhes }}</li>
+                    <li>{{ $produto->nome }}</li>
                 @endforeach
             </ul>
 
