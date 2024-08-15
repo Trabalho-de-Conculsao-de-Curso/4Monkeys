@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class ProdutoFinals extends Model
+class Conjunto extends Model
 {
     use HasFactory;
 
@@ -14,7 +14,7 @@ class ProdutoFinals extends Model
         'categoria',
         'preco_total'
     ];
-    protected $table = 'produto_finals';
+    protected $table = 'conjunto';
 
     public function getPrecoTotalFormatado()
     {
@@ -24,10 +24,10 @@ class ProdutoFinals extends Model
 
     public function produtos()
     {
-        return $this->belongsToMany(Produto::class, 'produto_final_produto', 'produto_final_id', 'produto_id');
+        return $this->belongsToMany(Produto::class, 'conjunto_produto', 'conjunto_id', 'produto_id');
     }
     public function softwares()
     {
-        return $this->belongsToMany(Software::class, 'produto_final_software', 'produto_final_id', 'software_id');
+        return $this->belongsToMany(Software::class, 'conjunto_software', 'conjunto_id', 'software_id');
     }
 }
