@@ -3,14 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\Produto;
-use App\Models\ProdutoFinals;
+use App\Models\Conjunto;
 use App\Models\Software;
 use App\Services\GeminiAPIService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
-class ProdutoFinalController extends Controller
+class ConjuntoController extends Controller
 {
     protected $geminiAPIService;
 
@@ -60,7 +60,7 @@ class ProdutoFinalController extends Controller
                         continue;
                     }
 
-                    $produtoFinal = ProdutoFinals::create([
+                    $produtoFinal = Conjunto::create([
                         'nome' => 'Produto Final ' . ucfirst($category),
                         'categoria' => $category,
                         'preco_total' => $desktop['total']
@@ -71,7 +71,7 @@ class ProdutoFinalController extends Controller
                     // Marca a categoria como processada
                     $categoriasExistentes[$category] = true;
 
-                    // Associar produtos ao ProdutoFinals
+                    // Associar produtos ao Conjunto
                     $componentes = $desktop['componentes'];
                     foreach ($componentes as $componentName) {
                         // Busca pelo produto associado
@@ -81,7 +81,7 @@ class ProdutoFinalController extends Controller
                             $possiveisProdutos = Produto::all(); // Carrega todos os produtos para comparar similaridade
 
                             if ($possiveisProdutos->isNotEmpty()) {
-                                // Usar a função Levenshtein para encontrar o nome mais parecido
+
                                 $produto = $possiveisProdutos->sortBy(function ($produto) use ($componentName) {
                                     return levenshtein($componentName, $produto->nome);
                                 })->first();
@@ -94,7 +94,7 @@ class ProdutoFinalController extends Controller
 
                         if ($produto) {
                             $produtoFinal->produtos()->attach($produto->id);
-                            Log::info("Produto: $componentName associado ao ProdutoFinals.");
+                            Log::info("Produto: $componentName associado ao Conjunto.");
                         } else {
                             Log::warning("Produto não encontrado Controller: $componentName");
                             $produtoNaoEncontrado = true;
@@ -103,19 +103,19 @@ class ProdutoFinalController extends Controller
                     }
 
                     if ($produtoNaoEncontrado) {
-                        ProdutoFinals::destroy($generatedProdutoFinalIds);
+                        Conjunto::destroy($generatedProdutoFinalIds);
                         Log::info("Produtos finais deletados devido a produtos não encontrados.");
                         break;
                     }
 
-                    // Associar softwares ao ProdutoFinals usando IDs diretamente
+                    // Associar softwares ao Conjunto usando IDs diretamente
                     foreach ($softwaresSelecionados as $softwareSelecionado) {
                         $produtoFinal->softwares()->attach($softwareSelecionado->id);
                         Log::info("Software ID: {$softwareSelecionado->id} associado ao ProdutoFinal.");
                     }
 
                     if ($produtoNaoEncontrado) {
-                        ProdutoFinals::destroy($generatedProdutoFinalIds);
+                        Conjunto::destroy($generatedProdutoFinalIds);
                         Log::info("Produtos finais deletados devido a softwares não encontrados.");
                         break;
                     }
@@ -123,7 +123,7 @@ class ProdutoFinalController extends Controller
 
                 if (!$produtoNaoEncontrado) {
                     DB::commit();
-                    $produtoFinals = ProdutoFinals::with('produtos', 'softwares')
+                    $produtoFinals = Conjunto::with('produtos', 'softwares')
                         ->whereIn('id', $generatedProdutoFinalIds)
                         ->get();
 

@@ -41,7 +41,7 @@ def coletar_produtos_da_pagina(driver):
 
 # Função para salvar os produtos, preços e links no banco
 def salvar_produtos_no_banco(produtos):
-    # Conectar ao banco de dados SQLite
+    # Conexão
     conn = sqlite3.connect('../database/database.sqlite')
     cursor = conn.cursor()
 
@@ -56,21 +56,20 @@ def salvar_produtos_no_banco(produtos):
             if loja_online_result:
                 loja_online_id = loja_online_result[0]
             else:
-                # Inserir o link na tabela 'loja_online' se não existir
+
                 cursor.execute('''
                     INSERT INTO loja_online (urlLoja, created_at, updated_at)
                     VALUES (?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
                 ''', (produto['link'],))
                 loja_online_id = cursor.lastrowid  # Recuperar o ID da loja online inserida
 
-            # Inserir o preço na tabela 'precos'
+
             cursor.execute('''
                 INSERT INTO precos (valor, moeda, created_at, updated_at)
                 VALUES (?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
             ''', (produto['preco'], produto['moeda']))
             preco_id = cursor.lastrowid  # Recuperar o ID do preço inserido
 
-            # Inserir o produto na tabela 'produtos'
             cursor.execute('''
                 INSERT INTO produtos (nome, preco_id, loja_online_id, created_at, updated_at)
                 VALUES (?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
@@ -82,10 +81,9 @@ def salvar_produtos_no_banco(produtos):
             print(f"Erro ao inserir o produto no banco de dados: {e}")
             conn.rollback()
 
-    # Fechar a conexão
     conn.close()
 
-# Função principal para processar todas as páginas de uma URL específica
+
 def processar_paginas(url_base, max_paginas=1):
     pagina = 1
     todos_produtos = []
@@ -94,32 +92,23 @@ def processar_paginas(url_base, max_paginas=1):
         url = f"{url_base}?page_number={pagina}"
         driver.get(url)
 
-        # Aguardar o carregamento da página
         driver.implicitly_wait(10)
-
-        # Coletar os produtos da página atual
         produtos_da_pagina = coletar_produtos_da_pagina(driver)
 
-        # Verificar se há produtos na página
         if not produtos_da_pagina:
             break
 
         # Adicionar os produtos da página à lista total de produtos
         todos_produtos.extend(produtos_da_pagina)
-
         print(f"Página {pagina} processada para URL: {url_base}")
-
-        # Avançar para a próxima página
         pagina += 1
-
-        # Pequena pausa para evitar sobrecarga do servidor
         time.sleep(2)
 
     # Salvar todos os produtos coletados no banco de dados
     salvar_produtos_no_banco(todos_produtos)
     print(f"Total de produtos coletados e salvos para {url_base}: {len(todos_produtos)}")
 
-# URLs das diferentes categorias que você quer processar
+
 urls_para_processar = [
     "https://patoloco.com.br/produtos/placa-de-video",
    "https://patoloco.com.br/produtos/processadores",
@@ -135,5 +124,4 @@ urls_para_processar = [
 for url in urls_para_processar:
     processar_paginas(url)
 
-# Fechar o navegador
 driver.quit()

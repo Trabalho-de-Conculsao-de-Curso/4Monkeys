@@ -11,7 +11,7 @@ return new class extends Migration
     {
         if (config('database.default') === 'sqlite') {
             DB::statement('
-                CREATE TABLE produto_finals (
+                CREATE TABLE conjunto (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     nome VARCHAR(255),
                     categoria VARCHAR(255),
@@ -21,7 +21,7 @@ return new class extends Migration
                 )
             ');
         } else {
-            Schema::create('produto_finals', function (Blueprint $table) {
+            Schema::create('conjunto', function (Blueprint $table) {
                 $table->id();
                 $table->string('nome');
                 $table->string('categoria');
@@ -36,6 +36,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('produto_finals');
+        Schema::dropIfExists('conjunto');
     }
 };

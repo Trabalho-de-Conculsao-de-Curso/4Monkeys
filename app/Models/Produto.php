@@ -26,9 +26,9 @@ class Produto extends Model
         return $this->belongsTo(LojaOnline::class);
     }
 
-    public function produtoFinais()
+    public function conjunto()
     {
-        return $this->belongsToMany(ProdutoFinals::class, 'produto_final_produto', 'produto_id', 'produto_final_id');
+        return $this->belongsToMany(Conjunto::class, 'conjunto_produto', 'produto_id', 'conjunto_id');
     }
 
     public static function search($term)

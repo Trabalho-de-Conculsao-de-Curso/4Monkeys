@@ -25,7 +25,7 @@ def coletar_produtos_da_pagina(driver):
             link = link_element.get_attribute('href')
 
             resultados.append({
-                'nome': nome,  # Pode ser removido se não for necessário em outro lugar
+                'nome': nome,
                 'preco': preco,
                 'moeda': moeda,
                 'link': link
@@ -77,7 +77,7 @@ def salvar_produtos_no_banco(produtos):
             print(f"Erro ao inserir o produto no banco de dados: {e}")
             conn.rollback()
 
-    # Fechar a conexão
+
     conn.close()
 
 # Função principal para processar todas as páginas de uma URL específica
@@ -88,33 +88,22 @@ def processar_paginas(url_base, max_paginas=5):
     while pagina <= max_paginas:
         url = f"{url_base}?page_number={pagina}"
         driver.get(url)
-
-        # Aguardar o carregamento da página (opcional)
         driver.implicitly_wait(10)
-
-        # Coletar os produtos da página atual
         produtos_da_pagina = coletar_produtos_da_pagina(driver)
-
-        # Verificar se há produtos na página
         if not produtos_da_pagina:
             break
 
-        # Adicionar os produtos da página à lista total de produtos
         todos_produtos.extend(produtos_da_pagina)
-
         print(f"Página {pagina} processada para URL: {url_base}")
 
-        # Avançar para a próxima página
         pagina += 1
 
-        # Pequena pausa para evitar sobrecarga do servidor
         time.sleep(2)
 
     # Salvar todos os produtos coletados no banco de dados
     salvar_produtos_no_banco(todos_produtos)
     print(f"Total de produtos coletados e salvos para {url_base}: {len(todos_produtos)}")
 
-# URLs das diferentes categorias que você quer processar
 urls_para_processar = [
     "https://www.kabum.com.br/hardware/placa-de-video-vga",
     "https://www.kabum.com.br/hardware/memoria-ram",
@@ -125,9 +114,8 @@ urls_para_processar = [
     "https://www.kabum.com.br/hardware/ssd-2-5"
 ]
 
-# Processar todas as URLs
+
 for url in urls_para_processar:
     processar_paginas(url)
 
-# Fechar o navegador
 driver.quit()
