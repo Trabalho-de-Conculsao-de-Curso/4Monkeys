@@ -26,8 +26,6 @@
                 <tr class="bg-gray-200">
                     <th class="py-2 px-3">ID</th>
                     <th class="py-2 px-3">Nome</th>
-                    <th class="py-2 px-3">Marca</th>
-                    <th class="py-2 px-3">Especificação</th>
                     <th class="py-2 px-3">Valor</th>
                     <th class="py-2 px-3">Moeda</th>
                     <th class="py-2 px-3">Lojas Online</th>
@@ -42,8 +40,6 @@
                     <tr>
                         <td class="py-2 px-3">{{ $produto->id }}</td>
                         <td class="py-2 px-3">{{ $produto->nome }}</td>
-                        <td class="py-2 px-3">{{ $produto->marca->nome }}</td>
-                        <td class="py-2 px-3">{{ $produto->especificacoes->detalhes }}</td>
                         <td class="py-2 px-3">{{ $produto->preco->valor }}</td>
                         <td class="py-2 px-3">{{ $produto->preco->moeda }}</td>
                         <td class="py-2 px-3">{{ $produto->lojaOnline->nome }}</td>

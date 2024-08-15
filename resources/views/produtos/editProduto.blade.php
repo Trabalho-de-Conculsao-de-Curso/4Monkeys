@@ -22,27 +22,6 @@
             <input type="text" name="nome" id="nome" value="{{$produto->nome}}" required class="form-input mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 border-2">
         </div>
 
-        <h3 class="text-lg font-semibold mb-2">Marca</h3>
-        <div class="grid grid-cols-2 gap-4">
-            <div>
-                <label for="marca_nome" class="block text-sm font-medium text-gray-700">Nome</label>
-                <input type="text" name="marca_nome" id="marca_nome" value="{{$produto->marca->nome}}" required class="border-2 form-input mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
-            </div>
-            <div>
-                <label for="marca_qualidade" class="block text-sm font-medium text-gray-700">Qualidade</label>
-                <input type="text" name="marca_qualidade" id="marca_qualidade" value="{{$produto->marca->qualidade}}" required class="border-2 form-input mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
-            </div>
-            <div>
-                <label for="marca_garantia" class="block text-sm font-medium text-gray-700">Garantia</label>
-                <input type="text" name="marca_garantia" id="marca_garantia" value="{{$produto->marca->garantia}}" required class="border-2 form-input mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
-            </div>
-        </div>
-
-        <h3 class="text-lg font-semibold mt-6 mb-2">Especificações</h3>
-        <div class="mb-4">
-            <label for="especificacoes_detalhes" class="block text-sm font-medium text-gray-700">Detalhes</label>
-            <input type="text" name="especificacoes_detalhes" id="especificacoes_detalhes" value="{{$produto->especificacoes->detalhes}}" required class="border-2 form-input mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
-        </div>
 
         <h3 class="text-lg font-semibold mb-2">Preço</h3>
         <div class="grid grid-cols-2 gap-4">
@@ -54,12 +33,6 @@
                 <label for="preco_moeda" class="block text-sm font-medium text-gray-700">Moeda</label>
                 <input type="text" name="preco_moeda" id="preco_moeda" value="{{$produto->preco->moeda}}" required class="border-2 form-input mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
             </div>
-        </div>
-
-        <h3 class="text-lg font-semibold mt-6 mb-2">Lojas Online</h3>
-        <div class="mb-4">
-            <label for="lojasOnline" class="block text-sm font-medium text-gray-700">Nome da Loja</label>
-            <input type="text" name="lojasOnline" id="lojasOnline" value="{{$produto->lojaOnline->nome}}" required class="border-2 form-input mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
         </div>
 
         <div class="mb-6">

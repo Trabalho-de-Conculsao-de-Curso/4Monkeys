@@ -63,7 +63,7 @@ class ProdutoFinalController extends Controller
                     $produtoFinal = ProdutoFinals::create([
                         'nome' => 'Produto Final ' . ucfirst($category),
                         'categoria' => $category,
-                        'preco_total' => $desktop['total'] / 100
+                        'preco_total' => $desktop['total']
                     ]);
 
                     $generatedProdutoFinalIds[] = $produtoFinal->id;
@@ -75,13 +75,25 @@ class ProdutoFinalController extends Controller
                     $componentes = $desktop['componentes'];
                     foreach ($componentes as $componentName) {
                         // Busca pelo produto associado
-                        $produto = Produto::whereHas('especificacoes', function ($query) use ($componentName) {
-                            $query->where('detalhes', 'like', "%$componentName%");
-                        })
-                            ->first();
+                        $produto = Produto::where('nome', 'like', "%$componentName%")->first();
+
+                        if (!$produto) {
+                            $possiveisProdutos = Produto::all(); // Carrega todos os produtos para comparar similaridade
+
+                            if ($possiveisProdutos->isNotEmpty()) {
+                                // Usar a função Levenshtein para encontrar o nome mais parecido
+                                $produto = $possiveisProdutos->sortBy(function ($produto) use ($componentName) {
+                                    return levenshtein($componentName, $produto->nome);
+                                })->first();
+
+                                Log::info("Produto mais semelhante encontrado CONTROLLER: '{$produto->nome}'");
+                            } else {
+                                Log::warning("Nenhum produto semelhante encontrado para CONTROLLER: $componentName");
+                            }
+                        }
 
                         if ($produto) {
-                            $produtoFinal->produtos()->attach($produto);
+                            $produtoFinal->produtos()->attach($produto->id);
                             Log::info("Produto: $componentName associado ao ProdutoFinals.");
                         } else {
                             Log::warning("Produto não encontrado Controller: $componentName");

@@ -1,6 +1,8 @@
 <?php
 namespace App\Services;
 
+use App\Models\LojaOnline;
+use App\Models\Preco;
 use App\Models\Produto;
 use Gemini\Laravel\Facades\Gemini;
 use Illuminate\Support\Facades\Cache;
@@ -22,9 +24,6 @@ class GeminiAPIService
 
     public function getRecommendations(array $softwares, array $produtos)
     {
-        $produtos = Cache::remember('produtos', 60 * 60, function () {
-            return Produto::with('especificacoes', 'preco')->get()->toArray();
-        });
 
         $prompt = $this->generatePrompt($softwares, $produtos);
 
@@ -46,36 +45,45 @@ class GeminiAPIService
 
     protected function generatePrompt(array $softwares, array $produtos)
     {
-        $prompt = "Avalie os requisitos de desempenho dos softwares selecionados e utilize esses requisitos para montar três desktops categorizados como bronze, silver e gold.\n\n";
+
+        $prompt = "Avalie os softwares selecionados e utilize como base para montar três desktops categorizados como bronze, silver e gold.\n\n";
         $prompt .= "Monte os desktops de forma que atendam aos requisitos mínimos dos softwares escolhidos, focando na custo-efetividade dos componentes utilizados.\n";
         $prompt .= "Crie um arquivo JSON mostrando todos os produtos necessários para que cada desktop atenda os requisitos das categorias de acordo com os produtos cadastrados no banco de dados.\n\n";
         $prompt .= "Certifique-se de que todos os componentes são compatíveis entre si e que cada desktop inclui os seguintes componentes essenciais: CPU, GPU, RAM, HD ou SSD, Fonte, MOTHERBOARD e Cooler.\n\n";
-        $prompt .= "Retorne os dados estruturados no seguinte formato JSON, mantendo apenas as especificações dos componentes e removendo qualquer informação adicional:\n\n";
-        $prompt .= "{ \"desktops\": [ { \"categoria\": \"bronze\", \"componentes\": { \"CPU\": \"Especificação do Produto\", \"GPU\": \"Especificação do Produto\", \"RAM\": \"Especificação do Produto\", \"Fonte\": \"Especificação do Produto\", \"MOTHERBOARD\": \"Especificação do Produto\", \"Cooler\": \"Especificação do Produto\", \"HD\": \"Especificação do Produto\" }, \"total\": VALOR_DA_SOMA_TOTAL_DOS_ITENS_SELECIONADOS }, { \"categoria\": \"silver\", \"componentes\": { \"CPU\": \"Especificação do Produto\", \"GPU\": \"Especificação do Produto\", \"RAM\": \"Especificação do Produto\", \"Fonte\": \"Especificação do Produto\", \"MOTHERBOARD\": \"Especificação do Produto\", \"Cooler\": \"Especificação do Produto\", \"HD\": \"Especificação do Produto\" }, \"total\": VALOR_DA_SOMA_TOTAL_DOS_ITENS SELECIONADOS }, { \"categoria\": \"gold\", \"componentes\": { \"CPU\": \"Especificação do Produto\", \"GPU\": \"Especificação do Produto\", \"RAM\": \"Especificação do Produto\", \"Fonte\": \"Especificação do Produto\", \"MOTHERBOARD\": \"Especificação do Produto\", \"Cooler\": \"Especificação do Produto\", \"HD\": \"Especificação do Produto\" }, \"total\": VALOR_DA_SOMA TOTAL_DOS_ITENS SELECIONADOS } ] }\n\n";
+        $prompt .= "Retorne os dados estruturados no seguinte formato JSON, mantendo apenas os nomes dos componentes e removendo qualquer informação adicional:\n\n";
+        $prompt .= "{ \"desktops\": [ { \"categoria\": \"bronze\", \"componentes\": { \"CPU\": \"Nome do Produto\", \"GPU\": \"Nome do Produto\", \"RAM\": \"Nome do Produto\", \"Fonte\": \"Nome do Produto\", \"MOTHERBOARD\": \"Nome do Produto\", \"Cooler\": \"Nome do Produto\", \"HD\": \"Nome do Produto\" }, \"total\": VALOR_DA_SOMA_TOTAL_DOS_ITENS_SELECIONADOS }, { \"categoria\": \"silver\", \"componentes\": { \"CPU\": \"Nome do Produto\", \"GPU\": \"Nome do Produto\", \"RAM\": \"Nome do Produto\", \"Fonte\": \"Nome do Produto\", \"MOTHERBOARD\": \"Nome do Produto\", \"Cooler\": \"Nome do Produto\", \"HD\": \"Nome do Produto\" }, \"total\": VALOR_DA_SOMA_TOTAL_DOS_ITENS SELECIONADOS }, { \"categoria\": \"gold\", \"componentes\": { \"CPU\": \"Nome do Produto\", \"GPU\": \"Nome do Produto\", \"RAM\": \"Nome do Produto\", \"Fonte\": \"Nome do Produto\", \"MOTHERBOARD\": \"Nome do Produto\", \"Cooler\": \"Nome do Produto\", \"HD\": \"Nome do Produto\" }, \"total\": VALOR_DA_SOMA TOTAL_DOS ITENS SELECIONADOS } ] }\n\n";
         $prompt .= "Garanta a integridade e consistência de todas as informações.\n\n";
         $prompt .= "Softwares selecionados e seus requisitos:\n";
 
         foreach ($softwares as $software) {
             $prompt .= "- Nome: {$software['nome']}\n";
-            $prompt .= "  Requisitos de desempenho: {$software['requisitos']}\n";
         }
-        $prompt .= "use apenas os produtos disponiveis:\n";
+        $prompt .= "Utilize APENAS os seguintes produtos disponíveis\n";
         $prompt .= "\nProdutos Disponíveis:\n";
         foreach ($produtos as $produto) {
-            $especificacoes = $produto['especificacoes']['detalhes'];
-            $preco = $produto['preco']['valor'];
-            $prompt .= " Garanta que seja passado exatamente as mesmas especificacoes:\n";
-            $prompt .= "- Nome: {$produto['nome']}, Preço: R$ {$preco},Especificações: {$especificacoes}\n";
+            $preco = Preco::find($produto['preco_id'])->valor ?? 'N/A';
+            $url = LojaOnline::find($produto['loja_online_id'])->url ?? 'URL não disponível';
+
+            if ($preco !== 'N/A') {
+                $prompt .= "- Nome: {$produto['nome']}, Preço: R$ {$preco}, URL: {$url}\n";
+            } else {
+                Log::warning("Preço não encontrado para o produto ID: {$produto['id']}");
+                $prompt .= "- Nome: {$produto['nome']}, Preço: N/A\n";
+            }
+            $prompt .= "\nGaranta que seja passado exatamente o mesmo nome do array\n";
+            $prompt .= "- Nome: {$produto['nome']}, Preço: R$ {$preco}\n";
         }
+
 
         $prompt .= "\nDicas adicionais:\n";
         $prompt .= "- Priorize componentes com melhor relação custo-efetividade.\n";
-        $prompt .= "- Para a categoria bronze, escolha componentes que chegam próximos aos requisitos mínimos dos softwares com o menor custo.\n";
+        $prompt .= "- Para a categoria bronze, escolha componentes que atendam aos requisitos mínimos dos softwares com o menor custo.\n";
         $prompt .= "- Para a categoria silver, escolha componentes que ofereçam um bom equilíbrio entre desempenho e custo.\n";
         $prompt .= "- Para a categoria gold, escolha componentes de alta performance, mas ainda mantendo a preocupação com o custo-efetividade.\n";
 
         return $prompt;
     }
+
 
     protected function parseResponse($response)
     {
@@ -149,22 +157,29 @@ class GeminiAPIService
             $total = 0;
 
             foreach ($components as $componentName) {
-                // Busca pelo produto no cache
-                $produto = collect($produtosCache)->first(function ($produto) use ($componentName) {
-                    return isset($produto['especificacoes']['detalhes']) && is_string($produto['especificacoes']['detalhes']) &&
-                        stripos($produto['especificacoes']['detalhes'], $componentName) !== false;
-                });
+                // Busca pelo produto no banco de dados
+                $produto = Produto::where('nome', 'like', "%$componentName%")->first();
 
-                // Se não encontrado no cache, busca no banco de dados
+                // Se o produto não for encontrado, buscar por nomes semelhantes
                 if (!$produto) {
-                    $produto = Produto::whereHas('especificacoes', function ($query) use ($componentName) {
-                        $query->where('detalhes', 'like', "%$componentName%");
-                    })->first();
+                    $possiveisProdutos = Produto::all(); // Carrega todos os produtos para comparar similaridade
+
+                    if ($possiveisProdutos->isNotEmpty()) {
+                        // Usar a função Levenshtein para encontrar o nome mais parecido
+                        $produto = $possiveisProdutos->sortBy(function ($produto) use ($componentName) {
+                            return levenshtein($componentName, $produto->nome);
+                        })->first();
+
+                        Log::info("Produto mais semelhante encontrado: '{$produto->nome}'");
+                    } else {
+                        Log::warning("Nenhum produto semelhante encontrado para: $componentName");
+                    }
                 }
 
                 if ($produto) {
-                    $price = $produto['preco']['valor'];
-                    Log::info("Produto: $componentName, Preço: $price");
+                    // Agora $produto é uma instância de Produto e você pode acessar o relacionamento preco
+                    $price = $produto->preco->valor;
+                    Log::info("Produto: {$produto->nome}, Preço: $price");
                     $total += $price;
                 } else {
                     Log::warning("Produto não encontrado: $componentName");
@@ -181,6 +196,7 @@ class GeminiAPIService
             'totals' => $totals,
         ];
     }
+
 
 
 }
