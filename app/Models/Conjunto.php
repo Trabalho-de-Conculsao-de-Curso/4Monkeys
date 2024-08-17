@@ -11,8 +11,8 @@ class Conjunto extends Model
 
     protected $fillable = [
         'nome',
-        'categoria',
-        'preco_total'
+        'categoria_id',
+        'preco_total',
     ];
     protected $table = 'conjunto';
 
@@ -29,5 +29,10 @@ class Conjunto extends Model
     public function softwares()
     {
         return $this->belongsToMany(Software::class, 'conjunto_software', 'conjunto_id', 'software_id');
+    }
+
+    public function categoria()
+    {
+        return $this->belongsTo(Categoria::class, 'categoria_id');  // Relacionamento com Categoria
     }
 }

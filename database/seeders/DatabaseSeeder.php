@@ -22,6 +22,7 @@ class DatabaseSeeder extends Seeder
             LojaOnlineSeeder::class,
             ProdutoSeeder::class,*/
             SoftwareSeeder::class,
+            CategoriaSeeder::class,
         ]);
     }
 }

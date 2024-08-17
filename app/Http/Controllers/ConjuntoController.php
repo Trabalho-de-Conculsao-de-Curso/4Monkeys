@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Categoria;
 use App\Models\Produto;
 use App\Models\Conjunto;
 use App\Models\Software;
@@ -38,7 +39,7 @@ class ConjuntoController extends Controller
         $softwaresSelecionados = Software::find($request->input('softwares'));
         $produtos = Produto::all();
 
-        // Preparar dados para enviar ao geminiAPI
+        // Preparar dados para enviar ao GeminiAPI
         $softwaresData = $softwaresSelecionados->toArray();
         $produtosData = $produtos->toArray();
 
@@ -47,29 +48,33 @@ class ConjuntoController extends Controller
 
             try {
                 $produtoNaoEncontrado = false;
-                $generatedProdutoFinalIds = [];
+                $generatedConjuntoIds = [];
+                $categoriasExistentes = ['1' => false, '2' => false, '3' => false];
 
                 $recommendations = $this->geminiAPIService->getRecommendations($softwaresData, $produtosData);
-                $categoriasExistentes = ['bronze' => false, 'silver' => false, 'gold' => false];
 
                 foreach ($recommendations['desktops'] as $desktop) {
-                    $category = strtolower($desktop['categoria']);
+                    $categoryId = $desktop['categoria'];  // ID da categoria retornado pela API
 
-                    // Verifica se a categoria já foi processada
-                    if (isset($categoriasExistentes[$category]) && $categoriasExistentes[$category]) {
-                        continue;
+                    // Buscar a categoria pelo ID
+                    $categoria = Categoria::find($categoryId);
+
+                    if (!$categoria) {
+                        Log::warning("Categoria não encontrada para o ID: $categoryId");
+                        $produtoNaoEncontrado = true;
+                        break;
                     }
 
-                    $produtoFinal = Conjunto::create([
-                        'nome' => 'Produto Final ' . ucfirst($category),
-                        'categoria' => $category,
+                    // Criar o Conjunto
+                    $conjunto = Conjunto::create([
+                        'nome' => 'Conjunto ' . ucfirst($categoria->nome),
+                        'categoria_id' => $categoria->id,
                         'preco_total' => $desktop['total']
                     ]);
 
-                    $generatedProdutoFinalIds[] = $produtoFinal->id;
+                    $generatedConjuntoIds[] = $conjunto->id;
+                    $categoriasExistentes[$categoria->nome] = true;
 
-                    // Marca a categoria como processada
-                    $categoriasExistentes[$category] = true;
 
                     // Associar produtos ao Conjunto
                     $componentes = $desktop['componentes'];
@@ -81,7 +86,6 @@ class ConjuntoController extends Controller
                             $possiveisProdutos = Produto::all(); // Carrega todos os produtos para comparar similaridade
 
                             if ($possiveisProdutos->isNotEmpty()) {
-
                                 $produto = $possiveisProdutos->sortBy(function ($produto) use ($componentName) {
                                     return levenshtein($componentName, $produto->nome);
                                 })->first();
@@ -93,7 +97,7 @@ class ConjuntoController extends Controller
                         }
 
                         if ($produto) {
-                            $produtoFinal->produtos()->attach($produto->id);
+                            $conjunto->produtos()->attach($produto->id);
                             Log::info("Produto: $componentName associado ao Conjunto.");
                         } else {
                             Log::warning("Produto não encontrado Controller: $componentName");
@@ -103,32 +107,32 @@ class ConjuntoController extends Controller
                     }
 
                     if ($produtoNaoEncontrado) {
-                        Conjunto::destroy($generatedProdutoFinalIds);
-                        Log::info("Produtos finais deletados devido a produtos não encontrados.");
+                        Conjunto::destroy($generatedConjuntoIds);
+                        Log::info("Conjuntos deletados devido a produtos não encontrados.");
                         break;
                     }
 
                     // Associar softwares ao Conjunto usando IDs diretamente
                     foreach ($softwaresSelecionados as $softwareSelecionado) {
-                        $produtoFinal->softwares()->attach($softwareSelecionado->id);
-                        Log::info("Software ID: {$softwareSelecionado->id} associado ao ProdutoFinal.");
+                        $conjunto->softwares()->attach($softwareSelecionado->id);
+                        Log::info("Software ID: {$softwareSelecionado->id} associado ao Conjunto.");
                     }
 
                     if ($produtoNaoEncontrado) {
-                        Conjunto::destroy($generatedProdutoFinalIds);
-                        Log::info("Produtos finais deletados devido a softwares não encontrados.");
+                        Conjunto::destroy($generatedConjuntoIds);
+                        Log::info("Conjuntos deletados devido a softwares não encontrados.");
                         break;
                     }
                 }
 
                 if (!$produtoNaoEncontrado) {
                     DB::commit();
-                    $produtoFinals = Conjunto::with('produtos', 'softwares')
-                        ->whereIn('id', $generatedProdutoFinalIds)
+                    $conjuntos = Conjunto::with('produtos', 'softwares', 'categoria')
+                        ->whereIn('id', $generatedConjuntoIds)
                         ->get();
 
                     // Retornar a view com os dados
-                    return view('resultado', compact('produtoFinals'));
+                    return view('resultado', compact('conjuntos'));
                 } else {
                     DB::rollBack();
                 }
@@ -141,4 +145,5 @@ class ConjuntoController extends Controller
 
         } while ($produtoNaoEncontrado);
     }
+
 }
