@@ -15,7 +15,6 @@ return new class extends Migration
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     nome VARCHAR(255),
                     categoria_id VARCHAR(255),
-                    preco_total REAL,
                     created_at TIMESTAMP,
                     updated_at TIMESTAMP
                 )
@@ -25,7 +24,6 @@ return new class extends Migration
                 $table->id();
                 $table->string('nome');
                 $table->string('categoria_id');
-                $table->float('preco_total');
                 $table->timestamps();
             });
         }
