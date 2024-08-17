@@ -14,7 +14,7 @@ return new class extends Migration
                 CREATE TABLE conjunto (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     nome VARCHAR(255),
-                    categoria VARCHAR(255),
+                    categoria_id VARCHAR(255),
                     preco_total REAL,
                     created_at TIMESTAMP,
                     updated_at TIMESTAMP
@@ -24,7 +24,7 @@ return new class extends Migration
             Schema::create('conjunto', function (Blueprint $table) {
                 $table->id();
                 $table->string('nome');
-                $table->string('categoria');
+                $table->string('categoria_id');
                 $table->float('preco_total');
                 $table->timestamps();
             });

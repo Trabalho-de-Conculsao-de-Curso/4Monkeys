@@ -24,15 +24,15 @@
 <div class="container mx-auto py-8 grid grid-cols-3">
 
 
-    @foreach ($produtoFinals as $produtoFinal)
+    @foreach ($conjuntos as $conjunto)
         <div>
-            <h2>{{ $produtoFinal->nome }}</h2>
-            <p>Categoria: {{ ucfirst($produtoFinal->categoria) }}</p>
-            <p>Preço Total: R$ {{ number_format($produtoFinal->preco_total, 2, ',', '.') }}</p>
+            <h2>{{ $conjunto->nome }}</h2>
+            <p>Categoria: {{ ucfirst($conjunto->categoria->nome) }}</p>
+            <p>Preço Total: R$ {{ number_format($conjunto->preco_total, 2, ',', '.') }}</p>
 
             <h3>Componentes</h3>
             <ul>
-                @foreach ($produtoFinal->produtos as $produto)
+                @foreach ($conjunto->produtos as $produto)
                     <li>{{ $produto->nome }}</li>
                 @endforeach
             </ul>

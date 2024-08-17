@@ -81,7 +81,7 @@ def salvar_produtos_no_banco(produtos):
     conn.close()
 
 # Função principal para processar todas as páginas de uma URL específica
-def processar_paginas(url_base, max_paginas=5):
+def processar_paginas(url_base, max_paginas=1):
     pagina = 1
     todos_produtos = []
 
