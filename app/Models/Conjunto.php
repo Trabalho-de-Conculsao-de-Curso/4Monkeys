@@ -12,15 +12,9 @@ class Conjunto extends Model
     protected $fillable = [
         'nome',
         'categoria_id',
-        'preco_total',
     ];
     protected $table = 'conjunto';
 
-    public function getPrecoTotalFormatado()
-    {
-
-        return number_format($this->preco_total, 2, ',', '.');
-    }
 
     public function produtos()
     {

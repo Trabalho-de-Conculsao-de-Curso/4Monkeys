@@ -50,6 +50,7 @@ class ConjuntoController extends Controller
                 $produtoNaoEncontrado = false;
                 $generatedConjuntoIds = [];
                 $categoriasExistentes = ['1' => false, '2' => false, '3' => false];
+                $conjuntos = []; // Array para armazenar conjuntos com seus totais
 
                 $recommendations = $this->geminiAPIService->getRecommendations($softwaresData, $produtosData);
 
@@ -69,12 +70,10 @@ class ConjuntoController extends Controller
                     $conjunto = Conjunto::create([
                         'nome' => 'Conjunto ' . ucfirst($categoria->nome),
                         'categoria_id' => $categoria->id,
-                        'preco_total' => $desktop['total']
                     ]);
 
                     $generatedConjuntoIds[] = $conjunto->id;
                     $categoriasExistentes[$categoria->nome] = true;
-
 
                     // Associar produtos ao Conjunto
                     $componentes = $desktop['componentes'];
@@ -118,18 +117,15 @@ class ConjuntoController extends Controller
                         Log::info("Software ID: {$softwareSelecionado->id} associado ao Conjunto.");
                     }
 
-                    if ($produtoNaoEncontrado) {
-                        Conjunto::destroy($generatedConjuntoIds);
-                        Log::info("Conjuntos deletados devido a softwares não encontrados.");
-                        break;
-                    }
+                    // Armazenar conjunto com o total retornado da API
+                    $conjuntos[] = [
+                        'conjunto' => $conjunto,
+                        'total' => $desktop['total'],  // Inclua o total da API
+                    ];
                 }
 
                 if (!$produtoNaoEncontrado) {
                     DB::commit();
-                    $conjuntos = Conjunto::with('produtos', 'softwares', 'categoria')
-                        ->whereIn('id', $generatedConjuntoIds)
-                        ->get();
 
                     // Retornar a view com os dados
                     return view('resultado', compact('conjuntos'));
@@ -145,5 +141,7 @@ class ConjuntoController extends Controller
 
         } while ($produtoNaoEncontrado);
     }
+
+
 
 }
