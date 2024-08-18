@@ -116,27 +116,31 @@ class GeminiAPIService
 
     }
 
+    public function findProductIdBySimilarity($componentName)
+    {
+        // Busca pelo produto diretamente pelo nome
+        $produto = Produto::where('nome', 'like', "%$componentName%")->first();
 
-    protected function normalizeComponentNames($decodedContent){
+        // Se o produto não for encontrado, buscar por nomes semelhantes
+        if (!$produto) {
+            $possiveisProdutos = Produto::all(); // Carrega todos os produtos para comparar similaridade
 
-        foreach ($decodedContent['desktops'] as &$desktop) {
-            foreach ($desktop['componentes'] as $key => &$component) {
-                $component = $this->extractSpecifications($component);
+            if ($possiveisProdutos->isNotEmpty()) {
+                // Usar a função Levenshtein para encontrar o nome mais parecido
+                $produto = $possiveisProdutos->sortBy(function ($produto) use ($componentName) {
+                    return levenshtein($componentName, $produto->nome);
+                })->first();
+
+                if ($produto) {
+                    Log::info("Produto mais semelhante encontrado: '{$produto->nome}'");
+                } else {
+                    Log::warning("Nenhum produto semelhante encontrado para: $componentName");
+                }
             }
         }
-        return $decodedContent;
+
+        return $produto ? $produto->id : null;
     }
-
-
-    protected function extractSpecifications($componentName){
-        $patterns=[
-            '/s\s*/i',
-        ];
-
-        $cleanName = preg_replace($patterns, "", $componentName);
-        return trim($cleanName);
-    }
-
 
 
 
@@ -148,8 +152,6 @@ class GeminiAPIService
             'gold' => 0,
         ];
 
-        // Obter produtos do cache
-        $produtosCache = Cache::get('produtos', []);
 
         foreach ($desktops as &$desktop) {
             $category = $desktop['categoria'];
@@ -157,27 +159,11 @@ class GeminiAPIService
             $total = 0;
 
             foreach ($components as $componentName) {
-                // Busca pelo produto no banco de dados
-                $produto = Produto::where('nome', 'like', "%$componentName%")->first();
 
-                // Se o produto não for encontrado, buscar por nomes semelhantes
-                if (!$produto) {
-                    $possiveisProdutos = Produto::all(); // Carrega todos os produtos para comparar similaridade
+                $productId = $this->findProductIdBySimilarity($componentName);
 
-                    if ($possiveisProdutos->isNotEmpty()) {
-                        // Usar a função Levenshtein para encontrar o nome mais parecido
-                        $produto = $possiveisProdutos->sortBy(function ($produto) use ($componentName) {
-                            return levenshtein($componentName, $produto->nome);
-                        })->first();
-
-                        Log::info("Produto mais semelhante encontrado: '{$produto->nome}'");
-                    } else {
-                        Log::warning("Nenhum produto semelhante encontrado para: $componentName");
-                    }
-                }
-
-                if ($produto) {
-                    // Agora $produto é uma instância de Produto e você pode acessar o relacionamento preco
+                if ($productId) {
+                    $produto = Produto::find($productId);
                     $price = $produto->preco->valor;
                     Log::info("Produto: {$produto->nome}, Preço: $price");
                     $total += $price;
@@ -196,8 +182,6 @@ class GeminiAPIService
             'totals' => $totals,
         ];
     }
-
-
 
 }
 
