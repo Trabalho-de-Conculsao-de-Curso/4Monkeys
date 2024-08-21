@@ -76,7 +76,7 @@ class ConjuntoController extends Controller
 
                 if (!$produtoNaoEncontrado) {
                     DB::commit();
-                    return view('resultado', compact('conjuntos'));
+                    return response()->json(['produtoFinals' => $conjunto]);
                 } else {
                     DB::rollBack();
                 }
