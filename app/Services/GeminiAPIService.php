@@ -5,7 +5,6 @@ use App\Models\LojaOnline;
 use App\Models\Preco;
 use App\Models\Produto;
 use Gemini\Laravel\Facades\Gemini;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -84,7 +83,6 @@ class GeminiAPIService
         return $prompt;
     }
 
-
     protected function parseResponse($response)
     {
 
@@ -141,8 +139,6 @@ class GeminiAPIService
 
         return $produto ? $produto->id : null;
     }
-
-
 
     public function calculateTotals($desktops)
     {
