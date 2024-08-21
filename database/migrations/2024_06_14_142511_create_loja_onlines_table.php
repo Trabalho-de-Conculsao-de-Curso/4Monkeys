@@ -13,7 +13,6 @@ return new class extends Migration
     {
         Schema::create('loja_online', function (Blueprint $table) {
             $table->id();
-            $table->string('nome');
             $table->string('urlLoja');
             $table->timestamps();
         });

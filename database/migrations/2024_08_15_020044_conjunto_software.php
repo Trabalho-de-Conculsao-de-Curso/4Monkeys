@@ -11,11 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('especificacoes', function (Blueprint $table) {
+        Schema::create('conjunto_software', function (Blueprint $table) {
             $table->id();
-            $table->string('detalhes',120);
+            $table->foreignId('conjunto_id')->constrained('conjunto')->onDelete('cascade');
+            $table->foreignId('software_id')->constrained('softwares')->onDelete('cascade');
             $table->timestamps();
-
         });
     }
 
@@ -24,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('especificacoes');
+        Schema::dropIfExists('conjunto_software');
     }
 };

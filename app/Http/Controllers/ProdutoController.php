@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Especificacoes;
-use App\Models\Marca;
 use App\Models\LojaOnline;
 use App\Models\Preco;
 use App\Models\Produto;
@@ -14,7 +12,7 @@ class ProdutoController extends Controller
 
     public function index()
     {
-        $produtos = Produto::with('marca','especificacoes', 'preco', 'lojaOnline')->paginate(10);
+        $produtos = Produto::with( 'preco', 'lojaOnline')->paginate(10);
         return view('produtos.index', [
             'produtos' => $produtos
         ]);
@@ -31,26 +29,10 @@ class ProdutoController extends Controller
     {
         $request->validate([
             'nome' => 'required',
-            'marca_nome' => 'required',
-            'marca_qualidade' => 'required',
-            'marca_garantia' => 'required',
-            'especificacoes_detalhes' => 'required',
             'preco_valor' => 'required',
             'preco_moeda' => 'required',
-            'lojasOnline' => 'required',
             'urlLojaOnline' => 'required'
         ]);
-
-        // Cria uma nova Marca, Especificacoes, Preco, LojaOnline
-        $marca = new Marca();
-        $marca->nome = $request->input('marca_nome');
-        $marca->qualidade = $request->input('marca_qualidade');
-        $marca->garantia = $request->input('marca_garantia');
-        $marca->save();
-
-        $especificacoes = new Especificacoes();
-        $especificacoes->detalhes = $request->input('especificacoes_detalhes');
-        $especificacoes->save();
 
         $preco = new Preco();
         $preco->valor = $request->input('preco_valor');
@@ -58,15 +40,12 @@ class ProdutoController extends Controller
         $preco->save();
 
         $lojaOnline = new LojaOnline();
-        $lojaOnline->nome = $request->input('lojasOnline');
         $lojaOnline->urlLoja = $request->input('urlLojaOnline');
         $lojaOnline->save();
 
         // Criar o produto associado à marca
         $produto = new Produto();
         $produto->nome = $request->input('nome');
-        $produto->marca_id = $marca->id;
-        $produto->especificacoes_id = $especificacoes->id;
         $produto->preco_id = $preco->id;
         $produto->loja_online_id = $lojaOnline->id;
 
@@ -81,18 +60,10 @@ class ProdutoController extends Controller
         $search = $request->input('search');
 
         $results = Produto::where(function($query) use ($search) {
-            $query->where('nome', 'like', "%$search%")
+            $query->where('id', 'like', "%$search%")
                 ->orWhere('preco', 'like', "%$search%")
                 ->orWhere('lojasOnline', 'like', "%$search%");
         })
-            ->orWhereHas('marca', function($query) use ($search) {
-                $query->where('nome', 'like', "%$search%")
-                    ->orWhere('qualidade', 'like', "%$search%")
-                    ->orWhere('garantia', 'like', "%$search%");
-            })
-            ->orWhereHas('especificacoes', function($query) use ($search) {
-                $query->where('detalhes', 'like', "%$search%");
-            })
             ->orWhereHas('lojaOnline', function($query) use ($search) {
                 $query->where('nome', 'like', "%$search%")
                     ->orWhere('urlLoja', 'like', "%$search%");
@@ -109,7 +80,7 @@ class ProdutoController extends Controller
 
     public function edit($id)
     {
-        $produto= Produto::with('marca','especificacoes', 'preco','lojaOnline')->find($id);
+        $produto= Produto::with( 'preco','lojaOnline')->find($id);
         return view('produtos.editProduto',compact('produto'));
     }
 
@@ -119,17 +90,6 @@ class ProdutoController extends Controller
         $produto = Produto::find($id);
         $produto->update($request->all());
 
-        $marca = Marca::find($produto->marca_id);
-        $marca->update([
-            'nome' => $request->input('marca_nome'),
-            'qualidade' => $request->input('marca_qualidade'),
-            'garantia' => $request->input('marca_garantia'),
-
-        ]);
-        $especificacoes = Especificacoes::find($produto->especificacoes_id);
-        $especificacoes->update([
-            'detalhes' => $request->input('especificacoes_detalhes'),
-        ]);
 
         $marca = Preco::find($produto->preco_id);
         $marca->update([
@@ -140,7 +100,6 @@ class ProdutoController extends Controller
 
         $lojaOnline = LojaOnline::find($produto->loja_online_id);
         $lojaOnline->update([
-            'nome' => $request->input('lojasOnline'),
             'urlLoja' => $request->input('urlLojaOnline'),
         ]);
 
@@ -156,8 +115,6 @@ class ProdutoController extends Controller
 
         if (request()->has('_token')){
             $produto = Produto::findOrFail($id);
-            $produto->marca()->delete();
-            $produto->especificacoes()->delete();
             $produto->preco()->delete();
             $produto->lojaOnline()->delete();
             $produto->delete();
