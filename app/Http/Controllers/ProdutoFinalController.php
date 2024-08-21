@@ -116,7 +116,7 @@ class ProdutoFinalController extends Controller
                         ->get();
 
                     // Retornar a view com os dados
-                    return view('resultado', compact('produtoFinals'));
+                    return response()->json(['produtoFinals' => $produtoFinals]);
                 } else {
                     DB::rollBack();
                 }
