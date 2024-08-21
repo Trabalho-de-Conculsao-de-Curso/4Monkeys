@@ -207,19 +207,19 @@
         fetch('{{ route("home.selecionar") }}', {
             method: 'POST',
             body: formData,
-            headers: {
+            /*headers: {
                 'X-CSRF-TOKEN': '{{ csrf_token() }}'
-            }
+            }*/
         })
         .then(response => response.json())
         .then(data => {
-            loadingSpinner.classList.add('hidden'); // Oculta a animação de carregamento
-            // Faça algo com a resposta, como atualizar a interface do usuário
+            loadingSpinner.classList.add('hidden'); 
+           
             console.log(data);
             alert("Softwares selecionados com sucesso!");
         })
         .catch(error => {
-            loadingSpinner.classList.add('hidden'); // Oculta a animação de carregamento
+            loadingSpinner.classList.add('hidden'); 
             console.error('Erro:', error);
             alert("Ocorreu um erro ao selecionar os softwares.");
         });
