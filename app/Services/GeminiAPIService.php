@@ -1,6 +1,8 @@
 <?php
 namespace App\Services;
 
+use App\Models\LojaOnline;
+use App\Models\Preco;
 use App\Models\Produto;
 use Gemini\Laravel\Facades\Gemini;
 use Illuminate\Support\Facades\Http;
@@ -21,6 +23,7 @@ class GeminiAPIService
 
     public function getRecommendations(array $softwares, array $produtos)
     {
+
         $prompt = $this->generatePrompt($softwares, $produtos);
 
         $response = Http::withHeaders([
@@ -28,52 +31,61 @@ class GeminiAPIService
             'Content-Type' => 'application/json'
         ])->post($this->apiUrl, [
             'prompt' => $prompt,
-            'model'
+            'model' =>'text-davinci-003'
         ]);
-        if ($response = Gemini::geminiPro()->generateContent([$prompt])) {
-            return $this->parseResponse($response);
+        if ($response=Gemini::geminiPro()->generateContent([$prompt])) {
+            $recommendations = $this->parseResponse($response);
+            return $this->calculateTotals($recommendations['desktops']);
+        } else {
+            Log::error('Erro ao chamar a API do Gemini: ');
+            throw new \Exception('Erro ao chamar a API do Gemini');
         }
-
-
     }
 
     protected function generatePrompt(array $softwares, array $produtos)
     {
 
+        $prompt = "Avalie os softwares selecionados e utilize como base para montar três desktops categorizados como bronze, silver e gold.\n\n";
+        $prompt .= "Monte os desktops de forma que atendam aos requisitos mínimos dos softwares escolhidos, focando na custo-efetividade dos componentes utilizados.\n";
+        $prompt .= "Crie um arquivo JSON mostrando todos os produtos necessários para que cada desktop atenda os requisitos das categorias de acordo com os produtos cadastrados no banco de dados.\n\n";
+        $prompt .= "Certifique-se de que todos os componentes são compatíveis entre si e que cada desktop inclui os seguintes componentes essenciais: CPU, GPU, RAM, HD ou SSD, Fonte, MOTHERBOARD e Cooler.\n\n";
+        $prompt .= "Retorne os dados estruturados no seguinte formato JSON, mantendo apenas os nomes dos componentes e removendo qualquer informação adicional:\n\n";
+        $prompt .= "{ \"desktops\": [ { \"categoria\": \"1\", \"componentes\": { \"CPU\": \"Nome do Produto\", \"GPU\": \"Nome do Produto\", \"RAM\": \"Nome do Produto\", \"Fonte\": \"Nome do Produto\", \"MOTHERBOARD\": \"Nome do Produto\", \"Cooler\": \"Nome do Produto\", \"HD\": \"Nome do Produto\" }, \"total\": VALOR_DA_SOMA_TOTAL_DOS_ITENS_SELECIONADOS }, { \"categoria\": \"2\", \"componentes\": { \"CPU\": \"Nome do Produto\", \"GPU\": \"Nome do Produto\", \"RAM\": \"Nome do Produto\", \"Fonte\": \"Nome do Produto\", \"MOTHERBOARD\": \"Nome do Produto\", \"Cooler\": \"Nome do Produto\", \"HD\": \"Nome do Produto\" }, \"total\": VALOR_DA_SOMA_TOTAL_DOS_ITENS SELECIONADOS }, { \"categoria\": \"3\", \"componentes\": { \"CPU\": \"Nome do Produto\", \"GPU\": \"Nome do Produto\", \"RAM\": \"Nome do Produto\", \"Fonte\": \"Nome do Produto\", \"MOTHERBOARD\": \"Nome do Produto\", \"Cooler\": \"Nome do Produto\", \"HD\": \"Nome do Produto\" }, \"total\": VALOR_DA_SOMA TOTAL_DOS ITENS SELECIONADOS } ] }\n\n";
+        $prompt .= "Garanta a integridade e consistência de todas as informações.\n\n";
+        $prompt .= "Softwares selecionados e seus requisitos:\n";
+
         foreach ($softwares as $software) {
-            $prompt = "- {$software['nome']}\n";
-            $prompt .= "- {$software['requisitos']}\n";
-
-            // Gerar o prompt que será enviado para a API do Gemini
-            $prompt .= "Avalie os requisitos dos softwares selecionados e baseie-se nelas para a montagem dos desktops.\n\n";
-            $prompt .= "Monte 3 desktops categorizados como bronze, silver e gold baseado nos softwares escolhidos e seus requisitos.\n";
-            $prompt .= "Crie um arquivo tipo Json mostrando todos os produtos necessarios para que um desktop atenda os requisitos das categorias de acordo com os produtos cadastrados no banco\n\n";
-            $prompt .= "Certifique-se de que todos os componentes são compatíveis entre si e que cada desktop inclui os seguintes componentes essenciais: CPU, GPU, RAM,HD ou SSD, Fonte, MOTHERBOARD e Cooler.\n\n";
-            $prompt .= "Retorne os dados estruturados no seguinte formato JSON:\n\n";
-            $prompt .= "{ \"desktops\": [ { \"categoria\": \"bronze\", \"componentes\": { \"CPU\": \"Produto analisado\", \"GPU\": \"Produto analisado\", \"RAM\": \"Produto analisado\", \"Fonte\": \"Produto analisado\", \"MOTHERBOARD\": \"Produto analisado\", \"Cooler\": \"Produto analisado\", \"HD\": \"Produto analisado\" }, \"total\": VALOR_DA_SOMA_TOTAL_DOS_ITENS_SELECIONADOS }, { \"categoria\": \"silver\", \"componentes\": { \"CPU\": \"Produto analisado\", \"GPU\": \"Produto analisado\", \"RAM\": \"Produto analisado\", \"Fonte\": \"Produto analisado\", \"MOTHERBOARD\": \"Produto analisado\", \"Cooler\": \"Produto analisado\", \"HD\": \"Produto analisado\" }, \"total\": VALOR_DA_SOMA_TOTAL_DOS_ITENS_SELECIONADOS }, { \"categoria\": \"gold\", \"componentes\": { \"CPU\": \"Produto analisado\", \"GPU\": \"Produto analisado\", \"RAM\": \"Produto analisado\", \"Fonte\": \"Produto analisado\", \"MOTHERBOARD\": \"Produto analisado\", \"Cooler\": \"Produto analisado\", \"HD\": \"Produto analisado\" }, \"total\": VALOR_DA_SOMA_TOTAL_DOS_ITENS_SELECIONADOS } ] }\n\n";
-            $prompt .= "Realize a soma dos Preço: da CPU, GPU, RAM, HDD ou SSD, Fonte, MOTHERBOARD e Cooler de cada desktop (Bronze, Silver Gold) individualmente de acordo com os valores informados no cadastro do produto.\n";
-            $prompt .= "Garanta a integridade e consistência de todas as informaçoes\n\n";
-            $prompt .= "Softwares selecionados:\n";
+            $prompt .= "- Nome: {$software['nome']}\n";
         }
-
+        $prompt .= "Utilize APENAS os seguintes produtos disponíveis\n";
         $prompt .= "\nProdutos Disponíveis:\n";
         foreach ($produtos as $produto) {
-            $produtoModel = Produto::find($produto['id']);
-            $marcaNome = $produtoModel->marca->nome;
-            $especificacoes = $produtoModel->especificacoes->detalhes;
-            $preco = $produtoModel->preco->valor;
+            $preco = Preco::find($produto['preco_id'])->valor ?? 'N/A';
+            $url = LojaOnline::find($produto['loja_online_id'])->url ?? 'URL não disponível';
 
-            $prompt .= "- Nome: {$produto['nome']}, Preço: {$preco}, Marca: {$marcaNome}, Especificações: {$especificacoes}\n";
+            if ($preco !== 'N/A') {
+                $prompt .= "- Nome: {$produto['nome']}, Preço: R$ {$preco}, URL: {$url}\n";
+            } else {
+                Log::warning("Preço não encontrado para o produto ID: {$produto['id']}");
+                $prompt .= "- Nome: {$produto['nome']}, Preço: N/A\n";
+            }
+            $prompt .= "\nGaranta que seja passado exatamente o mesmo nome do array\n";
+            $prompt .= "- Nome: {$produto['nome']}, Preço: R$ {$preco}\n";
         }
 
-        $prompt .= "Os valores estão sendo salvos como int, realize a soma precisa desses valores para apresentação do valor final do desktop da CPU, GPU, RAM, HDD ou SSD, Fonte, MOTHERBOARD e Cooler de cada desktop (Bronze, Silver e Gold) individualmente de acordo com os valores informados no cadastro do produto.\n";
-        $prompt .= "Retorne a resposta em JSON no formato especificado acima.\n";
+
+        $prompt .= "\nDicas adicionais:\n";
+        $prompt .= "- Priorize componentes com melhor relação custo-efetividade.\n";
+        $prompt .= "- Para a categoria 1, escolha componentes que atendam aos requisitos mínimos dos softwares com o menor custo.\n";
+        $prompt .= "- Para a categoria 2, escolha componentes que ofereçam um bom equilíbrio entre desempenho e custo.\n";
+        $prompt .= "- Para a categoria 3, escolha componentes de alta performance, mas ainda mantendo a preocupação com o custo-efetividade.\n";
 
         return $prompt;
     }
 
     protected function parseResponse($response)
     {
+
         $candidates = $response->candidates ?? [];
 
         foreach ($candidates as $candidate) {
@@ -101,4 +113,75 @@ class GeminiAPIService
         throw new \Exception('Resposta da API do Gemini não está no formato esperado');
 
     }
+
+    public function findProductIdBySimilarity($componentName)
+    {
+        // Busca pelo produto diretamente pelo nome
+        $produto = Produto::where('nome', 'like', "%$componentName%")->first();
+
+        // Se o produto não for encontrado, buscar por nomes semelhantes
+        if (!$produto) {
+            $possiveisProdutos = Produto::all(); // Carrega todos os produtos para comparar similaridade
+
+            if ($possiveisProdutos->isNotEmpty()) {
+                // Usar a função Levenshtein para encontrar o nome mais parecido
+                $produto = $possiveisProdutos->sortBy(function ($produto) use ($componentName) {
+                    return levenshtein($componentName, $produto->nome);
+                })->first();
+
+                if ($produto) {
+                    Log::info("Produto mais semelhante encontrado: '{$produto->nome}'");
+                } else {
+                    Log::warning("Nenhum produto semelhante encontrado para: $componentName");
+                }
+            }
+        }
+
+        return $produto ? $produto->id : null;
+    }
+
+    public function calculateTotals($desktops)
+    {
+        $totals = [
+            'bronze' => 0,
+            'silver' => 0,
+            'gold' => 0,
+        ];
+
+
+        foreach ($desktops as &$desktop) {
+            $category = $desktop['categoria'];
+            $components = $desktop['componentes'];
+            $total = 0;
+
+            foreach ($components as $componentName) {
+
+                $productId = $this->findProductIdBySimilarity($componentName);
+
+                if ($productId) {
+                    $produto = Produto::find($productId);
+                    $price = $produto->preco->valor;
+                    Log::info("Produto: {$produto->nome}, Preço: $price");
+                    $total += $price;
+                } else {
+                    Log::warning("Produto não encontrado: $componentName");
+                }
+            }
+
+            Log::info("Total para a categoria $category: $total");
+            $desktop['total'] = $total; // Atualize o total no array $desktops
+            $totals[$category] = $total;
+        }
+
+        return [
+            'desktops' => $desktops,
+            'totals' => $totals,
+        ];
+    }
+
 }
+
+
+
+
+

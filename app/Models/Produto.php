@@ -11,21 +11,12 @@ class Produto extends Model
 
     protected $fillable = [
         'nome',
-        'marca_id',
-        'especificacoes_id',
         'preco_id',
         'loja_online_id',
         'created_at',
         'updated_at',
     ];
 
-    public function marca(){
-        return $this->belongsTo(Marca::class);
-    }
-
-    public function especificacoes(){
-        return $this->belongsTo(Especificacoes::class);
-    }
 
     public function preco(){
         return $this->belongsTo(Preco::class);
@@ -35,9 +26,9 @@ class Produto extends Model
         return $this->belongsTo(LojaOnline::class);
     }
 
-    public function produtoFinais()
+    public function conjunto()
     {
-        return $this->belongsToMany(ProdutoFinal::class, 'produto_final_produto', 'produto_id', 'produto_final_id');
+        return $this->belongsToMany(Conjunto::class, 'conjunto_produto', 'produto_id', 'conjunto_id');
     }
 
     public static function search($term)

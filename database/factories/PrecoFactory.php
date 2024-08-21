@@ -19,7 +19,6 @@ class PrecoFactory extends Factory
         return [
             'valor' => $this->faker->randomFloat(2, 1, 1000),
             'moeda' => 'BRL',
-
         ];
 
     }
