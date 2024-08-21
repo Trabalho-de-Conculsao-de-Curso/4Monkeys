@@ -136,5 +136,4 @@ class ConjuntoController extends Controller
             Log::info("Software ID: {$softwareSelecionado['id']} associado ao Conjunto.");
         }
     }
-
 }
