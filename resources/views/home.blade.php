@@ -42,7 +42,7 @@
             <h1 class="text-2xl font-bold">4 Monkeys Setup</h1>
         </div>
             <button class="bg-gray-600 font-bold text-white py-2 px-4 rounded hover:bg-purple-700 transition duration-300 border-2 border-purple-800">
-                ASSINAR AGORA 
+                ASSINAR AGORA
             </button>
     </header>
 
@@ -68,7 +68,7 @@
                     </svg>
                 </button>
             </div>
-            
+
             <div id="mobile-menu" class="bg-zinc-900 text-gray-200 p-4 border-r-2 border-gray-600 fixed top-0 left-0 w-64 h-full transform -translate-x-full md:hidden">
                 <h2 class="text-2xl font-bold mb-6">Menu</h2>
                 <ul>
@@ -112,7 +112,7 @@
                     </div>
                 </div>
                     <div>
-                        <form id="software-selection-form" action="{{ route('home.selecionar') }}" method="POST" class="bg-zinc-800 relative rounded-lg shadow p-6 border border-gray-600" onsubmit="validateForm(event)">
+                        <form id="software-selection-form" action="{{ auth()->check() ? route('home.selecionar') : route('free.selecionar') }}" method="POST" class="bg-zinc-800 relative rounded-lg shadow p-6 border border-gray-600" onsubmit="validateForm(event)">
                             @csrf
                             <h2 class="text-2xl font-semibold mb-4">Selecione os Softwares Desejados:</h2>
                             <div class="mb-6 grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -189,7 +189,7 @@
         </div>
     </div>
 
-    <script>
+    {{--<script>
         // Toggle mobile menu
         document.getElementById('menu-btn').addEventListener('click', function() {
             var menu = document.getElementById('mobile-menu');
@@ -225,6 +225,6 @@
         });
     });
 
-    </script>
+    </script> --}}
 </body>
 </html>
