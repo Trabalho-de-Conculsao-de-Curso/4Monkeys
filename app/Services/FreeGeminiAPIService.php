@@ -6,7 +6,7 @@ use Gemini\Laravel\Facades\Gemini;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
-class FreeGeminiService
+class FreeGeminiAPIService
 {
     protected $apiKey;
     protected $apiUrl;
@@ -32,8 +32,16 @@ class FreeGeminiService
         ]);
 
         if ($response=Gemini::geminiPro()->generateContent([$prompt])) {
-            $recommendations = $this->parseResponse($response);
-            return $recommendations['desktops']; // Retorna os desktops sem cálculo de preços
+            if (!empty($response->candidates) && is_array($response->candidates)) {
+                // Extrair o conteúdo da resposta
+                $content = $response->candidates[0]->content->parts[0]->text;
+
+                // Parsear as recomendações do conteúdo textual
+                return $this->parseRecommendations($content);
+            } else {
+                Log::error('Resposta inesperada da API gratuita do Gemini.');
+                throw new \Exception('Resposta inesperada da API gratuita do Gemini');
+            }
         } else {
             Log::error('Erro ao chamar a API gratuita do Gemini: ' . $response->body());
             throw new \Exception('Erro ao chamar a API gratuita do Gemini');
@@ -44,6 +52,8 @@ class FreeGeminiService
     {
         // Similar ao generatePrompt do GeminiAPIService, mas simplificado
         $prompt = "Crie três desktops categorizados como bronze, silver e gold com base nos softwares selecionados e produtos disponíveis.\n\n";
+        $prompt .= "Retorne os dados estruturados no seguinte formato JSON, mantendo apenas os nomes dos componentes e removendo qualquer informação adicional:\n\n";
+        $prompt .= "{ \"desktops\": [ { \"categoria\": \"bronze\", \"componentes\": { \"CPU\": \"Nome do Produto\", \"GPU\": \"Nome do Produto\", \"RAM\": \"Nome do Produto\", \"Fonte\": \"Nome do Produto\", \"MOTHERBOARD\": \"Nome do Produto\", \"Cooler\": \"Nome do Produto\", \"HD\": \"Nome do Produto\" } }, { \"categoria\": \"silver\", \"componentes\": { \"CPU\": \"Nome do Produto\", \"GPU\": \"Nome do Produto\", \"RAM\": \"Nome do Produto\", \"Fonte\": \"Nome do Produto\", \"MOTHERBOARD\": \"Nome do Produto\", \"Cooler\": \"Nome do Produto\", \"HD\": \"Nome do Produto\" } }, { \"categoria\": \"gold\", \"componentes\": { \"CPU\": \"Nome do Produto\", \"GPU\": \"Nome do Produto\", \"RAM\": \"Nome do Produto\", \"Fonte\": \"Nome do Produto\", \"MOTHERBOARD\": \"Nome do Produto\", \"Cooler\": \"Nome do Produto\", \"HD\": \"Nome do Produto\" } } ] }\n\n";
         $prompt .= "Softwares selecionados:\n";
         foreach ($softwares as $software) {
             $prompt .= "- Nome: {$software['nome']}\n";
@@ -57,26 +67,31 @@ class FreeGeminiService
         return $prompt;
     }
 
-    protected function parseResponse($response)
+    protected function parseRecommendations($content)
     {
-        // Parsear a resposta da API, similar ao GeminiAPIService
-        if (isset($response['choices'][0]['text'])) {
-            $content = $response['choices'][0]['text'];
-            $cleanContent = preg_replace('/```json|```/', '', $content);
-            $cleanContent = trim($cleanContent);
+        // Decodifica o JSON retornado pela API
+        $decodedContent = json_decode($content, true);
 
-            Log::info('Resposta da API gratuita do Gemini: ' . $cleanContent);
-            $decodedContent = json_decode($cleanContent, true);
+        // Adiciona logs para verificar o conteúdo decodificado
+        Log::info('Resposta JSON decodificada: ', $decodedContent);
 
-            if (json_last_error() === JSON_ERROR_NONE) {
-                Log::info('JSON decodificado com sucesso: ' . print_r($decodedContent, true));
-                return $decodedContent;
-            } else {
-                Log::error('Erro ao decodificar o JSON: ' . json_last_error_msg());
-                throw new \Exception('Erro ao decodificar a resposta JSON: ' . json_last_error_msg());
-            }
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            Log::error('Erro ao decodificar JSON: ' . json_last_error_msg());
+            throw new \Exception('Erro ao decodificar JSON: ' . json_last_error_msg());
         }
 
-        throw new \Exception('Resposta da API gratuita do Gemini não está no formato esperado');
+        // Extrai os desktops do conteúdo decodificado
+        $desktops = [];
+        foreach ($decodedContent['desktops'] as $desktop) {
+            $desktops[] = [
+                'categoria' => $desktop['categoria'],  // Pode ser 'bronze', 'silver' ou 'gold'
+                'componentes' => $desktop['componentes'],  // Contém os componentes do desktop
+            ];
+        }
+
+        // Log dos desktops extraídos
+        Log::info('Desktops parseados: ', $desktops);
+
+        return $desktops;
     }
 }
