@@ -2,9 +2,12 @@
 
 namespace Database\Factories;
 
-use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Models\Produto;
 use App\Models\Marca;
+use App\Models\Especificacoes;
+use App\Models\Preco;
+use App\Models\LojaOnline;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Produto>
@@ -17,15 +20,16 @@ class ProdutoFactory extends Factory
      * @return array<string, mixed>
      */
     protected $model = Produto::class;
+
     public function definition(): array
     {
         $marca = Marca::factory()->create();
         return [
             'nome' => $this->faker->word,
-            'marca_id' => $marca->id,
-            'especificacoes' => $this->faker->sentence(),
-            'preco' => $this->faker->randomFloat(2, 10, 1000),
-            'lojasOnline'=> json_encode(['Loja A', 'Loja B', 'Loja C']),
+            'marca_id' => Marca::factory(),
+            'especificacoes_id' => Especificacoes::factory(),
+            'preco_id' => Preco::factory(),
+            'loja_online_id' => LojaOnline::factory(),
         ];
     }
 
