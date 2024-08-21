@@ -2,15 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Categoria;
 use App\Models\Produto;
-use App\Models\ProdutoFinals;
+use App\Models\Conjunto;
 use App\Models\Software;
 use App\Services\GeminiAPIService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
-class ProdutoFinalController extends Controller
+class ConjuntoController extends Controller
 {
     protected $geminiAPIService;
 
@@ -35,88 +36,47 @@ class ProdutoFinalController extends Controller
 
     public function selecionar(Request $request)
     {
-        $softwaresSelecionados = Software::find($request->input('softwares'));
-        $produtos = Produto::all();
-
-        // Preparar dados para enviar ao geminiAPI
-        $softwaresData = $softwaresSelecionados->toArray();
-        $produtosData = $produtos->toArray();
+        $softwaresSelecionados = $this->obterSoftwaresSelecionados($request);
+        $produtos = $this->obterTodosProdutos();
 
         do {
             DB::beginTransaction();
 
             try {
                 $produtoNaoEncontrado = false;
-                $generatedProdutoFinalIds = [];
+                $generatedConjuntoIds = [];
+                $conjuntos = []; // Array para armazenar conjuntos com seus totais
 
-                $recommendations = $this->geminiAPIService->getRecommendations($softwaresData, $produtosData);
-                $categoriasExistentes = ['bronze' => false, 'silver' => false, 'gold' => false];
+                $recommendations = $this->geminiAPIService->getRecommendations($softwaresSelecionados, $produtos);
 
                 foreach ($recommendations['desktops'] as $desktop) {
-                    $category = strtolower($desktop['categoria']);
+                    $categoria = $this->buscarCategoriaPorId($desktop['categoria']);
 
-                    // Verifica se a categoria já foi processada
-                    if (isset($categoriasExistentes[$category]) && $categoriasExistentes[$category]) {
-                        continue;
-                    }
-
-                    $produtoFinal = ProdutoFinals::create([
-                        'nome' => 'Produto Final ' . ucfirst($category),
-                        'categoria' => $category,
-                        'preco_total' => $desktop['total'] / 100
-                    ]);
-
-                    $generatedProdutoFinalIds[] = $produtoFinal->id;
-
-                    // Marca a categoria como processada
-                    $categoriasExistentes[$category] = true;
-
-                    // Associar produtos ao ProdutoFinals
-                    $componentes = $desktop['componentes'];
-                    foreach ($componentes as $componentName) {
-                        // Busca pelo produto associado
-                        $produto = Produto::whereHas('especificacoes', function ($query) use ($componentName) {
-                            $query->where('detalhes', 'like', "%$componentName%");
-                        })
-                            ->first();
-
-                        if ($produto) {
-                            $produtoFinal->produtos()->attach($produto);
-                            Log::info("Produto: $componentName associado ao ProdutoFinals.");
-                        } else {
-                            Log::warning("Produto não encontrado Controller: $componentName");
-                            $produtoNaoEncontrado = true;
-                            break;
-                        }
-                    }
-
-                    if ($produtoNaoEncontrado) {
-                        ProdutoFinals::destroy($generatedProdutoFinalIds);
-                        Log::info("Produtos finais deletados devido a produtos não encontrados.");
+                    if (!$categoria) {
+                        Log::warning("Categoria não encontrada para o ID: {$desktop['categoria']}");
+                        $produtoNaoEncontrado = true;
                         break;
                     }
 
-                    // Associar softwares ao ProdutoFinals usando IDs diretamente
-                    foreach ($softwaresSelecionados as $softwareSelecionado) {
-                        $produtoFinal->softwares()->attach($softwareSelecionado->id);
-                        Log::info("Software ID: {$softwareSelecionado->id} associado ao ProdutoFinal.");
-                    }
+                    $conjunto = $this->criarConjunto($categoria);
+                    $generatedConjuntoIds[] = $conjunto->id;
 
-                    if ($produtoNaoEncontrado) {
-                        ProdutoFinals::destroy($generatedProdutoFinalIds);
-                        Log::info("Produtos finais deletados devido a softwares não encontrados.");
+                    if (!$this->associarProdutosAoConjunto($conjunto, $desktop['componentes'])) {
+                        $produtoNaoEncontrado = true;
                         break;
                     }
+
+                    $this->associarSoftwaresAoConjunto($conjunto, $softwaresSelecionados);
+
+                    $conjuntos[] = [
+                        'conjunto' => $conjunto,
+                        'total' => $desktop['total'],
+                    ];
                 }
 
                 if (!$produtoNaoEncontrado) {
                     DB::commit();
-                    $produtoFinals = ProdutoFinals::with('produtos', 'softwares')
-                        ->whereIn('id', $generatedProdutoFinalIds)
-                        ->get();
-
-                    // Retornar a view com os dados
-                    return response()->json(['produtoFinals' => $produtoFinals]);
+                    return view('resultado', compact('conjuntos'));
                 } else {
                     DB::rollBack();
                 }
@@ -129,4 +89,52 @@ class ProdutoFinalController extends Controller
 
         } while ($produtoNaoEncontrado);
     }
+
+    protected function obterSoftwaresSelecionados(Request $request)
+    {
+        return Software::find($request->input('softwares'))->toArray();
+    }
+
+    protected function obterTodosProdutos()
+    {
+        return Produto::all()->toArray();
+    }
+
+    protected function buscarCategoriaPorId($categoryId)
+    {
+        return Categoria::find($categoryId);
+    }
+
+    protected function criarConjunto(Categoria $categoria)
+    {
+        return Conjunto::create([
+            'nome' => 'Conjunto ' . ucfirst($categoria->nome),
+            'categoria_id' => $categoria->id,
+        ]);
+    }
+
+    protected function associarProdutosAoConjunto(Conjunto $conjunto, array $componentes)
+    {
+        foreach ($componentes as $componentName) {
+            $productId = $this->geminiAPIService->findProductIdBySimilarity($componentName);
+
+            if ($productId) {
+                $conjunto->produtos()->attach($productId);
+                Log::info("Produto: $componentName associado ao Conjunto.");
+            } else {
+                Log::warning("Produto não encontrado Controller: $componentName");
+                return false;
+            }
+        }
+        return true;
+    }
+
+    protected function associarSoftwaresAoConjunto(Conjunto $conjunto, array $softwaresSelecionados)
+    {
+        foreach ($softwaresSelecionados as $softwareSelecionado) {
+            $conjunto->softwares()->attach($softwareSelecionado['id']);
+            Log::info("Software ID: {$softwareSelecionado['id']} associado ao Conjunto.");
+        }
+    }
+
 }
