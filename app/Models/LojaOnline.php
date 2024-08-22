@@ -14,6 +14,8 @@ class LojaOnline extends Model
     protected $fillable = [
         'nome',
         'urlLoja',
+        'valor',
+        'moeda',
         'created_at',
         'updated_at',
     ];
