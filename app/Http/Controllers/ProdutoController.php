@@ -12,7 +12,7 @@ class ProdutoController extends Controller
 
     public function index()
     {
-        $produtos = Produto::with( 'preco', 'lojaOnline')->paginate(10);
+        $produtos = Produto::with(  'lojaOnline')->paginate(10);
         return view('produtos.index', [
             'produtos' => $produtos
         ]);
@@ -34,19 +34,16 @@ class ProdutoController extends Controller
             'urlLojaOnline' => 'required'
         ]);
 
-        $preco = new Preco();
-        $preco->valor = $request->input('preco_valor');
-        $preco->moeda = $request->input('preco_moeda');
-        $preco->save();
 
         $lojaOnline = new LojaOnline();
+        $lojaOnline->valor =$request->input('preco_valor');
+        $lojaOnline->moeda =$request->input('preco_moeda');
         $lojaOnline->urlLoja = $request->input('urlLojaOnline');
         $lojaOnline->save();
 
         // Criar o produto associado à marca
         $produto = new Produto();
         $produto->nome = $request->input('nome');
-        $produto->preco_id = $preco->id;
         $produto->loja_online_id = $lojaOnline->id;
 
         $produto->save();
@@ -66,10 +63,8 @@ class ProdutoController extends Controller
         })
             ->orWhereHas('lojaOnline', function($query) use ($search) {
                 $query->where('nome', 'like', "%$search%")
-                    ->orWhere('urlLoja', 'like', "%$search%");
-            })
-            ->orWhereHas('preco', function($query) use ($search) {
-                $query->where('valor', 'like', "%$search%")
+                    ->orWhere('urlLoja', 'like', "%$search%")
+                    ->orWhere('valor', 'like', "%$search%")
                     ->orWhere('moeda', 'like', "%$search%");
             })
             ->paginate(10)->appends(['search' => $search]); // Adicionando o parâmetro de busca à paginação
@@ -80,7 +75,7 @@ class ProdutoController extends Controller
 
     public function edit($id)
     {
-        $produto= Produto::with( 'preco','lojaOnline')->find($id);
+        $produto= Produto::with( 'lojaOnline')->find($id);
         return view('produtos.editProduto',compact('produto'));
     }
 
@@ -91,17 +86,14 @@ class ProdutoController extends Controller
         $produto->update($request->all());
 
 
-        $marca = Preco::find($produto->preco_id);
-        $marca->update([
-            'valor' => $request->input('preco_valor'),
-            'moeda' => $request->input('preco_moeda'),
-
-        ]);
-
         $lojaOnline = LojaOnline::find($produto->loja_online_id);
         $lojaOnline->update([
             'urlLoja' => $request->input('urlLojaOnline'),
+            'valor' => $request->input('preco_valor'),
+            'moeda' => $request->input('preco_moeda')
         ]);
+
+
 
 
         return redirect()->route('produtos.index');
@@ -115,7 +107,6 @@ class ProdutoController extends Controller
 
         if (request()->has('_token')){
             $produto = Produto::findOrFail($id);
-            $produto->preco()->delete();
             $produto->lojaOnline()->delete();
             $produto->delete();
             return redirect()->route('produtos.index');
