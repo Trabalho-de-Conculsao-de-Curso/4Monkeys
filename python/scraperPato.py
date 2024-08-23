@@ -55,25 +55,27 @@ def salvar_produtos_no_banco(produtos):
 
             if loja_online_result:
                 loja_online_id = loja_online_result[0]
-            else:
-
+                # Atualizar os valores de 'valor' e 'moeda' na tabela loja_online
                 cursor.execute('''
-                    INSERT INTO loja_online (urlLoja, created_at, updated_at)
-                    VALUES (?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-                ''', (produto['link'],))
+                    UPDATE loja_online
+                    SET valor = ?, moeda = ?, updated_at = CURRENT_TIMESTAMP
+                    WHERE id = ?
+                ''', (produto['preco'], produto['moeda'], loja_online_id))
+            else:
+                # Inserir uma nova entrada na tabela loja_online
+                cursor.execute('''
+                    INSERT INTO loja_online (urlLoja, valor, moeda, created_at, updated_at)
+                    VALUES (?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+                ''', (produto['link'], produto['preco'], produto['moeda']))
                 loja_online_id = cursor.lastrowid  # Recuperar o ID da loja online inserida
 
 
-            cursor.execute('''
-                INSERT INTO precos (valor, moeda, created_at, updated_at)
-                VALUES (?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-            ''', (produto['preco'], produto['moeda']))
-            preco_id = cursor.lastrowid  # Recuperar o ID do preço inserido
 
+            # Inserir os dados na tabela produtos
             cursor.execute('''
-                INSERT INTO produtos (nome, preco_id, loja_online_id, created_at, updated_at)
-                VALUES (?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-            ''', (produto['nome'], preco_id, loja_online_id))
+                INSERT INTO produtos (nome,loja_online_id, created_at, updated_at)
+                VALUES (?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+            ''', (produto['nome'],  loja_online_id))
 
             # Salvar as alterações
             conn.commit()
@@ -83,7 +85,7 @@ def salvar_produtos_no_banco(produtos):
 
     conn.close()
 
-
+# Função para processar as páginas de produtos
 def processar_paginas(url_base, max_paginas=1):
     pagina = 1
     todos_produtos = []
@@ -108,16 +110,16 @@ def processar_paginas(url_base, max_paginas=1):
     salvar_produtos_no_banco(todos_produtos)
     print(f"Total de produtos coletados e salvos para {url_base}: {len(todos_produtos)}")
 
-
+# URLs para processar
 urls_para_processar = [
     "https://patoloco.com.br/produtos/placa-de-video",
-   "https://patoloco.com.br/produtos/processadores",
-   "https://patoloco.com.br/produtos/placas-mae",
-   "https://patoloco.com.br/produtos/memorias",
-   "https://patoloco.com.br/produtos/ssd",
-   "https://patoloco.com.br/produtos/ssd-m2",
-   "https://patoloco.com.br/produtos/coolers-e-watercoolers",
-   "https://patoloco.com.br/produtos/fontes",
+    "https://patoloco.com.br/produtos/processadores",
+    "https://patoloco.com.br/produtos/placas-mae",
+    "https://patoloco.com.br/produtos/memorias",
+    "https://patoloco.com.br/produtos/ssd",
+    "https://patoloco.com.br/produtos/ssd-m2",
+    "https://patoloco.com.br/produtos/coolers-e-watercoolers",
+    "https://patoloco.com.br/produtos/fontes",
 ]
 
 # Processar todas as URLs
