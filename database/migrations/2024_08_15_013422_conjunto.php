@@ -14,7 +14,8 @@ return new class extends Migration
                 CREATE TABLE conjunto (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     nome VARCHAR(255),
-                    categoria_id VARCHAR(255),
+                    categoria_id integer,
+                    user_id integer,
                     created_at TIMESTAMP,
                     updated_at TIMESTAMP
                 )
@@ -24,6 +25,7 @@ return new class extends Migration
                 $table->id();
                 $table->string('nome');
                 $table->string('categoria_id');
+                $table->foreignId('user_id')->constrained()->onDelete('cascade');
                 $table->timestamps();
             });
         }

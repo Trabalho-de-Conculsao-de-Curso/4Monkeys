@@ -12,10 +12,14 @@ class Conjunto extends Model
     protected $fillable = [
         'nome',
         'categoria_id',
+        'user_id',
     ];
     protected $table = 'conjunto';
 
-
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
     public function produtos()
     {
         return $this->belongsToMany(Produto::class, 'conjunto_produto', 'conjunto_id', 'produto_id');
