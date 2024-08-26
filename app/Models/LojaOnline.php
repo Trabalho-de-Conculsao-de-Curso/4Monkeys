@@ -12,7 +12,6 @@ class LojaOnline extends Model
     protected $table = 'loja_online';
 
     protected $fillable = [
-        'nome',
         'urlLoja',
         'valor',
         'moeda',
@@ -21,6 +20,6 @@ class LojaOnline extends Model
     ];
 
     public function produto(){
-        return $this->hasMany(Produto::class);
+        return $this->hasOne(Produto::class);
     }
 }
