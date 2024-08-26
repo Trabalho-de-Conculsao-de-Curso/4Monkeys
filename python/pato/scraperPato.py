@@ -1,38 +1,35 @@
 import sqlite3
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
+import requests
+from bs4 import BeautifulSoup
 import time
 
-# Inicializar o WebDriver do Chrome
-service = Service()
-options = webdriver.ChromeOptions()
-driver = webdriver.Chrome(service=service, options=options)
-
 # Função para coletar produtos de uma página
-def coletar_produtos_da_pagina(driver):
-    produtos = driver.find_elements(By.CSS_SELECTOR, 'article.product')
+def coletar_produtos_da_pagina(url):
+    response = requests.get(url)
+    soup = BeautifulSoup(response.content, 'html.parser')
+    produtos = soup.select('article.product')
     resultados = []
     for produto in produtos:
         try:
             # Nome do produto
-            nome = produto.find_element(By.CSS_SELECTOR, 'h3.tit').text
-
-            # Preço à vista
-            preco_element = produto.find_element(By.CSS_SELECTOR, 'span.h1.text-success')
-            preco_texto = preco_element.text
-            preco = float(preco_texto.replace('R$', '').replace('.', '').replace(',', '.').strip())
-            moeda = 'BRL'
+            nome = produto.select_one('h3.tit').get_text(strip=True)
 
             # Link do produto
-            link = produto.find_element(By.CSS_SELECTOR, 'a').get_attribute('href')
+            link = produto.select_one('a')['href']
+
+            # Preço à vista
+            preco_element = produto.select_one('span.h1.text-success')
+            if preco_element:
+                preco_texto = preco_element.get_text(strip=True)
+                preco = float(preco_texto.replace('R$', '').replace('.', '').replace(',', '.').strip())
+                moeda = 'BRL'
+            else:
+                preco = None
 
             resultados.append({
                 'nome': nome,
                 'preco': preco,
-                'moeda': moeda,
+                'moeda': moeda if preco else None,
                 'link': link
             })
         except Exception as e:
@@ -54,28 +51,26 @@ def salvar_produtos_no_banco(produtos):
             loja_online_result = cursor.fetchone()
 
             if loja_online_result:
-                loja_online_id = loja_online_result[0]
-                # Atualizar os valores de 'valor' e 'moeda' na tabela loja_online
-                cursor.execute('''
-                    UPDATE loja_online
-                    SET valor = ?, moeda = ?, updated_at = CURRENT_TIMESTAMP
-                    WHERE id = ?
-                ''', (produto['preco'], produto['moeda'], loja_online_id))
-            else:
-                # Inserir uma nova entrada na tabela loja_online
-                cursor.execute('''
-                    INSERT INTO loja_online (urlLoja, valor, moeda, created_at, updated_at)
-                    VALUES (?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-                ''', (produto['link'], produto['preco'], produto['moeda']))
-                loja_online_id = cursor.lastrowid  # Recuperar o ID da loja online inserida
+                print(f"Produto com o link {produto['link']} já existe na tabela loja_online. Não será salvo novamente.")
+                continue  # Pula para o próximo produto
 
+            if produto['preco'] is None:
+                # Produto sem preço, não salva
+                print(f"Produto {produto['nome']} está sem preço. Será ignorado.")
+                continue  # Pula para o próximo produto
 
+            # Inserir uma nova entrada na tabela loja_online
+            cursor.execute('''
+                INSERT INTO loja_online (urlLoja, valor, moeda, created_at, updated_at)
+                VALUES (?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+            ''', (produto['link'], produto['preco'], produto['moeda']))
+            loja_online_id = cursor.lastrowid  # Recuperar o ID da loja online inserida
 
             # Inserir os dados na tabela produtos
             cursor.execute('''
-                INSERT INTO produtos (nome,loja_online_id, created_at, updated_at)
+                INSERT INTO produtos (nome, loja_online_id, created_at, updated_at)
                 VALUES (?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-            ''', (produto['nome'],  loja_online_id))
+            ''', (produto['nome'], loja_online_id))
 
             # Salvar as alterações
             conn.commit()
@@ -92,10 +87,7 @@ def processar_paginas(url_base, max_paginas=1):
 
     while pagina <= max_paginas:
         url = f"{url_base}?page_number={pagina}"
-        driver.get(url)
-
-        driver.implicitly_wait(10)
-        produtos_da_pagina = coletar_produtos_da_pagina(driver)
+        produtos_da_pagina = coletar_produtos_da_pagina(url)
 
         if not produtos_da_pagina:
             break
@@ -125,5 +117,3 @@ urls_para_processar = [
 # Processar todas as URLs
 for url in urls_para_processar:
     processar_paginas(url)
-
-driver.quit()

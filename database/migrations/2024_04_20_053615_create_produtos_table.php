@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('produtos', function (Blueprint $table) {
             $table->id();
             $table->string('nome');
-            $table->foreignId('loja_online_id')->nullable()->constrained('loja_online')->unique()->onDelete('cascade');
+            $table->foreignId('loja_online_id')->nullable()->constrained('loja_online')->onDelete('cascade');
             $table->timestamps();
         });
     }
