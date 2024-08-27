@@ -6,11 +6,16 @@
     <title>Seleção de Softwares</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@latest/dist/tailwind.min.css" rel="stylesheet">
 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Schoolbell&display=swap" rel="stylesheet">
+
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
         <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    
 
     <script>
         function toggleDetails(id) {
@@ -32,6 +37,16 @@
             }
         }
     </script>
+
+    <style>
+            body {
+                font-family: 'Caveat', cursive;
+            }
+            h1 {
+                font-family: 'Caveat', cursive;
+                font-weight: 700;
+            }
+        </style>
 </head>
 
 <body class="bg-zinc-900 text-gray-200 flex flex-col h-screen">
@@ -41,9 +56,11 @@
             <img src="{{ asset('images/macacoOculos.png') }}" alt="Descrição da imagem" class="w-18 h-16 rounded-full border-2 mr-4">
             <h1 class="text-2xl font-bold">4 Monkeys Setup</h1>
         </div>
-            <button class="bg-gray-600 font-bold text-white py-2 px-4 rounded hover:bg-purple-700 transition duration-300 border-2 border-purple-800">
-                ASSINAR AGORA
-            </button>
+        <button class="flex items-center bg-gray-600 font-bold text-white py-2 px-4 rounded hover:bg-purple-700 transition duration-300 border-2 border-purple-800">
+            <span class="mr-2">ASSINAR AGORA</span>
+            <img src="{{ asset('images/seta-direita.png') }}" alt="Descrição da imagem" class="w-10 h-8 object-cover ml-2">
+        </button>
+            
     </header>
 
     <!-- Conteúdo Principal -->
@@ -171,7 +188,6 @@
                                     @endforeach
                                 </div>
                             </div>
-
                             <!-- Botão de Submissão -->
                             <button type="submit" class="bg-purple-800 text-white py-2 px-4 rounded hover:bg-purple-600 transition duration-300">Selecionar Softwares</button>
 
@@ -183,13 +199,15 @@
                                 <p class="text-white text-lg">Aguarde, seu setup está sendo montado...</p>
                             </div>
                         </form>
-                    </div>
+                         <div id="desktops-container"></div>
+                    </div>    
                 </div>
             </div>
         </div>
+        
     </div>
 
-    {{--<script>
+    <script>
         // Toggle mobile menu
         document.getElementById('menu-btn').addEventListener('click', function() {
             var menu = document.getElementById('mobile-menu');
@@ -197,27 +215,72 @@
         });
 
         document.getElementById('software-selection-form').addEventListener('submit', function(event) {
-        event.preventDefault(); // Impede o envio padrão do formulário
+        event.preventDefault(); 
 
         var loadingSpinner = document.getElementById('loading-spinner');
-        loadingSpinner.classList.remove('hidden'); // Exibe a animação de carregamento
+        loadingSpinner.classList.remove('hidden'); 
 
         var formData = new FormData(this);
 
-        fetch('{{ route("home.selecionar") }}', {
+        fetch('{{ route("free.selecionar") }}', {
             method: 'POST',
             body: formData,
             /*headers: {
-                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                'X-CSRF-TOKEN': '{{ csrf_token() }}' // Inclua o token CSRF se necessário
             }*/
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok ' + response.statusText);
+            }
+            return response.json();
+        })
         .then(data => {
             loadingSpinner.classList.add('hidden'); 
-           
-            console.log(data);
+
+            console.log('Dados recebidos:', data);
             alert("Softwares selecionados com sucesso!");
-        })
+
+            if (data.desktops && Array.isArray(data.desktops)) {
+                console.log('Desktops recebidos:', data.desktops);
+
+                // Esconde o formulário
+                var formContainer = document.getElementById('software-selection-form');
+                formContainer.style.display = 'none';
+
+                const desktopsContainer = document.getElementById('desktops-container');
+
+                desktopsContainer.innerHTML = ''; // Limpa o conteúdo anterior
+
+                data.desktops.forEach(desktop => {
+                    const desktopItem = document.createElement('div');
+                    
+                    desktopItem.classList.add('desktop-item', 'bg-zinc-800', 'p-4', 'rounded-lg', 'shadow', 'mb-4');
+
+                    desktopItem.innerHTML = `
+                        <h3 class="text-xl font-semibold mb-2">Categoria: ${desktop.categoria}</h3>
+                        <p><strong>CPU:</strong> ${desktop.componentes.CPU}</p>
+                        <p><strong>Cooler:</strong> ${desktop.componentes.Cooler}</p>
+                        <p><strong>Fonte:</strong> ${desktop.componentes.Fonte}</p>
+                        <p><strong>GPU:</strong> ${desktop.componentes.GPU}</p>
+                        <p><strong>HD:</strong> ${desktop.componentes.HD}</p>
+                        <p><strong>MOTHERBOARD:</strong> ${desktop.componentes.MOTHERBOARD}</p>
+                        <p><strong>RAM:</strong> ${desktop.componentes.RAM}</p>
+                        <div class="border-1">
+                            <button type="submit" class="bg-purple-800 text-white py-2 px-4 rounded hover:bg-purple-600 transition duration-300">Assine o Premium</button>
+                        </div>
+                    `;
+
+                    desktopsContainer.appendChild(desktopItem);
+                    
+                });
+
+                desktopsContainer.style.display = 'block'; // Assegura que o container esteja visível
+                console.log('Desktops exibidos com sucesso.');
+            } else {
+                console.error('Dados recebidos não estão no formato esperado:', data);
+            }
+        })  
         .catch(error => {
             loadingSpinner.classList.add('hidden'); 
             console.error('Erro:', error);
@@ -225,6 +288,9 @@
         });
     });
 
-    </script> --}}
+
+
+
+    </script>
 </body>
 </html>
