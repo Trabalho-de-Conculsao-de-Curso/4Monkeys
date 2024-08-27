@@ -71,6 +71,7 @@ class FreeGeminiAPIService
     {
         // Decodifica o JSON retornado pela API
         $decodedContent = json_decode($content, true);
+<
         // Adiciona logs para verificar o conteúdo decodificado
         Log::info('Resposta JSON decodificada: ', $decodedContent);
 

@@ -19,6 +19,11 @@ class AuthenticatedSessionController extends Controller
         return view('auth.user.login');
     }
 
+    public function createAdmin(): View
+    {
+        return view('auth.admin.admin-login');
+    }
+
     /**
      * Handle an incoming authentication request.
      */
@@ -30,6 +35,7 @@ class AuthenticatedSessionController extends Controller
 
         return redirect()->intended(route('dashboard', absolute: false));
     }
+
 
     /**
      * Destroy an authenticated session.
