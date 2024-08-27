@@ -2,4 +2,3 @@
     <p class="text-2xl">4 Monkeys Setup</p>
     <p class="text-2x2 mt-7">Registre-se</p>
 </div>
-
