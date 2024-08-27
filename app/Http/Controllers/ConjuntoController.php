@@ -32,6 +32,12 @@ class ConjuntoController extends Controller
     public function create()
     {
         $softwares = Software::all();
+        return view('dashboard', compact('softwares'));
+    }
+
+    public function createFree()
+    {
+        $softwares = Software::all();
         return view('home', compact('softwares'));
     }
 
