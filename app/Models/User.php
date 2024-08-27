@@ -44,4 +44,9 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function conjuntos()
+    {
+        return $this->hasMany(Conjunto::class);
+    }
 }
