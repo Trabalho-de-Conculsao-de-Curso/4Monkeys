@@ -27,11 +27,11 @@
         <div class="grid grid-cols-2 gap-4">
             <div>
                 <label for="preco_valor" class="block text-sm font-medium text-gray-700">Valor</label>
-                <input type="text" name="preco_valor" id="preco_valor" value="{{$produto->preco->valor}}" required class="border-2 form-input mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
+                <input type="text" name="preco_valor" id="preco_valor" value="{{$produto->lojaOnline->valor}}" required class="border-2 form-input mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
             </div>
             <div>
                 <label for="preco_moeda" class="block text-sm font-medium text-gray-700">Moeda</label>
-                <input type="text" name="preco_moeda" id="preco_moeda" value="{{$produto->preco->moeda}}" required class="border-2 form-input mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
+                <input type="text" name="preco_moeda" id="preco_moeda" value="{{$produto->lojaOnline->moeda}}" required class="border-2 form-input mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
             </div>
         </div>
 

@@ -2,7 +2,6 @@
 namespace App\Services;
 
 use App\Models\LojaOnline;
-use App\Models\Preco;
 use App\Models\Produto;
 use Gemini\Laravel\Facades\Gemini;
 use Illuminate\Support\Facades\Http;
@@ -57,17 +56,19 @@ class GeminiAPIService
         foreach ($softwares as $software) {
             $prompt .= "- Nome: {$software['nome']}\n";
         }
-        $prompt .= "Utilize APENAS os seguintes produtos disponíveis\n";
-        $prompt .= "\nProdutos Disponíveis:\n";
+        $prompt .= "\nUtilize APENAS os seguintes produtos disponíveis:\n";
         foreach ($produtos as $produto) {
-            $preco = Preco::find($produto['preco_id'])->valor ?? 'N/A';
-            $url = LojaOnline::find($produto['loja_online_id'])->url ?? 'URL não disponível';
+            // Agora, valor e moeda são campos na tabela loja_online
+            $lojaOnline = LojaOnline::find($produto['loja_online_id']);
+            $preco = $lojaOnline->valor ?? 'N/A';
+            $moeda = $lojaOnline->moeda ?? 'BRL';
+            $url = $lojaOnline->urlLoja ?? 'URL não disponível';
 
             if ($preco !== 'N/A') {
-                $prompt .= "- Nome: {$produto['nome']}, Preço: R$ {$preco}, URL: {$url}\n";
+                $prompt .= "- Nome: {$produto['nome']}, Preço: {$moeda} {$preco}, URL: {$url}\n";
             } else {
                 Log::warning("Preço não encontrado para o produto ID: {$produto['id']}");
-                $prompt .= "- Nome: {$produto['nome']}, Preço: N/A\n";
+                $prompt .= "- Nome: {$produto['nome']}, Preço: N/A, URL: {$url}\n";
             }
             $prompt .= "\nGaranta que seja passado exatamente o mesmo nome do array\n";
             $prompt .= "- Nome: {$produto['nome']}, Preço: R$ {$preco}\n";
@@ -148,21 +149,27 @@ class GeminiAPIService
             'gold' => 0,
         ];
 
-
         foreach ($desktops as &$desktop) {
             $category = $desktop['categoria'];
             $components = $desktop['componentes'];
             $total = 0;
 
             foreach ($components as $componentName) {
-
+                // Encontrar o ID do produto baseado no nome ou similaridade
                 $productId = $this->findProductIdBySimilarity($componentName);
 
                 if ($productId) {
+                    // Encontrar o produto e o preço associado na tabela loja_online
                     $produto = Produto::find($productId);
-                    $price = $produto->preco->valor;
-                    Log::info("Produto: {$produto->nome}, Preço: $price");
-                    $total += $price;
+                    if ($produto) {
+                        $lojaOnline = LojaOnline::find($produto->loja_online_id);
+                        $price = $lojaOnline->valor ?? 0;  // Use o valor da tabela loja_online
+
+                        Log::info("Produto: {$produto->nome}, Preço: {$lojaOnline->moeda} $price");
+                        $total += $price;
+                    } else {
+                        Log::warning("Produto com ID $productId não encontrado na tabela produtos.");
+                    }
                 } else {
                     Log::warning("Produto não encontrado: $componentName");
                 }

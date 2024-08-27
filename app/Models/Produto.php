@@ -11,16 +11,11 @@ class Produto extends Model
 
     protected $fillable = [
         'nome',
-        'preco_id',
         'loja_online_id',
         'created_at',
         'updated_at',
     ];
 
-
-    public function preco(){
-        return $this->belongsTo(Preco::class);
-    }
 
     public function lojaOnline(){
         return $this->belongsTo(LojaOnline::class);
