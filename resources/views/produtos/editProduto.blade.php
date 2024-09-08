@@ -22,6 +22,10 @@
             <input type="text" name="nome" id="nome" value="{{$produto->nome}}" required class="form-input mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 border-2">
         </div>
 
+        <div class="mb-4">
+            <label for="disponibilidade" class="block text-sm font-medium text-gray-700">Disponibilidade</label>
+            <input type="number" name="disponibilidade" id="disponibilidade" value="{{$produto->disponibilidade}}" required class="form-input mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 border-2">
+        </div>
 
         <h3 class="text-lg font-semibold mb-2">Preço</h3>
         <div class="grid grid-cols-2 gap-4">

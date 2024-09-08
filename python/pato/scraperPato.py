@@ -30,16 +30,24 @@ def coletar_produtos_da_pagina(url):
                 'nome': nome,
                 'preco': preco,
                 'moeda': moeda if preco else None,
-                'link': link
+                'link': link,
+                'disponibilidade': 1
             })
         except Exception as e:
             print("Erro ao processar um produto:", e)
     return resultados
 
+# Função para salvar o produto disponível na tabela estoque
+def salvar_no_estoque(cursor, produto_id):
+    cursor.execute('''
+        INSERT INTO estoque (produto_id, created_at, updated_at)
+        VALUES (?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+    ''', (produto_id,))
+
 # Função para salvar os produtos, preços e links no banco
 def salvar_produtos_no_banco(produtos):
     # Conexão
-    conn = sqlite3.connect('../database/database.sqlite')
+    conn = sqlite3.connect('../../database/database.sqlite')
     cursor = conn.cursor()
 
     for produto in produtos:
@@ -68,9 +76,14 @@ def salvar_produtos_no_banco(produtos):
 
             # Inserir os dados na tabela produtos
             cursor.execute('''
-                INSERT INTO produtos (nome, loja_online_id, created_at, updated_at)
-                VALUES (?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-            ''', (produto['nome'], loja_online_id))
+                INSERT INTO produtos (nome, loja_online_id, disponibilidade, created_at, updated_at)
+                VALUES (?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+            ''', (produto['nome'], loja_online_id, produto['disponibilidade']))
+            produto_id = cursor.lastrowid  # ID do produto recém-criado
+
+            # Verificar disponibilidade e salvar na tabela estoque
+            if produto['disponibilidade'] == 1:
+                salvar_no_estoque(cursor, produto_id)
 
             # Salvar as alterações
             conn.commit()

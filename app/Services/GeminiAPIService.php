@@ -33,6 +33,7 @@ class GeminiAPIService
             'model' =>'text-davinci-003'
         ]);
         if ($response=Gemini::geminiPro()->generateContent([$prompt])) {
+
             $recommendations = $this->parseResponse($response);
             return $this->calculateTotals($recommendations['desktops']);
         } else {

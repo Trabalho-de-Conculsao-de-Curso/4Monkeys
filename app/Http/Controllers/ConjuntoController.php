@@ -45,7 +45,7 @@ class ConjuntoController extends Controller
     {
         $softwaresSelecionados = $this->obterSoftwaresSelecionados($request);
         $produtos = $this->obterTodosProdutos();
-        $user = auth()->user(); // Obtém o usuário autenticado
+        $user = auth()->user(); // Obtém o usuário autenticado'
 
         do {
             DB::beginTransaction();
@@ -56,6 +56,7 @@ class ConjuntoController extends Controller
                 $conjuntos = []; // Array para armazenar conjuntos com seus totais
 
                 $recommendations = $this->geminiAPIService->getRecommendations($softwaresSelecionados, $produtos);
+
 
                 foreach ($recommendations['desktops'] as $desktop) {
                     $categoria = $this->buscarCategoriaPorId($desktop['categoria']);
@@ -77,11 +78,12 @@ class ConjuntoController extends Controller
 
                     $this->associarSoftwaresAoConjunto($conjunto, $softwaresSelecionados);
 
-                    $conjuntos[] = [
-                        'conjunto' => $conjunto,
-                        'total' => $desktop['total'],
-                    ];
+
                 }
+                $conjuntos = $recommendations;
+                dd($conjuntos);
+
+
 
                 if (!$produtoNaoEncontrado) {
                     DB::commit();
