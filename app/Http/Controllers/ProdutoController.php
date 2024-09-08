@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\LojaOnline;
-use App\Models\Preco;
 use App\Models\Produto;
 use Illuminate\Http\Request;
 
@@ -31,7 +30,8 @@ class ProdutoController extends Controller
             'nome' => 'required',
             'preco_valor' => 'required',
             'preco_moeda' => 'required',
-            'urlLojaOnline' => 'required'
+            'urlLojaOnline' => 'required',
+            'disponibilidade' => 'required',
         ]);
 
 
@@ -44,6 +44,7 @@ class ProdutoController extends Controller
         // Criar o produto associado à marca
         $produto = new Produto();
         $produto->nome = $request->input('nome');
+        $produto->disponibilidade = $request->input('disponibilidade');
         $produto->loja_online_id = $lojaOnline->id;
 
         $produto->save();
@@ -83,6 +84,7 @@ class ProdutoController extends Controller
     public function update( Request $request,$id)
     {
         $produto = Produto::find($id);
+        $produto->disponibilidade = $request->input('disponibilidade');
         $produto->update($request->all());
 
 

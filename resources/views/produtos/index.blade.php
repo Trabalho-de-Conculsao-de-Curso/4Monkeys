@@ -29,6 +29,7 @@
                         <th class="py-2 px-3">Valor</th>
                         <th class="py-2 px-3">Moeda</th>
                         <th class="py-2 px-3">URL Loja Online</th>
+                        <th class="py-2 px-3">Disponibilidade</th>
                         <th class="py-2 px-3">Criado Em</th>
                         <th class="py-2 px-3">Atualizado Em</th>
                         <th class="py-2 px-3">Ações</th>
@@ -44,6 +45,7 @@
                         <td class="py-2 px-3 max-w-xs truncate tooltip">
                             <span class="tooltiptext">{{ $produto->lojaOnline->urlLoja }}</span>
                         </td>
+                        <td class="py-2 px-3">{{ $produto->disponibilidade }}</td>
                         <td class="py-2 px-3">{{ $produto->created_at }}</td>
                         <td class="py-2 px-3">{{ $produto->updated_at }}</td>
                         <td class="py-2 px-3">
