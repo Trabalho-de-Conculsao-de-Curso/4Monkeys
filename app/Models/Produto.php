@@ -30,4 +30,9 @@ class Produto extends Model
     {
         return self::where('nome', 'like', '%' . $term . '%');
     }
+
+    public function estoque()
+    {
+        return $this->hasOne(Estoque::class);
+    }
 }
