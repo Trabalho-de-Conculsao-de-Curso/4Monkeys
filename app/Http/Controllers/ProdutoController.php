@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Estoque;
 use App\Models\LojaOnline;
 use App\Models\Produto;
 use Illuminate\Http\Request;
@@ -48,6 +49,12 @@ class ProdutoController extends Controller
         $produto->loja_online_id = $lojaOnline->id;
 
         $produto->save();
+
+        if ($produto->disponibilidade == 1) {
+            $estoque = new Estoque();
+            $estoque->produto_id = $produto->id;
+            $estoque->save();
+        }
 
         return redirect('/produtos');
     }

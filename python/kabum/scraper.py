@@ -18,13 +18,13 @@ def extract_product_data(item):
         parts = image_url.split('/')
         if len(parts) >= 8:
             product_id = parts[6]  # ID do produto
-            slug = parts[7].split('_')[0]  # Slug do produto
+
         else:
             product_id = parts[-2] if len(parts) > 2 else None
-            slug = parts[-1].split('_')[0] if len(parts[-1].split('_')) > 0 else None
 
-        if product_id and slug:
-            product_url = f"https://www.kabum.com.br/produto/{product_id}/{slug}"
+
+        if product_id:
+            product_url = f"https://www.kabum.com.br/produto/{product_id}"
             return name, price_with_discount, currency, product_url
 
     return None

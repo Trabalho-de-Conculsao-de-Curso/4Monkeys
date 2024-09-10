@@ -2,31 +2,29 @@ import sqlite3
 import requests
 from bs4 import BeautifulSoup
 
-# Função para verificar disponibilidade do produto no site
+# Função para verificar disponibilidade de um produto no Kabum
 def verificar_disponibilidade_produto(url):
     response = requests.get(url)
     soup = BeautifulSoup(response.content, 'html.parser')
 
-    # Verifica se há uma mensagem de produto indisponível
-    produto_indisponivel = soup.select_one('div.alert span.alert.alert-danger')
+    # Verifica se o SVG com a classe "IconUnavailable" está presente na página
+    produto_indisponivel_svg = soup.select_one('svg.IconUnavailable')
 
-    if produto_indisponivel and "indisponível" in produto_indisponivel.get_text(strip=True).lower():
-        return False
+    # Verifica se a div que contém a mensagem de indisponibilidade está presente
+    produto_indisponivel_texto = soup.select_one('div#main-content div.sc-4e2d4867-0.kfefWY div.sc-4e2d4867-1.dPPiZL span.sc-4e2d4867-2.ccbyaK')
 
-    # Verifica se a página contém o erro 404 (página não encontrada)
-    pagina_erro_404 = soup.select_one('div.text-center h1')
-    if pagina_erro_404 and pagina_erro_404.get_text(strip=True) == "404":
+    # Se o SVG ou o texto de indisponibilidade for encontrado, o produto está indisponível
+    if produto_indisponivel_svg or (produto_indisponivel_texto and "Ops... Produto indisponível!" in produto_indisponivel_texto.get_text(strip=True)):
         return False
 
     return True
 
-
-# Função para verificar a disponibilidade dos produtos já salvos no banco de dados
+# Função para atualizar a disponibilidade dos produtos já salvos no banco de dados
 def verificar_disponibilidade_no_banco():
     conn = sqlite3.connect('../../database/database.sqlite')
     cursor = conn.cursor()
 
-    # Selecionar todas as URLs da tabela loja_online e seus IDs
+    # Selecionar todas as URLs da tabela loja_online
     cursor.execute('SELECT id, urlLoja FROM loja_online')
     produtos_no_banco = cursor.fetchall()
 
@@ -34,8 +32,9 @@ def verificar_disponibilidade_no_banco():
         loja_online_id, url = produto
         print(f"Verificando disponibilidade do produto com URL: {url}")
 
-        # Verificar se o produto ainda está disponível
+        # Verificar se o produto está disponível no Kabum
         disponivel = verificar_disponibilidade_produto(url)
+
         if not disponivel:
             print(f"Produto com URL {url} está indisponível. Alterando disponibilidade para 0.")
 
@@ -80,5 +79,7 @@ def verificar_disponibilidade_no_banco():
 
     conn.close()
 
-# Executar a verificação
+# Executar a função para verificar a disponibilidade dos produtos no Kabum
 verificar_disponibilidade_no_banco()
+
+
