@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Estoque;
 use App\Models\Produto;
 use App\Models\Software;
 use App\Services\FreeGeminiAPIService;
@@ -21,8 +22,7 @@ class FreeConjuntoController extends Controller
     {
         // Recuperar os softwares selecionados e todos os produtos disponíveis
         $softwaresSelecionados = Software::find($request->input('softwares'));
-        $produtos = Produto::all();
-
+        $produtos = Estoque::with('produto')->get()->pluck('produto.nome');
         // Preparar os dados para enviar ao FreeGeminiAPIService
         $softwaresData = $softwaresSelecionados->toArray();
         $produtosData = $produtos->toArray();

@@ -42,7 +42,7 @@ class ProdutoController extends Controller
         $lojaOnline->urlLoja = $request->input('urlLojaOnline');
         $lojaOnline->save();
 
-        // Criar o produto associado à marca
+        // Criar o produto associado à loja online
         $produto = new Produto();
         $produto->nome = $request->input('nome');
         $produto->disponibilidade = $request->input('disponibilidade');
@@ -95,12 +95,25 @@ class ProdutoController extends Controller
         $produto->update($request->all());
 
 
+
         $lojaOnline = LojaOnline::find($produto->loja_online_id);
         $lojaOnline->update([
             'urlLoja' => $request->input('urlLojaOnline'),
             'valor' => $request->input('preco_valor'),
             'moeda' => $request->input('preco_moeda')
         ]);
+
+        if ($produto->disponibilidade == 1) {
+            $estoque = new Estoque();
+            $estoque->produto_id = $produto->id;
+            $estoque->save();
+        } else {
+            // Remove o produto do estoque
+            $estoque = Estoque::where('produto_id', $produto->id)->first();
+            if ($estoque) {
+                $estoque->delete();
+            }
+        }
 
 
 
