@@ -28,6 +28,7 @@
         <th class="py-2 px-3">Nome</th>
         <th class="py-2 px-3">Descrição</th>
         <th class="py-2 px-3">Requisitos</th>
+        <th class="py-2 px-3">Imagem</th>
         <th class="py-2 px-3">Criado Em</th>
         <th class="py-2 px-3">Ações</th>
         </thead>
@@ -39,6 +40,13 @@
                     <td class="py-2 px-3">{{$software->nome}}</td>
                     <td class="py-2 px-3">{{$software->descricao}}</td>
                     <td class="py-2 px-3">{{$software->requisitos}}</td>
+                    <td class="py-2 px-3">
+                        @if($software->imagem)
+                            <img src="{{ asset('storage/' . $software->imagem) }}" alt="Imagem do Software" width="100">
+                        @else
+                            <span>Sem imagem</span>
+                        @endif
+                    </td>
                     <td class="py-2 px-3">{{$software->created_at}}</td>
                     <td>
                         <a href="{{url("softwares/$software->id/edit")}}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">Editar</a>
@@ -46,7 +54,7 @@
                         <form method="POST" action="{{url("softwares/$software->id")}}">
                             <input type="hidden" name="_token" value="{{ csrf_token() }}" />
                             @method('DELETE')
-                            <button type="submit" 
+                            <button type="submit"
                             class="bg-red-500 hover:bg-red-700 text-white mt-2
                             font-bold py-2 px-3.5 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
                             onclick="return confirm('Tem certeza que deseja excluir? {{$software->nome}} ?')"> Excluir</button>
