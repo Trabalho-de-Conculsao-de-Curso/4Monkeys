@@ -21,6 +21,11 @@
             <input type="text" name="nome" id="nome" required class="border-2 form-input mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
         </div>
 
+        <div class="mb-4">
+            <label for="disponibilidade" class="block text-sm font-medium text-gray-700">Disponibilidade</label>
+            <input type="number" name="disponibilidade" id="disponibilidade" required class="border-2 form-input mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
+        </div>
+
         <h3 class="text-lg font-semibold mb-2">Preço</h3>
         <div class="grid grid-cols-2 gap-4">
             <div>
@@ -33,7 +38,7 @@
             </div>
         </div>
 
-        <h3 class="text-lg font-semibold mt-6 mb-2">Lojas Online</h3>
+        <h3 class="text-lg font-semibold mt-6 mb-2">Loja Online</h3>
 
         <div class="mb-6">
             <label for="urlLojaOnline" class="block text-sm font-medium text-gray-700">URL da Loja Online</label>

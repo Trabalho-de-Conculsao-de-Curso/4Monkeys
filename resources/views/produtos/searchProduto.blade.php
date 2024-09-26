@@ -40,8 +40,8 @@
                     <tr>
                         <td class="py-2 px-3">{{ $produto->id }}</td>
                         <td class="py-2 px-3">{{ $produto->nome }}</td>
-                        <td class="py-2 px-3">{{ $produto->preco->valor }}</td>
-                        <td class="py-2 px-3">{{ $produto->preco->moeda }}</td>
+                        <td class="py-2 px-3">{{ $produto->lojaOnline->valor }}</td>
+                        <td class="py-2 px-3">{{ $produto->lojaOnline->moeda }}</td>
                         <td class="py-2 px-3">{{ $produto->lojaOnline->nome }}</td>
                         <td class="py-2 px-3 max-w-xs truncate tooltip">
                             <span class="tooltiptext">{{ $produto->lojaOnline->urlLoja }}</span>

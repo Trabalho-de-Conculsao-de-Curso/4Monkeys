@@ -61,8 +61,9 @@ class FreeGeminiAPIService
 
         $prompt .= "Produtos disponíveis:\n";
         foreach ($produtos as $produto) {
-            $prompt .= "- Nome: {$produto['nome']}\n";
+            $prompt .= "- Nome: {$produto}\n";
         }
+
 
         return $prompt;
     }
@@ -71,7 +72,7 @@ class FreeGeminiAPIService
     {
         // Decodifica o JSON retornado pela API
         $decodedContent = json_decode($content, true);
-        //dd($decodedContent);
+
         // Adiciona logs para verificar o conteúdo decodificado
         Log::info('Resposta JSON decodificada: ', $decodedContent);
 
