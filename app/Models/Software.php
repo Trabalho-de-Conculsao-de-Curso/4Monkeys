@@ -14,7 +14,8 @@ class Software extends Model
         'nome',
         'tipo',
         'descricao',
-        'requisitos'
+        'requisitos',
+        'imagem'
     ];
 
     public function produtoFinais()

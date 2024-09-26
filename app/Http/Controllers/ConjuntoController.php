@@ -6,6 +6,7 @@ use App\Models\Categoria;
 use App\Models\Produto;
 use App\Models\Conjunto;
 use App\Models\Software;
+use App\Models\User;
 use App\Services\GeminiAPIService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -44,6 +45,7 @@ class ConjuntoController extends Controller
     {
         $softwaresSelecionados = $this->obterSoftwaresSelecionados($request);
         $produtos = $this->obterTodosProdutos();
+        $user = auth()->user(); // Obtém o usuário autenticado'
 
         do {
             DB::beginTransaction();
@@ -55,6 +57,7 @@ class ConjuntoController extends Controller
 
                 $recommendations = $this->geminiAPIService->getRecommendations($softwaresSelecionados, $produtos);
 
+
                 foreach ($recommendations['desktops'] as $desktop) {
                     $categoria = $this->buscarCategoriaPorId($desktop['categoria']);
 
@@ -64,7 +67,8 @@ class ConjuntoController extends Controller
                         break;
                     }
 
-                    $conjunto = $this->criarConjunto($categoria);
+                    // Cria o conjunto associado ao usuário autenticado
+                    $conjunto = $this->criarConjunto($categoria, $user);
                     $generatedConjuntoIds[] = $conjunto->id;
 
                     if (!$this->associarProdutosAoConjunto($conjunto, $desktop['componentes'])) {
@@ -74,15 +78,16 @@ class ConjuntoController extends Controller
 
                     $this->associarSoftwaresAoConjunto($conjunto, $softwaresSelecionados);
 
-                    $conjuntos[] = [
-                        'conjunto' => $conjunto,
-                        'total' => $desktop['total'],
-                    ];
+
                 }
+                $conjuntos = $recommendations;
+                dd($conjuntos);
+
+
 
                 if (!$produtoNaoEncontrado) {
                     DB::commit();
-                    return response()->json(['produtoFinals' => $conjunto]);
+                    return response()->json(['conjuntos' => $conjuntos]);
                 } else {
                     DB::rollBack();
                 }
@@ -95,6 +100,7 @@ class ConjuntoController extends Controller
 
         } while ($produtoNaoEncontrado);
     }
+
 
     protected function obterSoftwaresSelecionados(Request $request)
     {
@@ -111,13 +117,14 @@ class ConjuntoController extends Controller
         return Categoria::find($categoryId);
     }
 
-    protected function criarConjunto(Categoria $categoria)
+    protected function criarConjunto(Categoria $categoria, $user)
     {
-        return Conjunto::create([
+        return $user->conjuntos()->create([
             'nome' => 'Conjunto ' . ucfirst($categoria->nome),
             'categoria_id' => $categoria->id,
         ]);
     }
+
 
     protected function associarProdutosAoConjunto(Conjunto $conjunto, array $componentes)
     {

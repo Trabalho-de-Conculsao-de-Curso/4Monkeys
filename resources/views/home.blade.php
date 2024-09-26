@@ -15,7 +15,7 @@
 
         <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    
+
 
     <script>
         function toggleDetails(id) {
@@ -60,7 +60,7 @@
             <span class="mr-2">ASSINAR AGORA</span>
             <img src="{{ asset('images/seta-direita.png') }}" alt="Descrição da imagem" class="w-10 h-8 object-cover ml-2">
         </button>
-            
+
     </header>
 
     <!-- Conteúdo Principal -->
@@ -200,13 +200,13 @@
                             </div>
                         </form>
                          <div id="desktops-container"></div>
-                    </div>    
+                    </div>
                 </div>
             </div>
         </div>
-        
-    </div>
 
+    </div>
+{{--
     <script>
         // Toggle mobile menu
         document.getElementById('menu-btn').addEventListener('click', function() {
@@ -215,10 +215,10 @@
         });
 
         document.getElementById('software-selection-form').addEventListener('submit', function(event) {
-        event.preventDefault(); 
+        event.preventDefault();
 
         var loadingSpinner = document.getElementById('loading-spinner');
-        loadingSpinner.classList.remove('hidden'); 
+        loadingSpinner.classList.remove('hidden');
 
         var formData = new FormData(this);
 
@@ -236,7 +236,7 @@
             return response.json();
         })
         .then(data => {
-            loadingSpinner.classList.add('hidden'); 
+            loadingSpinner.classList.add('hidden');
 
             console.log('Dados recebidos:', data);
             alert("Softwares selecionados com sucesso!");
@@ -254,7 +254,7 @@
 
                 data.desktops.forEach(desktop => {
                     const desktopItem = document.createElement('div');
-                    
+
                     desktopItem.classList.add('desktop-item', 'bg-zinc-800', 'p-4', 'rounded-lg', 'shadow', 'mb-4');
 
                     desktopItem.innerHTML = `
@@ -272,7 +272,7 @@
                     `;
 
                     desktopsContainer.appendChild(desktopItem);
-                    
+
                 });
 
                 desktopsContainer.style.display = 'block'; // Assegura que o container esteja visível
@@ -280,9 +280,9 @@
             } else {
                 console.error('Dados recebidos não estão no formato esperado:', data);
             }
-        })  
+        })
         .catch(error => {
-            loadingSpinner.classList.add('hidden'); 
+            loadingSpinner.classList.add('hidden');
             console.error('Erro:', error);
             alert("Ocorreu um erro ao selecionar os softwares.");
         });
@@ -291,6 +291,6 @@
 
 
 
-    </script>
+    </script> --}}
 </body>
 </html>

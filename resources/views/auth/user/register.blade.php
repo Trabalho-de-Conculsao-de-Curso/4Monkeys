@@ -2,7 +2,7 @@
     <form method="POST" action="{{ route('register') }}" class="mt-17">
         @csrf
         <!-- Name -->
-         
+
         <div>
             <x-input-label for="name" :value="__('Nome')" />
             <x-text-input id="name" class="bg-neutral-900 border-zinc-600 block mt-1 w-full" type="text" name="name" :value="old('name')" required autofocus autocomplete="name" />
