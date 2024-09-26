@@ -61,8 +61,9 @@ class FreeGeminiAPIService
 
         $prompt .= "Produtos disponíveis:\n";
         foreach ($produtos as $produto) {
-            $prompt .= "- Nome: {$produto['nome']}\n";
+            $prompt .= "- Nome: {$produto}\n";
         }
+
 
         return $prompt;
     }

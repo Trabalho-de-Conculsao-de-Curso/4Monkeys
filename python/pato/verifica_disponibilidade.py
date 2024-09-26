@@ -7,13 +7,19 @@ def verificar_disponibilidade_produto(url):
     response = requests.get(url)
     soup = BeautifulSoup(response.content, 'html.parser')
 
-    # Verificar se a div .row contém a div .alert com a mensagem de indisponibilidade
+    # Verifica se há uma mensagem de produto indisponível
     produto_indisponivel = soup.select_one('div.alert span.alert.alert-danger')
 
     if produto_indisponivel and "indisponível" in produto_indisponivel.get_text(strip=True).lower():
         return False
 
+    # Verifica se a página contém o erro 404 (página não encontrada)
+    pagina_erro_404 = soup.select_one('div.text-center h1')
+    if pagina_erro_404 and pagina_erro_404.get_text(strip=True) == "404":
+        return False
+
     return True
+
 
 # Função para verificar a disponibilidade dos produtos já salvos no banco de dados
 def verificar_disponibilidade_no_banco():

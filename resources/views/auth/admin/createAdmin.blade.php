@@ -12,7 +12,7 @@
     <div class="min-h-screen flex items-center justify-center">
         <div class="bg-zinc-800 p-8 rounded-lg shadow-lg w-full max-w-md">
             <h1 class="text-2xl font-bold mb-6 text-center">Cadastro</h1>
-            <form method="POST" action="{{ route('register') }}">
+            <form method="POST" action="/admin">
                 @csrf
 
                 <div class="mb-4">
