@@ -4,10 +4,11 @@ from .verificador_base import VerificadorProdutos
 
 class VerificadorProdutoPato(VerificadorProdutos):
     def verificar_disponibilidade_produto(self, url):
+
         response = requests.get(url)
         soup = BeautifulSoup(response.content, 'html.parser')
-
         produto_indisponivel = soup.select_one('div.alert span.alert.alert-danger')
+
         if produto_indisponivel and "indisponível" in produto_indisponivel.get_text(strip=True).lower():
             return False
 

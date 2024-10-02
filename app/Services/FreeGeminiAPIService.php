@@ -24,14 +24,20 @@ class FreeGeminiAPIService
 
         // Enviar requisição para a API gratuita
         $response = Http::withHeaders([
-            'Authorization' => 'Bearer ' . $this->apiKey,
             'Content-Type' => 'application/json'
-        ])->post($this->apiUrl, [
-            'prompt' => $prompt,
-            'model' => 'text-davinci-003'
+        ])->post($this->apiUrl . '?key=' . $this->apiKey, [
+            'contents' => [
+                [
+                    'parts' => [
+                        ['text' => $prompt]
+                    ]
+                ]
+            ]
         ]);
 
+
         if ($response=Gemini::geminiPro()->generateContent([$prompt])) {
+
             if (!empty($response->candidates) && is_array($response->candidates)) {
                 // Extrair o conteúdo da resposta
                 $content = $response->candidates[0]->content->parts[0]->text;

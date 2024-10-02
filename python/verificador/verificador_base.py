@@ -73,9 +73,17 @@ class VerificadorProdutos(ABC):
                             conn.commit()
                 else:
                     print(f"Não foi possível coletar os dados do produto com URL: {url}. Removendo do banco.")
-                    cursor.execute('DELETE FROM produtos WHERE id = ?', (produto_id,))
+
+                    # Primeiro, remova o produto do estoque baseado no produto_id
+                    cursor.execute('DELETE FROM estoque WHERE produto_id = ?', (produto_id,))
+
+                    # Depois, remova as informações da loja_online e do produto
                     cursor.execute('DELETE FROM loja_online WHERE id = (SELECT loja_online_id FROM produtos WHERE id = ?)', (produto_id,))
+                    cursor.execute('DELETE FROM produtos WHERE id = ?', (produto_id,))
+
+                    # Commit das alterações no banco
                     conn.commit()
+
 
         conn.close()
 

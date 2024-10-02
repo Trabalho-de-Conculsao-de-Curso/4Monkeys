@@ -23,7 +23,7 @@ return [
     | If you need a specific base URL for the Gemini API, you can provide it here.
     | Otherwise, leave empty to use the default value.
     */
-    'base_url' => env('FREE_GEMINI_BASE_URL'),
+    'base_url' => env('FREE_GEMINI_API_URL'),
 
     /*
     |--------------------------------------------------------------------------

@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Marca;
+use App\Http\Requests\StoreSoftwareRequest;
 use App\Models\Software;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use App\Models\RequisitoSoftware;
 
 class SoftwareController extends Controller
 {
@@ -28,17 +29,10 @@ class SoftwareController extends Controller
         return view('softwares.createSoftware');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        // Validação dos dados recebidos, incluindo a imagem
-        $request->validate([
-            'nome' => 'required',
-            'software_imagem' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048', // Valida a imagem
-        ]);
 
+
+    public function store(StoreSoftwareRequest $request)
+    {
         // Verifica se uma imagem foi enviada
         if ($request->hasFile('software_imagem')) {
             // Armazena a imagem na pasta 'public/images'
@@ -49,11 +43,52 @@ class SoftwareController extends Controller
                 'tipo' => $request->input('tipo'),
                 'nome' => $request->input('nome'),
                 'descricao' => $request->input('descricao'),
-                'requisitos' => $request->input('requisitos'),
                 'imagem' => $imagemPath, // Salva o caminho da imagem
             ]);
 
             if ($software) {
+                // Criação dos requisitos mínimo, médio e recomendado para esse software
+                $requisitos = [
+                    [
+                        'software_id' => $software->id,
+                        'requisito_nivel' => 'Minimo',
+                        'cpu' => $request->input('cpu_min'),
+                        'gpu' => $request->input('gpu_min'),
+                        'ram' => $request->input('ram_min'),
+                        'placa_mae' => $request->input('placa_mae_min'),
+                        'ssd' => $request->input('ssd_min'),
+                        'cooler' => $request->input('cooler_min'),
+                        'fonte' => $request->input('fonte_min')
+                    ],
+                    [
+                        'software_id' => $software->id,
+                        'requisito_nivel' => 'Medio',
+                        'cpu' => $request->input('cpu_med'),
+                        'gpu' => $request->input('gpu_med'),
+                        'ram' => $request->input('ram_med'),
+                        'placa_mae' => $request->input('placa_mae_med'),
+                        'ssd' => $request->input('ssd_med'),
+                        'cooler' => $request->input('cooler_med'),
+                        'fonte' => $request->input('fonte_med')
+                    ],
+                    [
+                        'software_id' => $software->id,
+                        'requisito_nivel' => 'Recomendado',
+                        'cpu' => $request->input('cpu_rec'),
+                        'gpu' => $request->input('gpu_rec'),
+                        'ram' => $request->input('ram_rec'),
+                        'placa_mae' => $request->input('placa_mae_rec'),
+                        'ssd' => $request->input('ssd_rec'),
+                        'cooler' => $request->input('cooler_rec'),
+                        'fonte' => $request->input('fonte_rec')
+                    ],
+                ];
+
+                // Insere os requisitos no banco de dados
+                foreach ($requisitos as $requisito) {
+                    RequisitoSoftware::create($requisito);
+                }
+
                 return response()->redirectTo('/softwares');
             }
         }
@@ -61,6 +96,8 @@ class SoftwareController extends Controller
         // Em caso de falha, retorna um erro ou redireciona
         return back()->withErrors(['message' => 'Erro ao salvar o software.']);
     }
+
+
 
     /**
      * Display the specified resource.
