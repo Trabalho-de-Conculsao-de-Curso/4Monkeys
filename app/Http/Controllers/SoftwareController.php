@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreSoftwareRequest;
+use App\Http\Requests\UpdateSoftwareRequest;
 use App\Models\Software;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -15,7 +16,8 @@ class SoftwareController extends Controller
      */
     public function index()
     {
-        $softwares = Software::all();
+        $softwares = Software::with('requisitos')->get();
+
         return view('softwares.index', [
             'softwares' => $softwares
         ]);
@@ -107,7 +109,6 @@ class SoftwareController extends Controller
         $search = $request->input('search');
         $results = Software::where('nome', 'like', "%$search%")
             ->orWhere('descricao', 'like', "%$search%")
-            ->orWhere('requisitos', 'like', "%$search%")
             ->get();
 
 
@@ -118,24 +119,29 @@ class SoftwareController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Software $software)
+    public function edit($id)
     {
-        return view('softwares.editSoftware', compact('software'));
+        $software = Software::findOrFail($id);
+
+        // Busca os requisitos de hardware relacionados
+        $requisitos = [
+            'Minimo' => RequisitoSoftware::where('software_id', $software->id)->where('requisito_nivel', 'Minimo')->first(),
+            'Medio' => RequisitoSoftware::where('software_id', $software->id)->where('requisito_nivel', 'Medio')->first(),
+            'Recomendado' => RequisitoSoftware::where('software_id', $software->id)->where('requisito_nivel', 'Recomendado')->first()
+        ];
+
+        // Passa o software e os requisitos para a view
+        return view('softwares.editSoftware', compact('software', 'requisitos'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $id)
+    public function update(UpdateSoftwareRequest $request, $id)
     {
         // Busca o registro do software pelo ID
         $software = Software::findOrFail($id);
 
-        // Validação dos dados, incluindo a imagem (opcional no caso do update)
-        $request->validate([
-            'nome' => 'required',
-            'software_imagem' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // A imagem é opcional no update
-        ]);
 
         if ($request->has('remover_imagem') && $software->imagem) {
             // Remove a imagem do diretório 'public/storage'
@@ -162,12 +168,49 @@ class SoftwareController extends Controller
         $software->nome = $request->input('nome');
         $software->tipo = $request->input('tipo');
         $software->descricao = $request->input('descricao');
-        $software->requisitos = $request->input('requisitos');
 
         // Salva as alterações no banco de dados
         $software->save();
 
-        return redirect()->route('softwares.index');
+        $requisitos = [
+            'Minimo' => [
+                'cpu' => $request->input('cpu_min'),
+                'gpu' => $request->input('gpu_min'),
+                'ram' => $request->input('ram_min'),
+                'placa_mae' => $request->input('placa_mae_min'),
+                'ssd' => $request->input('ssd_min'),
+                'cooler' => $request->input('cooler_min'),
+                'fonte' => $request->input('fonte_min')
+            ],
+            'Medio' => [
+                'cpu' => $request->input('cpu_med'),
+                'gpu' => $request->input('gpu_med'),
+                'ram' => $request->input('ram_med'),
+                'placa_mae' => $request->input('placa_mae_med'),
+                'ssd' => $request->input('ssd_med'),
+                'cooler' => $request->input('cooler_med'),
+                'fonte' => $request->input('fonte_med')
+            ],
+            'Recomendado' => [
+                'cpu' => $request->input('cpu_rec'),
+                'gpu' => $request->input('gpu_rec'),
+                'ram' => $request->input('ram_rec'),
+                'placa_mae' => $request->input('placa_mae_rec'),
+                'ssd' => $request->input('ssd_rec'),
+                'cooler' => $request->input('cooler_rec'),
+                'fonte' => $request->input('fonte_rec')
+            ],
+        ];
+
+        // Atualiza ou cria os requisitos no banco de dados
+        foreach ($requisitos as $nivel => $requisito) {
+            RequisitoSoftware::updateOrCreate(
+                ['software_id' => $software->id, 'requisito_nivel' => $nivel],
+                $requisito
+            );
+        }
+
+        return redirect()->route('softwares.index')->with('success', 'Software atualizado com sucesso!');
     }
 
 

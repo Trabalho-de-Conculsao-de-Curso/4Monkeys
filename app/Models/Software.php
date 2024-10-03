@@ -14,12 +14,16 @@ class Software extends Model
         'nome',
         'tipo',
         'descricao',
-        'requisitos',
         'imagem'
     ];
 
     public function produtoFinais()
     {
         return $this->belongsToMany(Conjunto::class, 'conjunto_software', 'software_id', 'conjunto_id');
+    }
+
+    public function requisitos()
+    {
+        return $this->hasMany(RequisitoSoftware::class);
     }
 }
