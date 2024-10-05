@@ -3,18 +3,19 @@
 namespace App\Http\Controllers;
 
 use App\Models\Software;
-use App\Models\Conjunto;
 use Illuminate\Http\Request;
 
 class ConjuntoLocal extends Controller
 {
     public function getConjuntoProdutos(Request $request)
     {
+
         // Validação: garantir que 3 softwares foram selecionados
         $request->validate([
             'softwares' => 'required|array|min:3|max:3',
             'softwares.*' => 'exists:softwares,id'
         ]);
+
 
         // Receber os IDs dos softwares selecionados
         $softwareIds = $request->input('softwares');
@@ -28,21 +29,43 @@ class ConjuntoLocal extends Controller
             return response()->json(['message' => 'Nenhum software encontrado'], 404);
         }
 
-        // Identificar o conjunto relacionado ao software mais pesado
-        $conjunto = $softwareMaisPesado->conjuntos()->first();
+        // Identificar todos os conjuntos relacionados ao software mais pesado
+        $conjuntos = $softwareMaisPesado->conjuntos()->get();
 
-        if (!$conjunto) {
+        if ($conjuntos->isEmpty()) {
             return response()->json(['message' => 'Nenhum conjunto encontrado para o software mais pesado'], 404);
         }
 
-        // Buscar os produtos relacionados ao conjunto
-        $produtos = $conjunto->produtos()->get();
+        // Inicializar arrays para agrupar os produtos por categoria
+        $produtosCategoria1 = [];
+        $produtosCategoria2 = [];
+        $produtosCategoria3 = [];
 
-        // Opcional: Redirecionar para uma página ou retornar os dados como JSON
+        // Buscar os produtos relacionados a todos os conjuntos e separá-los por categoria_id
+        foreach ($conjuntos as $conjunto) {
+            $produtos = $conjunto->produtos()->get();
+
+            foreach ($produtos as $produto) {
+                switch ($conjunto->categoria_id) {
+                    case 1:
+                        $produtosCategoria1[] = $produto;
+                        break;
+                    case 2:
+                        $produtosCategoria2[] = $produto;
+                        break;
+                    case 3:
+                        $produtosCategoria3[] = $produto;
+                        break;
+                }
+            }
+        }
+
+        // Retornar a resposta JSON separada por categoria
         return response()->json([
             'software' => $softwareMaisPesado,
-            'conjunto' => $conjunto,
-            'produtos' => $produtos,
+            'categoria_1' => $produtosCategoria1,
+            'categoria_2' => $produtosCategoria2,
+            'categoria_3' => $produtosCategoria3,
         ]);
     }
 }

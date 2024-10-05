@@ -26,4 +26,9 @@ class Software extends Model
     {
         return $this->hasMany(RequisitoSoftware::class);
     }
+
+    public function conjuntos()
+    {
+        return $this->belongsToMany(Conjunto::class, 'conjunto_software');
+    }
 }
