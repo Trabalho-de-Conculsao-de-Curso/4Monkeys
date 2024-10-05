@@ -16,6 +16,7 @@ return new class extends Migration
             $table->integer('tipo');// 1 jogos - 2 trabalho - 3 utilitarios
             $table->string('nome');
             $table->text('descricao');
+            $table->integer('peso');
             $table->string('imagem')->nullable();
             $table->timestamps();
         });
