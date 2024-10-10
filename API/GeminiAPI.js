@@ -8,7 +8,7 @@ const genAI = new GoogleGenerativeAI(process.env.API_KEY);
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
 // Define o prompt
-const prompt = "Qual o hino que xinga os coritibanos";
+const prompt = "Tell me a history about a magic backpack";
 
 // Gera o conteúdo
 const result = await model.generateContent(prompt);
