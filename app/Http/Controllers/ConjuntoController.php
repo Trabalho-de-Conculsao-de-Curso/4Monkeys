@@ -11,6 +11,8 @@ use App\Services\GeminiAPIService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use GuzzleHttp\Client;
+
 
 class ConjuntoController extends Controller
 {
@@ -81,7 +83,6 @@ class ConjuntoController extends Controller
 
                 }
                 $conjuntos = $recommendations;
-                dd($conjuntos);
 
 
 

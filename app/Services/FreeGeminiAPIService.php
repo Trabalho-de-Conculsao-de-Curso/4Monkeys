@@ -19,38 +19,21 @@ class FreeGeminiAPIService
 
     public function getRecommendations(array $softwares, array $produtos)
     {
-        // Gerar o prompt baseado nos softwares e produtos disponíveis
         $prompt = $this->generatePrompt($softwares, $produtos);
 
-        // Enviar requisição para a API gratuita
-        $response = Http::withHeaders([
-            'Content-Type' => 'application/json'
-        ])->post($this->apiUrl . '?key=' . $this->apiKey, [
-            'contents' => [
-                [
-                    'parts' => [
-                        ['text' => $prompt]
-                    ]
-                ]
-            ]
-        ]);
+        // Fazer a chamada à API do Gemini usando a classe Gemini (sem a apiUrl explícita)
+        $response = Gemini::geminiPro()->generateContent([$prompt]);
 
+        if ($response && !empty($response->candidates) && is_array($response->candidates)) {
+            // Extrair o conteúdo da resposta
+            $content = $response->candidates[0]->content->parts[0]->text;
 
-        if ($response=Gemini::geminiPro()->generateContent([$prompt])) {
-
-            if (!empty($response->candidates) && is_array($response->candidates)) {
-                // Extrair o conteúdo da resposta
-                $content = $response->candidates[0]->content->parts[0]->text;
-
-                // Parsear as recomendações do conteúdo textual
-                return $this->parseRecommendations($content);
-            } else {
-                Log::error('Resposta inesperada da API gratuita do Gemini.');
-                throw new \Exception('Resposta inesperada da API gratuita do Gemini');
-            }
+            // Parsear as recomendações do conteúdo textual
+            return $this->parseRecommendations($content);
         } else {
-            Log::error('Erro ao chamar a API gratuita do Gemini: ' . $response->body());
-            throw new \Exception('Erro ao chamar a API gratuita do Gemini');
+            // Tratar erros no caso de resposta inesperada
+            Log::error('Resposta inesperada da API do Gemini.');
+            throw new \Exception('Resposta inesperada da API do Gemini');
         }
     }
 

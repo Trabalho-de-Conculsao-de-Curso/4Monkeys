@@ -6,6 +6,7 @@ use App\Http\Controllers\PremiumController;
 use App\Http\Controllers\ProdutoController;
 use App\Http\Controllers\ConjuntoController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ScikitController;
 use App\Http\Controllers\SoftwareController;
 use App\Http\Controllers\AdminController;
 use Illuminate\Support\Facades\Route;
@@ -30,6 +31,8 @@ Route::post('/selecionar-free', [FreeConjuntoController::class, 'selecionar'])->
 Route::get('/', [ConjuntoController::class, 'createFree'])->name('home.create');
 
 Route::post('/conjunto-produtos', [ConjuntoLocal::class, 'getConjuntoProdutos'])->name('conjunto.produtos');
+
+
 
 Route::resource('/produtos', ProdutoController::class);
 Route::resource('/softwares', SoftwareController::class);

@@ -23,21 +23,31 @@ class GeminiAPIService
     public function getRecommendations(array $softwares, array $produtos)
     {
 
+        // Gere o prompt com base nos softwares e produtos fornecidos
         $prompt = $this->generatePrompt($softwares, $produtos);
-
+        // Faça a requisição diretamente para a API do Gemini
         $response = Http::withHeaders([
-            'Authorization' => 'Bearer ' . $this->apiKey,
             'Content-Type' => 'application/json'
-        ])->post($this->apiUrl, [
-            'prompt' => $prompt,
-            'model' =>'text-davinci-003'
+        ])->post($this->apiUrl . "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" . $this->apiKey, [
+            'contents' => [
+                [
+                    'parts' => [
+                        ['text' => $prompt]
+                    ]
+                ]
+            ]
         ]);
-        if ($response=Gemini::geminiPro()->generateContent([$prompt])) {
 
-            $recommendations = $this->parseResponse($response);
+        // Verifica se a resposta foi bem-sucedida
+        if ($response->successful()) {
+            // Parseia a resposta da API
+            $recommendations = $this->parseResponse($response->json());
+
+            // Calcula e retorna os totais
             return $this->calculateTotals($recommendations['desktops']);
         } else {
-            Log::error('Erro ao chamar a API do Gemini: ');
+            // Log de erro e lançamento de exceção em caso de falha
+            Log::error('Erro ao chamar a API do Gemini: ' . $response->body());
             throw new \Exception('Erro ao chamar a API do Gemini');
         }
     }

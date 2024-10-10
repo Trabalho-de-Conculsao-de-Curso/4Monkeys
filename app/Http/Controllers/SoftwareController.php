@@ -45,6 +45,7 @@ class SoftwareController extends Controller
                 'tipo' => $request->input('tipo'),
                 'nome' => $request->input('nome'),
                 'descricao' => $request->input('descricao'),
+                'peso' => $request->input('peso'),
                 'imagem' => $imagemPath, // Salva o caminho da imagem
             ]);
 
@@ -109,9 +110,8 @@ class SoftwareController extends Controller
         $search = $request->input('search');
         $results = Software::where('nome', 'like', "%$search%")
             ->orWhere('descricao', 'like', "%$search%")
+            ->orWhere('peso', 'like', "%$search%")
             ->get();
-
-
 
         return view('softwares.searchSoftware', compact('results'));
     }
@@ -168,6 +168,7 @@ class SoftwareController extends Controller
         $software->nome = $request->input('nome');
         $software->tipo = $request->input('tipo');
         $software->descricao = $request->input('descricao');
+        $software->peso = $request->input('peso');
 
         // Salva as alterações no banco de dados
         $software->save();

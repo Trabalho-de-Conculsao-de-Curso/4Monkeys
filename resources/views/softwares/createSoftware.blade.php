@@ -27,6 +27,12 @@
         </div>
 
         <div>
+            <label for="peso">Peso</label>
+            <br/>
+            <input type="number" name="peso" id="peso">
+        </div>
+
+        <div>
             <label for="software_imagem">Upload de Imagem</label>
             <br/>
             <input id="software_imagem" type="file" name="software_imagem" required>

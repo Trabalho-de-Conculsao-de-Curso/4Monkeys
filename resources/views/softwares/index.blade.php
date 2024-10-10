@@ -27,6 +27,7 @@
         <th class="py-2 px-3">Tipo</th>
         <th class="py-2 px-3">Nome</th>
         <th class="py-2 px-3">Descrição</th>
+        <th class="py-2 px-3">Peso</th>
 
         <th class="py-2 px-3">Imagem</th>
         <th class="py-2 px-3">Criado Em</th>
@@ -39,6 +40,7 @@
                     <td class="py-2 px-3">{{$software->tipo}}</td>
                     <td class="py-2 px-3">{{$software->nome}}</td>
                     <td class="py-2 px-3">{{$software->descricao}}</td>
+                    <td class="py-2 px-3">{{$software->peso}}</td>
 
                     <td class="py-2 px-3">
                         @if($software->imagem)

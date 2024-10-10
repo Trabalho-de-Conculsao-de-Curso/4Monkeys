@@ -33,6 +33,12 @@
         </div>
 
         <div>
+            <label for="peso">Peso</label>
+            <br/>
+            <input type="number" name="peso" id="peso" value="{{$software->peso}}">
+        </div>
+
+        <div>
             <label for="software_imagem">Upload da Nova Imagem (opcional)</label>
             <br/>
             <input type="file" name="software_imagem" id="software_imagem">

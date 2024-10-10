@@ -14,6 +14,7 @@ class Software extends Model
         'nome',
         'tipo',
         'descricao',
+        'peso',
         'imagem'
     ];
 

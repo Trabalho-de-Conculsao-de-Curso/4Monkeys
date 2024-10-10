@@ -23,13 +23,10 @@ class ProdutoFactory extends Factory
 
     public function definition(): array
     {
-        $marca = Marca::factory()->create();
         return [
             'nome' => $this->faker->word,
-            'marca_id' => Marca::factory(),
-            'especificacoes_id' => Especificacoes::factory(),
-            'preco_id' => Preco::factory(),
             'loja_online_id' => LojaOnline::factory(),
+            'disponibilidade' => $this->faker->boolean,
         ];
     }
 

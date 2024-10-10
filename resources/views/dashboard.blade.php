@@ -88,7 +88,7 @@
                     </div>
                 </div>
                     <div class="text-slate-200">
-                        <form id="software-selection-form" action="{{ auth()->check() ? route('conjunto.produtos') : route('free.selecionar') }}" method="POST" class="bg-zinc-800 relative rounded-lg shadow p-6 border border-gray-600" onsubmit="validateForm(event)">
+                        <form id="software-selection-form" action="{{ auth()->check() ? route('home.selecionar') : route('home.selecionar') }}" method="POST" class="bg-zinc-800 relative rounded-lg shadow p-6 border border-gray-600" onsubmit="validateForm(event)">
                             @csrf
                             <h2 class="text-2xl font-semibold mb-4">Selecione os Softwares Desejados:</h2>
                             <div class="mb-6 grid grid-cols-1 md:grid-cols-3 gap-6">

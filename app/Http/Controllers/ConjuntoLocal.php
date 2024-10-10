@@ -12,13 +12,14 @@ class ConjuntoLocal extends Controller
 
         // Validação: garantir que 3 softwares foram selecionados
         $request->validate([
-            'softwares' => 'required|array|min:3|max:3',
+            'softwares' => 'required|array|min:1|max:3',
             'softwares.*' => 'exists:softwares,id'
         ]);
 
 
         // Receber os IDs dos softwares selecionados
         $softwareIds = $request->input('softwares');
+
 
         // Encontra o software com o maior peso
         $softwareMaisPesado = Software::whereIn('id', $softwareIds)
