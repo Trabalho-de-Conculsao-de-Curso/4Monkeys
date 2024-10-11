@@ -18,17 +18,20 @@
 
         <div class="mb-4">
             <label for="nome" class="block text-sm font-medium text-gray-700">Nome</label>
-            <input type="text" name="nome" id="nome" required class="border-2 form-input mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
+            <input type="text" name="nome" id="nome" required class="border-2 form-input mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50" value="{{ old('nome') }}">
         </div>
 
         <div class="mb-4">
             <label for="email" class="block text-sm font-medium text-gray-700">E-mail</label>
-            <input type="email" name="email" id="email" required class="border-2 form-input mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
+            <input type="email" name="email" id="email" required class="border-2 form-input mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"  value="{{ old('email') }}">
+            @error('email')
+            <span>{{ $message }}</span>
+            @enderror
         </div>
 
         <div class="mb-4">
             <label for="situacao" class="block text-sm font-medium text-gray-700">Situação</label>
-            <input type="text" name="situacao" id="situacao" required class="border-2 form-input mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
+            <input type="text" name="situacao" id="situacao" required class="border-2 form-input mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50" value="{{ old('situacao') }}">
         </div>
         <div class="mb-4">
             <label for="password" class="block text-sm font-medium text-gray-700">Senha</label>
@@ -40,6 +43,7 @@
             <input type="submit" value="Enviar" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
             <input type="hidden" name="_token" value="{{ csrf_token() }}">
         </div>
+
     </form>
 </div>
 
