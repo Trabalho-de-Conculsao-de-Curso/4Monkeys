@@ -130,7 +130,7 @@ it('Rota update atualiza um usuário existente e responde com 302', function () 
 
     // Dados atualizados
     $updatedData = [
-        'name' => 'Usuário Atualizado',
+        'nome' => 'Usuário Atualizado',
         'email' => 'usuario@atualizado.com',
         'situacao' => 'ativo',
         'password' => 'novaSenha123',  // Nova senha fornecida
@@ -156,7 +156,6 @@ it('Rota update atualiza um usuário existente e responde com 302', function () 
     $response->assertRedirect(route('usuario-premium.index'));
 });
 
-
 it('Rota destroy exclui um usuário existente e responde com 302', function () {
     // Criação de um usuário no banco de dados
     $usuario = User::factory()->create([
@@ -166,7 +165,7 @@ it('Rota destroy exclui um usuário existente e responde com 302', function () {
     ]);
 
     // Envia a requisição DELETE para excluir o usuário
-    $response = $this->delete("/premium/{$usuario->id}", [
+    $response = $this->delete("/usuario-premium/{$usuario->id}", [
         '_token' => csrf_token(),
     ]);
 
@@ -177,8 +176,6 @@ it('Rota destroy exclui um usuário existente e responde com 302', function () {
     $response->assertStatus(302);
     $response->assertRedirect(route('usuario-premium.index'));
 });
-
-
 
 
 it('Rota store falha ao criar usuário sem dados obrigatórios e responde com 422', function () {

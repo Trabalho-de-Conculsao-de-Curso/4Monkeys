@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Software;
 use Illuminate\Http\Request;
 
-class ConjuntoLocal extends Controller
+class ConjuntoLocalController extends Controller
 {
     public function getConjuntoProdutos(Request $request)
     {

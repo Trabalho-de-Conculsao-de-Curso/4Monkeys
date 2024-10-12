@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\ConjuntoLocal;
+use App\Http\Controllers\ConjuntoLocalController;
 use App\Http\Controllers\FreeConjuntoController;
 use App\Http\Controllers\PremiumController;
 use App\Http\Controllers\ProdutoController;
@@ -30,7 +30,7 @@ Route::middleware('auth')->group(function () {
 Route::post('/selecionar-free', [FreeConjuntoController::class, 'selecionar'])->name('free.selecionar');
 Route::get('/', [ConjuntoController::class, 'createFree'])->name('home.create');
 
-Route::post('/conjunto-produtos', [ConjuntoLocal::class, 'getConjuntoProdutos'])->name('conjunto.produtos');
+Route::post('/conjunto-produtos', [ConjuntoLocalController::class, 'getConjuntoProdutos'])->name('conjunto.produtos');
 
 
 
