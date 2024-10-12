@@ -37,7 +37,7 @@ Route::post('/conjunto-produtos', [ConjuntoLocalController::class, 'getConjuntoP
 Route::resource('/produtos', ProdutoController::class);
 Route::resource('/softwares', SoftwareController::class);
 Route::resource('/usuario-premium', PremiumController::class);
-Route::resource('/admin', AdminController::class);
+Route::resource('/create-admin', AdminController::class);
 
 
 /*Route::middleware(['auth', 'admin'])->group(function () {

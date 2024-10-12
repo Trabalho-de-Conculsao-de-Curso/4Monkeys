@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 
 class PremiumController extends Controller
@@ -107,7 +108,7 @@ class PremiumController extends Controller
 
         // Se a senha for fornecida, atualiza a senha
         if ($request->filled('password')) {
-            $usuario->password = bcrypt($request->input('password'));
+            $usuario->password = Hash::make($request->input('password'));
         }
 
         // Salva as alterações no banco de dados
