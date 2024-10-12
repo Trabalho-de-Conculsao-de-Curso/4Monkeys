@@ -21,11 +21,13 @@ class AdminController extends Controller
         return view('auth.admin.index', compact('admins'));
     }
 
-    public function create(){
-    return view('auth.admin.createAdmin');
+    public function create()
+    {
+        return view('auth.admin.createAdmin');
     }
 
-    public function store(Request $request){
+    public function store(Request $request)
+    {
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.Admin::class],
@@ -71,13 +73,21 @@ class AdminController extends Controller
 
     public function update(Request $request, $id)
     {
-
+        // Busca o administrador pelo ID
         $admin = Admin::findOrFail($id);
 
+        // Validação dos dados
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255|unique:admins,email,' . $admin->id, // Ignora o e-mail do próprio admin
+            'password' => 'nullable|string|min:6', // Senha opcional
+        ]);
+
+        // Atualização dos dados
         $admin->name = $request->input('name');
         $admin->email = $request->input('email');
-        $admin->password = Hash::make($request->input('password'));
 
+        // Se a senha for fornecida, atualiza a senha
         if ($request->filled('password')) {
             $admin->password = Hash::make($request->input('password'));
         }
@@ -86,6 +96,7 @@ class AdminController extends Controller
 
         return redirect()->route('create-admin.index')->with('success', 'Admin atualizado com sucesso!');
     }
+
 
     public function destroy($id)
     {
