@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Categoria;
 use App\Models\Conjunto;
 use App\Models\Produto;
 use App\Models\Software;
@@ -100,3 +101,17 @@ it('Rota getConjuntoProdutos retorna erro 404 quando nenhum conjunto é encontra
     $response->assertStatus(404);
     $response->assertJsonFragment(['message' => 'Nenhum conjunto encontrado para o software mais pesado']);
 });
+
+it('verifica a relação hasMany com Conjunto', function () {
+    // Cria uma categoria
+    $categoria = Categoria::factory()->create();
+
+    // Cria dois conjuntos relacionados à categoria
+    $conjunto1 = Conjunto::factory()->create(['categoria_id' => $categoria->id]);
+    $conjunto2 = Conjunto::factory()->create(['categoria_id' => $categoria->id]);
+
+    // Verifica se a relação hasMany com Conjunto está correta
+    expect($categoria->conjuntos)->toHaveCount(2);
+    expect($categoria->conjuntos->pluck('id'))->toContain($conjunto1->id, $conjunto2->id);
+});
+
