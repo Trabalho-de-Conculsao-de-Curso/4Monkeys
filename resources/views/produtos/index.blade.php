@@ -1,15 +1,12 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <title>Crud das Entidades</title>
-</head>
+<!-- resources/views/softwares/index.blade.php -->
+@extends('layouts.appSoftware')
+
+@section('title', 'Lista de Softwares')
+
+@section('content')
 <body class="font-sans antialiased dark:bg-black dark:text-white/50">
     <div class="container mx-auto p-4">
-        <h1 class="text-2xl font-bold mb-4 text-center">Lista de Produtos</h1>
+    <h1 class="text-1xl mb-4 text-left">Administrar > Lista de Hardware</h1>
 
         <div class="mb-4 flex justify-between items-center">
             <form action="{{ url('/produtos/search') }}" method="GET" class="flex items-center">
@@ -20,10 +17,10 @@
             <a href="/produtos/create" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">Cadastrar Novo Produto</a>
         </div>
 
-        <div class="overflow-x-auto">
-            <table class="min-w-full border border-solid text-sm">
-                <thead>
-                    <tr class="bg-gray-200">
+        <div class="overflow-x-auto rounded-sm">
+            <table class="table-auto w-full text-left border-collapse border border-gray-500 bg-white rounded-md">
+                <thead class="bg-blue-500 rounded-sm">
+                    <tr class="bg-gray-200 rounded-sm">
                         <th class="py-2 px-3">ID</th>
                         <th class="py-2 px-3">Nome</th>
                         <th class="py-2 px-3">Valor</th>
@@ -73,4 +70,4 @@
         </div>
     </div>
 </body>
-</html>
+@endsection

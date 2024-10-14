@@ -14,14 +14,28 @@ class SoftwareController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $softwares = Software::with('requisitos')->get();
+    $search = $request->input('search'); // Obtém o parâmetro de busca
 
-        return view('softwares.index', [
-            'softwares' => $softwares
-        ]);
+    if ($search) {
+        // Filtra os softwares com base no nome, descrição ou peso
+        $softwares = Software::where('nome', 'like', "%$search%")
+            ->orWhere('descricao', 'like', "%$search%")
+            ->orWhere('peso', 'like', "%$search%")
+            ->with('requisitos')
+            ->get();
+    } else {
+        // Se não houver pesquisa, obtém todos os softwares
+        $softwares = Software::with('requisitos')->get();
     }
+
+    return view('softwares.index', [
+        'softwares' => $softwares,
+        'search' => $search // Envia o termo de busca para a view
+    ]);
+}
+
 
     /**
      * Show the form for creating a new resource.

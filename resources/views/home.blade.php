@@ -5,17 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Seleção de Softwares</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@latest/dist/tailwind.min.css" rel="stylesheet">
-
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Schoolbell&display=swap" rel="stylesheet">
-
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
-
         <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-
 
     <script>
         function toggleDetails(id) {
@@ -37,16 +28,6 @@
             }
         }
     </script>
-
-    <style>
-            body {
-                font-family: 'Caveat', cursive;
-            }
-            h1 {
-                font-family: 'Caveat', cursive;
-                font-weight: 700;
-            }
-        </style>
 </head>
 
 <body class="bg-zinc-900 text-gray-200 flex flex-col h-screen">
