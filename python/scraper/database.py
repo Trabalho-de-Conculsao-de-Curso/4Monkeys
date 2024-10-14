@@ -10,6 +10,7 @@ def connect_db():
         return None
 
 def salvar_produtos_no_banco(produtos):
+
     conn = connect_db()
     cursor = conn.cursor()
 
