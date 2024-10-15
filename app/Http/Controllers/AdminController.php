@@ -18,7 +18,11 @@ class AdminController extends Controller
     }
 
     public function create(){
+        return view('auth.admin.createAdmin');
+    }
 
+    public function dashboard(){
+        return view('auth.admin.dashboardAdmin');
     }
 
     public function store(Request $request){

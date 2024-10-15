@@ -1,10 +1,11 @@
-@extends('layouts.appSoftware')
+@extends('padrao')
+
+@section('titulo', 'Clientes')
 
 @section('content')
-
 <!-- Main Content -->
 <div class="p-4">
-    <div class="border border-gray-300 rounded-lg p-6 bg-white shadow-md"> <!-- Adicionando a borda e o fundo branco -->
+    <div class="max-w-lg mx-auto border border-gray-300 rounded-lg p-6 bg-white shadow-md"> <!-- Ajuste do tamanho e centralização -->
         <form action="/softwares" method="POST" enctype="multipart/form-data" class="space-y-4">
             @csrf
             <div>

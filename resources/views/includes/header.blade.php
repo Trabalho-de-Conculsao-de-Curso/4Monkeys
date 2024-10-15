@@ -8,7 +8,7 @@
 
         <!-- Navegação -->
         <nav class="flex items-center space-x-6">
-            <a href="{{ url('/') }}" class="text-white hover:text-gray-200 px-4 py-2 bg-blue-500 rounded-md hover:bg-blue-700">Home</a>
+            <a href="{{ url('/admin') }}" class="text-white hover:text-gray-200 px-4 py-2 bg-blue-500 rounded-md hover:bg-blue-700">Home</a>
             <a href="{{ url('/softwares') }}" class="text-white hover:text-gray-200 px-4 py-2 bg-blue-500 rounded-md hover:bg-blue-700">Softwares</a>
             <a href="{{ url('/sobre') }}" class="text-white hover:text-gray-200 px-4 py-2 bg-blue-500 rounded-md hover:bg-blue-700">Sobre</a>
             <a href="{{ url('/contato') }}" class="text-white hover:text-gray-200 px-4 py-2 bg-blue-500 rounded-md hover:bg-blue-700">Contato</a>
@@ -33,7 +33,6 @@
                         </form>
                     </div>
                 @else
-                    <a href="{{ route('login') }}" class="text-white hover:text-gray-200 px-4 py-2 bg-blue-500 rounded-md hover:bg-blue-700">Entrar</a>
                 @endif
             </div>
         </nav>
