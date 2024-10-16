@@ -6,7 +6,6 @@ use App\Http\Controllers\PremiumController;
 use App\Http\Controllers\ProdutoController;
 use App\Http\Controllers\ConjuntoController;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\ScikitController;
 use App\Http\Controllers\SoftwareController;
 use App\Http\Controllers\AdminController;
 use Illuminate\Support\Facades\Route;

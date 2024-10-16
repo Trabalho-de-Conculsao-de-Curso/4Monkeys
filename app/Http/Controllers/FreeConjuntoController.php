@@ -18,6 +18,8 @@ class FreeConjuntoController extends Controller
         $this->FreeGeminiAPIService = $FreeGeminiAPIService;
     }
 
+
+
     public function selecionar(Request $request)
     {
         // Recuperar os softwares selecionados e todos os produtos disponíveis
@@ -33,9 +35,9 @@ class FreeConjuntoController extends Controller
             Log::info('Resposta bruta da API Free Gemini:', ['response' => $recommendations]);
 
             // Retornar a view com os dados das recomendações, sem salvar no banco
-            return response()->json(['desktops' => $recommendations]);
+            //return response()->json(['desktops' => $recommendations]);
 
-            //return view('resultado_free', ['desktops' => $recommendations]);
+            return view('resultado_free', ['desktops' => $recommendations]);
 
         } catch (\Exception $e) {
             // Logar qualquer erro e redirecionar de volta com uma mensagem de erro
