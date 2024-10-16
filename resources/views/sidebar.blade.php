@@ -10,15 +10,21 @@
                     <h4 class="text-section">Opções</h4>
                 </li>
                 <li class="{{ request()->routeIs('index.*') ? 'nav-item active' : 'nav-item' }}">
-                    <a href="/">
+                    <a href="/softwares">
                         <i class="fas fa-home"></i>
                         <p>Início</p>
                     </a>
                 </li>
                 <li class="{{ request()->routeIs('clientes.*') ? 'nav-item active' : 'nav-item' }}">
-                    <a href="/clientes">
-                        <i class="fas fa-users"></i>
-                        <p>Clientes</p>
+                    <a href="/softwares">
+                        <i class="fas fa-cogs"></i>
+                        <p>Softwares</p>
+                    </a>
+                </li>
+                <li class="{{ request()->routeIs('clientes.*') ? 'nav-item active' : 'nav-item' }}">
+                    <a href="/produtos">
+                        <i class="fas fa-memory"></i> 
+                        <p>Hardwares</p>
                     </a>
                 </li>
             </ul>

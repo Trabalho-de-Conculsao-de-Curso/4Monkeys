@@ -1,133 +1,194 @@
 @extends('padrao')
 
-@section('titulo', 'Clientes')
+@section('titulo', 'Softwares')
 
 @section('content')
-<!-- Main Content -->
-<div class="p-4">
-    <div class="max-w-lg mx-auto border border-gray-300 rounded-lg p-6 bg-white shadow-md"> <!-- Ajuste do tamanho e centralização -->
-        <form action="/softwares" method="POST" enctype="multipart/form-data" class="space-y-4">
-            @csrf
-            <div>
-                <label for="tipo" class="block font-semibold">Tipo do Software: 1 - Jogo, 2 - Trabalho, 3 - Utilitários</label>
-                <input type="text" name="tipo" id="tipo" required class="border border-gray-300 p-2 w-full rounded">
-            </div>
-            <div>
-                <label for="nome" class="block font-semibold">Nome</label>
-                <input type="text" name="nome" id="nome" required class="border border-gray-300 p-2 w-full rounded">
-            </div>
-            <div>
-                <label for="descricao" class="block font-semibold">Descrição</label>
-                <input type="text" name="descricao" id="descricao" class="border border-gray-300 p-2 w-full rounded">
-            </div>
 
-            <div>
-                <label for="peso" class="block font-semibold">Peso</label>
-                <input type="number" name="peso" id="peso" class="border border-gray-300 p-2 w-full rounded">
-            </div>
+@if ($errors->any())
+    <div class="alert alert-danger">
+        <ul>
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+    <br/>
+@endif
 
+<div class="panel-header bg-dark-gradient">
+    <div class="page-inner py-5">
+        <div class="d-flex align-items-left align-items-md-center flex-column flex-md-row">
             <div>
-                <label for="software_imagem" class="block font-semibold">Upload de Imagem</label>
-                <input id="software_imagem" type="file" name="software_imagem" required class="border border-gray-300 p-2 w-full rounded">
-                @error('software_imagem')
-                <div class="text-sm text-red-400">{{ $message }}</div>
-                @enderror
+                <h2 class="text-white pb-2 fw-bold">Softwares</h2>
+                <h5 class="text-white op-7 mb-2">Gerenciamento de Softwares</h5>
             </div>
+        </div>
+    </div>
+</div>
 
-            <h3 class="font-semibold">Requisitos Mínimos</h3>
-            <div>
-                <label for="cpu_min" class="block font-semibold">CPU</label>
-                <input type="text" name="cpu_min" id="cpu_min" required class="border border-gray-300 p-2 w-full rounded">
-            </div>
-            <div>
-                <label for="gpu_min" class="block font-semibold">GPU</label>
-                <input type="text" name="gpu_min" id="gpu_min" required class="border border-gray-300 p-2 w-full rounded">
-            </div>
-            <div>
-                <label for="ram_min" class="block font-semibold">RAM</label>
-                <input type="text" name="ram_min" id="ram_min" required class="border border-gray-300 p-2 w-full rounded">
-            </div>
-            <div>
-                <label for="placa_mae_min" class="block font-semibold">Placa Mãe</label>
-                <input type="text" name="placa_mae_min" id="placa_mae_min" class="border border-gray-300 p-2 w-full rounded">
-            </div>
-            <div>
-                <label for="ssd_min" class="block font-semibold">SSD</label>
-                <input type="text" name="ssd_min" id="ssd_min" class="border border-gray-300 p-2 w-full rounded">
-            </div>
-            <div>
-                <label for="cooler_min" class="block font-semibold">Cooler</label>
-                <input type="text" name="cooler_min" id="cooler_min" class="border border-gray-300 p-2 w-full rounded">
-            </div>
-            <div>
-                <label for="fonte_min" class="block font-semibold">Fonte</label>
-                <input type="text" name="fonte_min" id="fonte_min" class="border border-gray-300 p-2 w-full rounded">
-            </div>
+<div class="page-inner mt--5">
+    <div class="row">
+        <div class="col-md-5">
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex align-items-center">
+                        <h4 class="card-title ">Cadastro de Softwares</h4>
+                    </div>
+                </div>
+                <form action="/softwares" method="POST" enctype="multipart/form-data" class="space-y-4">
+                    @csrf
+                    <h1 class="text-xl font-bold mb-4 ml-4">Adicionar Software</h1>
 
-            <h3 class="font-semibold">Requisitos Médios</h3>
-            <div>
-                <label for="cpu_med" class="block font-semibold">CPU</label>
-                <input type="text" name="cpu_med" id="cpu_med" required class="border border-gray-300 p-2 w-full rounded">
-            </div>
-            <div>
-                <label for="gpu_med" class="block font-semibold">GPU</label>
-                <input type="text" name="gpu_med" id="gpu_med" required class="border border-gray-300 p-2 w-full rounded">
-            </div>
-            <div>
-                <label for="ram_med" class="block font-semibold">RAM</label>
-                <input type="text" name="ram_med" id="ram_med" required class="border border-gray-300 p-2 w-full rounded">
-            </div>
-            <div>
-                <label for="placa_mae_med" class="block font-semibold">Placa Mãe</label>
-                <input type="text" name="placa_mae_med" id="placa_mae_med" class="border border-gray-300 p-2 w-full rounded">
-            </div>
-            <div>
-                <label for="ssd_med" class="block font-semibold">SSD</label>
-                <input type="text" name="ssd_med" id="ssd_med" class="border border-gray-300 p-2 w-full rounded">
-            </div>
-            <div>
-                <label for="cooler_med" class="block font-semibold">Cooler</label>
-                <input type="text" name="cooler_med" id="cooler_med" class="border border-gray-300 p-2 w-full rounded">
-            </div>
-            <div>
-                <label for="fonte_med" class="block font-semibold">Fonte</label>
-                <input type="text" name="fonte_med" id="fonte_med" class="border border-gray-300 p-2 w-full rounded">
-            </div>
+                    <div class="form-group">
+                        <label for="tipo">Tipo do Software: 1 - Jogo, 2 - Trabalho, 3 - Utilitários</label>
+                        <br/>
+                        <input class="form-control" type="text" name="tipo" id="tipo" required>
+                    </div>
 
-            <h3 class="font-semibold">Requisitos Recomendados</h3>
-            <div>
-                <label for="cpu_rec" class="block font-semibold">CPU</label>
-                <input type="text" name="cpu_rec" id="cpu_rec" required class="border border-gray-300 p-2 w-full rounded">
-            </div>
-            <div>
-                <label for="gpu_rec" class="block font-semibold">GPU</label>
-                <input type="text" name="gpu_rec" id="gpu_rec" required class="border border-gray-300 p-2 w-full rounded">
-            </div>
-            <div>
-                <label for="ram_rec" class="block font-semibold">RAM</label>
-                <input type="text" name="ram_rec" id="ram_rec" required class="border border-gray-300 p-2 w-full rounded">
-            </div>
-            <div>
-                <label for="placa_mae_rec" class="block font-semibold">Placa Mãe</label>
-                <input type="text" name="placa_mae_rec" id="placa_mae_rec" class="border border-gray-300 p-2 w-full rounded">
-            </div>
-            <div>
-                <label for="ssd_rec" class="block font-semibold">SSD</label>
-                <input type="text" name="ssd_rec" id="ssd_rec" class="border border-gray-300 p-2 w-full rounded">
-            </div>
-            <div>
-                <label for="cooler_rec" class="block font-semibold">Cooler</label>
-                <input type="text" name="cooler_rec" id="cooler_rec" class="border border-gray-300 p-2 w-full rounded">
-            </div>
-            <div>
-                <label for="fonte_rec" class="block font-semibold">Fonte</label>
-                <input type="text" name="fonte_rec" id="fonte_rec" class="border border-gray-300 p-2 w-full rounded">
-            </div>
+                    <div class="form-group">
+                        <label for="nome">Nome</label>
+                        <br/>
+                        <input class="form-control" type="text" name="nome" id="nome" required>
+                    </div>
 
-            <div>
-                <input type="submit" value="Enviar" class="bg-blue-500 text-white p-2 rounded hover:bg-blue-600">
+                    <div class="form-group">
+                        <label for="descricao">Descrição</label>
+                        <br/>
+                        <input class="form-control" type="text" name="descricao" id="descricao">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="peso">Peso</label>
+                        <br/>
+                        <input class="form-control" type="number" name="peso" id="peso">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="software_imagem">Upload de Imagem</label>
+                        <br/>
+                        <input class="form-control" type="file" name="software_imagem" id="software_imagem" required>
+                        @error('software_imagem')
+                            <div class="text-sm text-red-400">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <h3>Requisitos Mínimos</h3>
+                    <div class="form-group">
+                        <label for="cpu_min">CPU</label>
+                        <br/>
+                        <input class="form-control" type="text" name="cpu_min" id="cpu_min" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="gpu_min">GPU</label>
+                        <br/>
+                        <input class="form-control" type="text" name="gpu_min" id="gpu_min" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="ram_min">RAM</label>
+                        <br/>
+                        <input class="form-control" type="text" name="ram_min" id="ram_min" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="placa_mae_min">Placa Mãe</label>
+                        <br/>
+                        <input class="form-control" type="text" name="placa_mae_min" id="placa_mae_min">
+                    </div>
+                    <div class="form-group">
+                        <label for="ssd_min">SSD</label>
+                        <br/>
+                        <input class="form-control" type="text" name="ssd_min" id="ssd_min">
+                    </div>
+                    <div class="form-group">
+                        <label for="cooler_min">Cooler</label>
+                        <br/>
+                        <input class="form-control" type="text" name="cooler_min" id="cooler_min">
+                    </div>
+                    <div class="form-group">
+                        <label for="fonte_min">Fonte</label>
+                        <br/>
+                        <input class="form-control" type="text" name="fonte_min" id="fonte_min">
+                    </div>
+
+                    <h3>Requisitos Médios</h3>
+                    <div class="form-group">
+                        <label for="cpu_med">CPU</label>
+                        <br/>
+                        <input class="form-control" type="text" name="cpu_med" id="cpu_med" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="gpu_med">GPU</label>
+                        <br/>
+                        <input class="form-control" type="text" name="gpu_med" id="gpu_med" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="ram_med">RAM</label>
+                        <br/>
+                        <input class="form-control" type="text" name="ram_med" id="ram_med" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="placa_mae_med">Placa Mãe</label>
+                        <br/>
+                        <input class="form-control" type="text" name="placa_mae_med" id="placa_mae_med">
+                    </div>
+                    <div class="form-group">
+                        <label for="ssd_med">SSD</label>
+                        <br/>
+                        <input class="form-control" type="text" name="ssd_med" id="ssd_med">
+                    </div>
+                    <div class="form-group">
+                        <label for="cooler_med">Cooler</label>
+                        <br/>
+                        <input class="form-control" type="text" name="cooler_med" id="cooler_med">
+                    </div>
+                    <div class="form-group">
+                        <label for="fonte_med">Fonte</label>
+                        <br/>
+                        <input class="form-control" type="text" name="fonte_med" id="fonte_med">
+                    </div>
+
+                    <h3>Requisitos Recomendados</h3>
+                    <div class="form-group">
+                        <label for="cpu_rec">CPU</label>
+                        <br/>
+                        <input class="form-control" type="text" name="cpu_rec" id="cpu_rec" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="gpu_rec">GPU</label>
+                        <br/>
+                        <input class="form-control" type="text" name="gpu_rec" id="gpu_rec" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="ram_rec">RAM</label>
+                        <br/>
+                        <input class="form-control" type="text" name="ram_rec" id="ram_rec" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="placa_mae_rec">Placa Mãe</label>
+                        <br/>
+                        <input class="form-control" type="text" name="placa_mae_rec" id="placa_mae_rec">
+                    </div>
+                    <div class="form-group">
+                        <label for="ssd_rec">SSD</label>
+                        <br/>
+                        <input class="form-control" type="text" name="ssd_rec" id="ssd_rec">
+                    </div>
+                    <div class="form-group">
+                        <label for="cooler_rec">Cooler</label>
+                        <br/>
+                        <input class="form-control" type="text" name="cooler_rec" id="cooler_rec">
+                    </div>
+                    <div class="form-group">
+                        <label for="fonte_rec">Fonte</label>
+                        <br/>
+                        <input class="form-control" type="text" name="fonte_rec" id="fonte_rec">
+                    </div>
+
+                    <div class="form-group">
+                        <input type="submit" value="Enviar" class="btn btn-primary" value="enviar">
+                    </div>
+                </form>
             </div>
-        </form>
+        </div>
     </div>
 </div>
 @endsection
