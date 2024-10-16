@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Estoque;
-use App\Models\Produto;
 use App\Models\Software;
 use App\Services\FreeGeminiAPIService;
 use Illuminate\Http\Request;

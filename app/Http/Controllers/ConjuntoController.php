@@ -6,12 +6,11 @@ use App\Models\Categoria;
 use App\Models\Produto;
 use App\Models\Conjunto;
 use App\Models\Software;
-use App\Models\User;
 use App\Services\GeminiAPIService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use GuzzleHttp\Client;
+
 
 
 class ConjuntoController extends Controller

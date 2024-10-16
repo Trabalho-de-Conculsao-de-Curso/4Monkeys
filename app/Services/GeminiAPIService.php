@@ -3,8 +3,6 @@ namespace App\Services;
 
 use App\Models\LojaOnline;
 use App\Models\Produto;
-use Gemini\Laravel\Facades\Gemini;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 
