@@ -10,9 +10,9 @@ use App\Http\Controllers\SoftwareController;
 use App\Http\Controllers\AdminController;
 use Illuminate\Support\Facades\Route;
 
-/Route::get('/home', function () {
+/*Route::get('/home', function () {
     return view('home');
-});/
+});*/
 
 Route::get('/dashboard', [ConjuntoController::class, 'create'])
     ->middleware(['auth', 'verified'])
@@ -23,25 +23,24 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::post('/selecionar', [ConjuntoController::class, 'selecionar'])->name('home.selecionar');
+
 });
 
 Route::post('/selecionar-free', [FreeConjuntoController::class, 'selecionar'])->name('free.selecionar');
 Route::get('/', [ConjuntoController::class, 'createFree'])->name('home.create');
 
-
 Route::post('/conjunto-produtos', [ConjuntoLocalController::class, 'getConjuntoProdutos'])->name('conjunto.produtos');
+
+
 
 Route::resource('/produtos', ProdutoController::class);
 Route::resource('/softwares', SoftwareController::class);
 Route::resource('/usuario-premium', PremiumController::class);
-
-Route::get('/create-admin', [AdminController::class, 'create'])->name('auth.admin.create');
-Route::get('/dashboard-admin', [AdminController::class, 'dashboard'])->name('admin.dashboard');
+Route::resource('/create-admin', AdminController::class);
 
 
-
-/Route::middleware(['auth', 'admin'])->group(function () {
+/*Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/admin', [AdminController::class, 'index'])->name('auth.admin.AdminDashboard');
-});/ //implementação da rota com o token
+});*/ //implementação da rota com o token
 
-require DIR.'/auth.php';
+require __DIR__.'/auth.php';
