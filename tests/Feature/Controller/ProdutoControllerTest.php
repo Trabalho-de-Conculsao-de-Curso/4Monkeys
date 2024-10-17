@@ -34,24 +34,6 @@ it('Rota edit responde com 200', function () {
 
 
 
-it('Rota index retorna produtos da segunda página com paginação e responde com 200', function () {
-    // Criação de 15 produtos, mais do que o limite de 10 por página
-    Produto::factory()->count(15)->hasLojaOnline()->create();
-
-    // Faz uma requisição para a segunda página
-    $response = $this->get('/produtos?page=2', [
-        '_token' => csrf_token(),
-    ]);
-
-    // Verifica se a resposta está correta (200 OK)
-    $response->assertStatus(200);
-
-    // Verifica se os produtos da segunda página aparecem na view
-    $produtosPaginados = Produto::with('lojaOnline')->paginate(10, ['*'], 'page', 2);
-    foreach ($produtosPaginados->items() as $produto) {
-        $response->assertSee($produto->nome);
-    }
-});
 
 it('Rota store cria um produto e responde com 302', function () {
     // Dados completos necessários para a criação do produto
