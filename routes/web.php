@@ -33,6 +33,7 @@ Route::middleware('auth')->group(function () {
 Route::post('/selecionar-free', [FreeConjuntoController::class, 'selecionar'])->name('free.selecionar');
 Route::get('/', [ConjuntoController::class, 'createFree'])->name('home.create');
 
+
 Route::post('/conjunto-produtos', [ConjuntoLocal::class, 'getConjuntoProdutos'])->name('conjunto.produtos');
 
 Route::resource('/produtos', ProdutoController::class);
