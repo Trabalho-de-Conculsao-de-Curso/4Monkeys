@@ -3,9 +3,6 @@
 namespace Database\Factories;
 
 use App\Models\Produto;
-use App\Models\Marca;
-use App\Models\Especificacoes;
-use App\Models\Preco;
 use App\Models\LojaOnline;
 use Illuminate\Database\Eloquent\Factories\Factory;
 

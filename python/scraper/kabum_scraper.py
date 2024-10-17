@@ -11,8 +11,14 @@ class KabumScraper:
         if not script_tag:
             return []
 
+
+        # Decodifica o conteúdo do script __NEXT_DATA__
         data = json.loads(script_tag.string)
+
+        # Verifica se 'pageProps' tem o campo 'data' como string JSON e decodifica
         catalog_data = json.loads(data['props']['pageProps']['data'])
+
+        # Agora acessa o campo 'catalogServer' dentro do JSON
         catalog_data_inner = catalog_data['catalogServer']['data']
 
         resultados = []

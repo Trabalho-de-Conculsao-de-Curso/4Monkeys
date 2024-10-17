@@ -37,7 +37,7 @@
                 @foreach ($results as $usuario)
                     <tr>
                         <td class="py-2 px-3">{{ $usuario->id }}</td>
-                        <td class="py-2 px-3">{{ $usuario->nome }}</td>
+                        <td class="py-2 px-3">{{ $usuario->name }}</td>
                         <td class="py-2 px-3">{{ $usuario->email }}</td>
                         <td class="py-2 px-3">{{ $usuario->situacao}}</td>
                         <td class="py-2 px-3">{{ $usuario->created_at }}</td>

@@ -12,7 +12,7 @@ class Estoque extends Model
     protected $table = 'Estoque';
 
     protected $fillable = [
-        'produto_id,',
+        'produto_id',
         'created_at',
         'updated_at',
     ];

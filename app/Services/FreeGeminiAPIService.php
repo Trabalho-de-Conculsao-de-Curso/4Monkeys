@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use Exception;
 use Gemini\Laravel\Facades\Gemini;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -14,32 +15,38 @@ class FreeGeminiAPIService
     public function __construct()
     {
         $this->apiKey = config('services.free_gemini.api_key');
-        $this->apiUrl = config('services.free_gemini.api_url');
     }
 
     public function getRecommendations(array $softwares, array $produtos)
     {
         $prompt = $this->generatePrompt($softwares, $produtos);
 
-        // Fazer a chamada à API do Gemini usando a classe Gemini (sem a apiUrl explícita)
-        $response = Gemini::geminiPro()->generateContent([$prompt]);
+        try {
+            // Instancia o cliente Gemini com a chave da API
+            $client = \Gemini::client($this->apiKey);
 
-        if ($response && !empty($response->candidates) && is_array($response->candidates)) {
-            // Extrair o conteúdo da resposta
-            $content = $response->candidates[0]->content->parts[0]->text;
+            // Faz a chamada à API usando o SDK do Gemini
+            $response = $client->geminiPro()->generateContent($prompt);
+            // Verifica se a resposta contém candidatos válidos
+            if ($response && !empty($response->candidates) && is_array($response->candidates)) {
+                // Extrair o conteúdo da resposta
+                $content = $response->candidates[0]->content->parts[0]->text;
 
-            // Parsear as recomendações do conteúdo textual
-            return $this->parseRecommendations($content);
-        } else {
-            // Tratar erros no caso de resposta inesperada
-            Log::error('Resposta inesperada da API do Gemini.');
-            throw new \Exception('Resposta inesperada da API do Gemini');
+                // Parsear as recomendações do conteúdo textual
+                return $this->parseRecommendations($content);
+            } else {
+                Log::error('Resposta inesperada da API do Gemini: ' . json_encode($response));
+                throw new Exception('Resposta inesperada da API do Gemini');
+            }
+        } catch (Exception $e) {
+            Log::error('Erro na comunicação com a API do Gemini: ' . $e->getMessage());
+            throw new Exception('Erro ao tentar obter recomendações do Gemini: ' . $e->getMessage());
         }
     }
 
     protected function generatePrompt(array $softwares, array $produtos)
     {
-        // Similar ao generatePrompt do GeminiAPIService, mas simplificado
+
         $prompt = "Crie três desktops categorizados como bronze, silver e gold com base nos softwares selecionados e produtos disponíveis.\n\n";
         $prompt .= "Retorne os dados estruturados no seguinte formato JSON, mantendo apenas os nomes dos componentes e removendo qualquer informação adicional:\n\n";
         $prompt .= "{ \"desktops\": [ { \"categoria\": \"bronze\", \"componentes\": { \"CPU\": \"Nome do Produto\", \"GPU\": \"Nome do Produto\", \"RAM\": \"Nome do Produto\", \"Fonte\": \"Nome do Produto\", \"MOTHERBOARD\": \"Nome do Produto\", \"Cooler\": \"Nome do Produto\", \"HD\": \"Nome do Produto\" } }, { \"categoria\": \"silver\", \"componentes\": { \"CPU\": \"Nome do Produto\", \"GPU\": \"Nome do Produto\", \"RAM\": \"Nome do Produto\", \"Fonte\": \"Nome do Produto\", \"MOTHERBOARD\": \"Nome do Produto\", \"Cooler\": \"Nome do Produto\", \"HD\": \"Nome do Produto\" } }, { \"categoria\": \"gold\", \"componentes\": { \"CPU\": \"Nome do Produto\", \"GPU\": \"Nome do Produto\", \"RAM\": \"Nome do Produto\", \"Fonte\": \"Nome do Produto\", \"MOTHERBOARD\": \"Nome do Produto\", \"Cooler\": \"Nome do Produto\", \"HD\": \"Nome do Produto\" } } ] }\n\n";

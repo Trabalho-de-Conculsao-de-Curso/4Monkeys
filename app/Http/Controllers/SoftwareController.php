@@ -47,6 +47,26 @@ class SoftwareController extends Controller
 
 
 
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit($id)
+    {
+        $software = Software::findOrFail($id);
+
+        // Busca os requisitos de hardware relacionados
+        $requisitos = [
+            'Minimo' => RequisitoSoftware::where('software_id', $software->id)->where('requisito_nivel', 'Minimo')->first(),
+            'Medio' => RequisitoSoftware::where('software_id', $software->id)->where('requisito_nivel', 'Medio')->first(),
+            'Recomendado' => RequisitoSoftware::where('software_id', $software->id)->where('requisito_nivel', 'Recomendado')->first()
+        ];
+
+        // Passa o software e os requisitos para a view
+        return view('softwares.editSoftware', compact('software', 'requisitos'));
+    }
+
+
+
     public function store(StoreSoftwareRequest $request)
     {
         // Verifica se uma imagem foi enviada
@@ -114,8 +134,6 @@ class SoftwareController extends Controller
         return back()->withErrors(['message' => 'Erro ao salvar o software.']);
     }
 
-
-
     /**
      * Display the specified resource.
      */
@@ -128,24 +146,6 @@ class SoftwareController extends Controller
             ->get();
 
         return view('softwares.searchSoftware', compact('results'));
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit($id)
-    {
-        $software = Software::findOrFail($id);
-
-        // Busca os requisitos de hardware relacionados
-        $requisitos = [
-            'Minimo' => RequisitoSoftware::where('software_id', $software->id)->where('requisito_nivel', 'Minimo')->first(),
-            'Medio' => RequisitoSoftware::where('software_id', $software->id)->where('requisito_nivel', 'Medio')->first(),
-            'Recomendado' => RequisitoSoftware::where('software_id', $software->id)->where('requisito_nivel', 'Recomendado')->first()
-        ];
-
-        // Passa o software e os requisitos para a view
-        return view('softwares.editSoftware', compact('software', 'requisitos'));
     }
 
     /**

@@ -3,8 +3,6 @@ namespace App\Services;
 
 use App\Models\LojaOnline;
 use App\Models\Produto;
-use Gemini\Laravel\Facades\Gemini;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 
@@ -22,35 +20,32 @@ class GeminiAPIService
 
     public function getRecommendations(array $softwares, array $produtos)
     {
-
         // Gere o prompt com base nos softwares e produtos fornecidos
         $prompt = $this->generatePrompt($softwares, $produtos);
-        // Faça a requisição diretamente para a API do Gemini
-        $response = Http::withHeaders([
-            'Content-Type' => 'application/json'
-        ])->post($this->apiUrl . "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" . $this->apiKey, [
-            'contents' => [
-                [
-                    'parts' => [
-                        ['text' => $prompt]
-                    ]
-                ]
-            ]
-        ]);
 
-        // Verifica se a resposta foi bem-sucedida
-        if ($response->successful()) {
-            // Parseia a resposta da API
-            $recommendations = $this->parseResponse($response->json());
+        try {
+            // Instancia o cliente Gemini com a chave da API
+            $client = \Gemini::client($this->apiKey);
 
-            // Calcula e retorna os totais
-            return $this->calculateTotals($recommendations['desktops']);
-        } else {
-            // Log de erro e lançamento de exceção em caso de falha
-            Log::error('Erro ao chamar a API do Gemini: ' . $response->body());
-            throw new \Exception('Erro ao chamar a API do Gemini');
+            // Faz a chamada à API usando o SDK do Gemini
+            $response = $client->geminiPro()->generateContent($prompt);
+
+            // Verifica se a resposta contém candidatos válidos
+            if ($response) {
+                // Parseia a resposta da API
+                $recommendations = $this->parseResponse($response);
+                // Calcula e retorna os totais com base nas recomendações
+                return $this->calculateTotals($recommendations['desktops']);
+            } else {
+                Log::error('Resposta inesperada da API do Gemini: ' . json_encode($response));
+                throw new \Exception('Resposta inesperada da API do Gemini');
+            }
+        } catch (\Exception $e) {
+            Log::error('Erro na comunicação com a API do Gemini: ' . $e->getMessage());
+            throw new \Exception('Erro ao tentar obter recomendações do Gemini: ' . $e->getMessage());
         }
     }
+
 
     protected function generatePrompt(array $softwares, array $produtos)
     {
@@ -58,9 +53,9 @@ class GeminiAPIService
         $prompt = "Avalie os softwares selecionados e utilize como base para montar três desktops categorizados como bronze, silver e gold.\n\n";
         $prompt .= "Monte os desktops de forma que atendam aos requisitos mínimos dos softwares escolhidos, focando na custo-efetividade dos componentes utilizados.\n";
         $prompt .= "Crie um arquivo JSON mostrando todos os produtos necessários para que cada desktop atenda os requisitos das categorias de acordo com os produtos cadastrados no banco de dados.\n\n";
-        $prompt .= "Certifique-se de que todos os componentes são compatíveis entre si e que cada desktop inclui os seguintes componentes essenciais: CPU, GPU, RAM, HD ou SSD, Fonte, MOTHERBOARD e Cooler.\n\n";
+        $prompt .= "Certifique-se de que todos os componentes são compatíveis entre si e que cada desktop inclui os seguintes componentes essenciais: CPU, GPU, RAM, HD ou SSD, Fonte, placa_mae e Cooler.\n\n";
         $prompt .= "Retorne os dados estruturados no seguinte formato JSON, mantendo apenas os nomes dos componentes e removendo qualquer informação adicional:\n\n";
-        $prompt .= "{ \"desktops\": [ { \"categoria\": \"1\", \"componentes\": { \"CPU\": \"Nome do Produto\", \"GPU\": \"Nome do Produto\", \"RAM\": \"Nome do Produto\", \"Fonte\": \"Nome do Produto\", \"MOTHERBOARD\": \"Nome do Produto\", \"Cooler\": \"Nome do Produto\", \"HD\": \"Nome do Produto\" }, \"total\": VALOR_DA_SOMA_TOTAL_DOS_ITENS_SELECIONADOS }, { \"categoria\": \"2\", \"componentes\": { \"CPU\": \"Nome do Produto\", \"GPU\": \"Nome do Produto\", \"RAM\": \"Nome do Produto\", \"Fonte\": \"Nome do Produto\", \"MOTHERBOARD\": \"Nome do Produto\", \"Cooler\": \"Nome do Produto\", \"HD\": \"Nome do Produto\" }, \"total\": VALOR_DA_SOMA_TOTAL_DOS_ITENS SELECIONADOS }, { \"categoria\": \"3\", \"componentes\": { \"CPU\": \"Nome do Produto\", \"GPU\": \"Nome do Produto\", \"RAM\": \"Nome do Produto\", \"Fonte\": \"Nome do Produto\", \"MOTHERBOARD\": \"Nome do Produto\", \"Cooler\": \"Nome do Produto\", \"HD\": \"Nome do Produto\" }, \"total\": VALOR_DA_SOMA TOTAL_DOS ITENS SELECIONADOS } ] }\n\n";
+        $prompt .= "{ \"desktops\": [ { \"categoria\": \"1\", \"componentes\": { \"CPU\": \"Nome do Produto\", \"GPU\": \"Nome do Produto\", \"RAM\": \"Nome do Produto\", \"Fonte\": \"Nome do Produto\", \"placa_mae\": \"Nome do Produto\", \"Cooler\": \"Nome do Produto\", \"HD\": \"Nome do Produto\" }, \"total\": VALOR_DA_SOMA_TOTAL_DOS_ITENS_SELECIONADOS }, { \"categoria\": \"2\", \"componentes\": { \"CPU\": \"Nome do Produto\", \"GPU\": \"Nome do Produto\", \"RAM\": \"Nome do Produto\", \"Fonte\": \"Nome do Produto\", \"placa_mae\": \"Nome do Produto\", \"Cooler\": \"Nome do Produto\", \"HD\": \"Nome do Produto\" }, \"total\": VALOR_DA_SOMA_TOTAL_DOS_ITENS SELECIONADOS }, { \"categoria\": \"3\", \"componentes\": { \"CPU\": \"Nome do Produto\", \"GPU\": \"Nome do Produto\", \"RAM\": \"Nome do Produto\", \"Fonte\": \"Nome do Produto\", \"placa_mae\": \"Nome do Produto\", \"Cooler\": \"Nome do Produto\", \"HD\": \"Nome do Produto\" }, \"total\": VALOR_DA_SOMA TOTAL_DOS ITENS SELECIONADOS } ] }\n\n";
         $prompt .= "Garanta a integridade e consistência de todas as informações.\n\n";
         $prompt .= "Softwares selecionados e seus requisitos:\n";
 

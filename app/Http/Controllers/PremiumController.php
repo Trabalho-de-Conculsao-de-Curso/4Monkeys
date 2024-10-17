@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 
 class PremiumController extends Controller
 {
@@ -31,19 +33,29 @@ class PremiumController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'nome' => 'required',
-            'email' => 'required',
-            'situacao' => 'required',
+            'nome' => 'required|string|max:255',
+            'email' => [
+                'required',
+                'email',
+                Rule::unique(User::class), // Validação de email único
+            ],
+            'situacao' => 'required|string|max:50',
+            'password' => 'required|string|min:6',
+        ], [
+            'email.unique' => 'O email informado já está em uso. Por favor, escolha outro.',
         ]);
-        $usuario = new User();
-        $usuario->nome = $request->input('nome');
-        $usuario->email = $request->input('email');
-        $usuario->situacao = $request->input('situacao');
-        $usuario->password = $request->input('password');
-        $usuario->save();
 
-        return redirect()->route('premium.index');
+        // Criação do usuário com fillable
+        $usuario = User::create([
+            'name' => $request->input('nome'),
+            'email' => $request->input('email'),
+            'situacao' => $request->input('situacao'),
+            'password' => bcrypt($request->input('password')),
+        ]);
 
+        // Redireciona com mensagem de sucesso
+        return redirect()->route('usuario-premium.index')
+            ->with('success', 'Usuário criado com sucesso!');
     }
 
     /**
@@ -55,7 +67,7 @@ class PremiumController extends Controller
 
         $results = User::where(function($query) use ($search) {
             $query->where('id', 'like', "%$search%")
-                ->orWhere('nome', 'like', "%$search%")
+                ->orWhere('name', 'like', "%$search%")
                 ->orWhere('situacao', 'like', "%$search%")
             ->orWhere('email', 'like', "%$search%");
         })
@@ -78,15 +90,35 @@ class PremiumController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $usuarios = User::find($id);
-        $usuarios->nome = $request->input('nome');
-        $usuarios->email = $request->input('email');
-        $usuarios->situacao = $request->input('situacao');
-        $usuarios->password = $request->input('password');
-        $usuarios->update($request->all());
+        // Validação dos dados
+        $request->validate([
+            'nome' => 'required|string|max:255',
+            'email' => 'required|email|max:255|unique:users,email,' . $id, // Validação de email único
+            'situacao' => 'required|string|max:50',
+            'password' => 'nullable|string|min:6', // Senha opcional
+        ]);
 
-        return redirect()->route('usuario-premium.index');
+        // Busca o usuário pelo ID
+        $usuario = User::findOrFail($id);
+
+        // Atualiza os campos
+        $usuario->name = $request->input('nome');
+        $usuario->email = $request->input('email');
+        $usuario->situacao = $request->input('situacao');
+
+        // Se a senha for fornecida, atualiza a senha
+        if ($request->filled('password')) {
+            $usuario->password = Hash::make($request->input('password'));
+        }
+
+        // Salva as alterações no banco de dados
+        $usuario->save();
+
+        // Redireciona após a atualização
+        return redirect()->route('usuario-premium.index')
+            ->with('success', 'Usuário atualizado com sucesso!');
     }
+
 
     /**
      * Remove the specified resource from storage.

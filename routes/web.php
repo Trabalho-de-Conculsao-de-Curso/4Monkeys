@@ -10,9 +10,9 @@ use App\Http\Controllers\SoftwareController;
 use App\Http\Controllers\AdminController;
 use Illuminate\Support\Facades\Route;
 
-/*Route::get('/home', function () {
+/Route::get('/home', function () {
     return view('home');
-});*/
+});/
 
 Route::get('/dashboard', [ConjuntoController::class, 'create'])
     ->middleware(['auth', 'verified'])
@@ -40,8 +40,8 @@ Route::get('/dashboard-admin', [AdminController::class, 'dashboard'])->name('adm
 
 
 
-/*Route::middleware(['auth', 'admin'])->group(function () {
+/Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/admin', [AdminController::class, 'index'])->name('auth.admin.AdminDashboard');
-});*/ //implementação da rota com o token
+});/ //implementação da rota com o token
 
 require __DIR__.'/auth.php';
