@@ -12,7 +12,7 @@ class ProdutoController extends Controller
 
     public function index()
     {
-        $produtos = Produto::with(  'lojaOnline')->paginate(10);
+        $produtos = Produto::with('lojaOnline')->paginate(10000);
         return view('produtos.index', [
             'produtos' => $produtos
         ]);
