@@ -1,17 +1,13 @@
 <?php
 
-use App\Http\Controllers\ConjuntoLocal;
+use App\Http\Controllers\ConjuntoLocalController;
 use App\Http\Controllers\FreeConjuntoController;
 use App\Http\Controllers\PremiumController;
 use App\Http\Controllers\ProdutoController;
 use App\Http\Controllers\ConjuntoController;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\ScikitController;
 use App\Http\Controllers\SoftwareController;
 use App\Http\Controllers\AdminController;
-use App\Http\Controllers\ClienteController;
-use App\Http\Controllers\IndexController;
-
 use Illuminate\Support\Facades\Route;
 
 
