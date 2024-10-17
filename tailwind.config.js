@@ -4,11 +4,12 @@ import forms from '@tailwindcss/forms';
 /** @type {import('tailwindcss').Config} */
 export default {
     content: [
-        './vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php',
-        './storage/framework/views/*.php',
-        './resources/views/**/*.blade.php',
-        './resources/views/produtos/*.blade.php'
-    ],
+		'./vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php',
+		 './storage/framework/views/*.php',
+		 './resources/views/**/*.blade.php',
+		 './resources/views/produtos/*.blade.php',
+		 "./vendor/robsontenorio/mary/src/View/Components/**/*.php"
+	],
 
     theme: {
         extend: {
@@ -18,5 +19,8 @@ export default {
         },
     },
 
-    plugins: [forms],
+    plugins: [
+		forms,
+		require("daisyui")
+	],
 };

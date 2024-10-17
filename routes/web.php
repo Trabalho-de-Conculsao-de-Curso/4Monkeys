@@ -44,4 +44,4 @@ Route::get('/dashboard-admin', [AdminController::class, 'dashboard'])->name('adm
     Route::get('/admin', [AdminController::class, 'index'])->name('auth.admin.AdminDashboard');
 });/ //implementação da rota com o token
 
-require DIR.'/auth.php';
+require __DIR__.'/auth.php';

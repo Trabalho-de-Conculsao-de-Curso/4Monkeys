@@ -1,56 +1,54 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Crud das Entidades</title>
-</head>
-<body class="font-sans antialiased dark:bg-black dark:text-white/50">
+@extends('layouts.appSoftware')
 
-<div>
-    <h1>Busca</h1>
-    <div>
-        <a href="/softwares/create">Cadastrar Novo Software</a>
+@section('title', 'Lista de Softwares')
+
+@section('content')
+
+<div class="p-4 bg-white rounded-lg shadow-md">
+    <h1 class="text-xl font-bold mb-4">Busca</h1>
+    <div class="mb-4">
+        <a href="/softwares/create" class="text-blue-500 hover:underline">Cadastrar Novo Software</a>
         <br>
         <br>
-        <button><a href="/softwares">Home</a></button>
+        <button class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+            <a href="/softwares" class="text-white">Home</a>
+        </button>
     </div>
-    <br>
-    <form action="{{ url('softwares/search') }}" method="GET">
-        <input type="text" name="search" placeholder="Procurar Software
-">
-        <button type="submit">Search</button>
+
+    <form action="{{ url('softwares/search') }}" method="GET" class="mb-4">
+        <input type="text" name="search" placeholder="Procurar Software" class="border border-gray-300 p-2 w-full rounded">
+        <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Search</button>
     </form>
 
     @if ($results->count() > 0)
-        <table border="1">
+        <table class="min-w-full border-collapse border border-gray-200">
             <thead>
-            <th>ID</th>
-            <th>Tipo</th>
-            <th>Nome</th>
-            <th>Descrição</th>
-            <th>Requisitos</th>
-            <th>Criado Em</th>
-            <th>Ações</th>
+                <tr class="bg-gray-100">
+                    <th class="border border-gray-200 px-4 py-2">ID</th>
+                    <th class="border border-gray-200 px-4 py-2">Tipo</th>
+                    <th class="border border-gray-200 px-4 py-2">Nome</th>
+                    <th class="border border-gray-200 px-4 py-2">Descrição</th>
+                    <th class="border border-gray-200 px-4 py-2">Requisitos</th>
+                    <th class="border border-gray-200 px-4 py-2">Criado Em</th>
+                    <th class="border border-gray-200 px-4 py-2">Ações</th>
+                </tr>
             </thead>
             <tbody>
-            @foreach ($results as $software
-)
+            @foreach ($results as $software)
                 <tr>
-                    <td>{{$software->id}}</td>
-                    <td>{{$software->tipo}}</td>
-                    <td>{{$software->nome}}</td>
-                    <td>{{$software->descricao}}</td>
-                    <td>{{$software->requisitos}}</td>
-                    <td>{{ $software->created_at}}</td>
-                    <td>{{ $software->updated_at}}</td>
-                    <td>
-                        <a href="{{ url("softwares/$software->id/edit") }}">Editar</a>
+                    <td class="border border-gray-200 px-4 py-2">{{ $software->id }}</td>
+                    <td class="border border-gray-200 px-4 py-2">{{ $software->tipo }}</td>
+                    <td class="border border-gray-200 px-4 py-2">{{ $software->nome }}</td>
+                    <td class="border border-gray-200 px-4 py-2">{{ $software->descricao }}</td>
+                    <td class="border border-gray-200 px-4 py-2">{{ $software->requisitos }}</td>
+                    <td class="border border-gray-200 px-4 py-2">{{ $software->created_at }}</td>
+                    <td class="border border-gray-200 px-4 py-2">
+                        <a href="{{ url("softwares/$software->id/edit") }}" class="text-blue-500 hover:underline">Editar</a>
                         <br>
-                        <form method="POST" action="{{url("softwares/$software->id")}}">
-                            <input type="hidden" name="_token" value="{{ csrf_token() }}" />
+                        <form method="POST" action="{{url("softwares/$software->id")}}" class="inline">
+                            @csrf
                             @method('DELETE')
-                            <button type="submit" onclick="return confirm('Tem certeza que deseja excluir? {{$software->nome}} ?')"> Excluir</button>
+                            <button type="submit" onclick="return confirm('Tem certeza que deseja excluir? {{$software->nome}} ?')" class="text-red-500 hover:underline">Excluir</button>
                         </form>
                     </td>
                 </tr>
@@ -58,11 +56,9 @@
             </tbody>
         </table>
     @else
-        <p>Nenhum software encontrado.</p>
+        <p class="text-red-500 mt-4">Nenhum software encontrado.</p>
     @endif
 </div>
 
-
-
 </body>
-</html>
+@endsection
