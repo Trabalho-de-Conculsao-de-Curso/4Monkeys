@@ -10,7 +10,6 @@ use App\Http\Controllers\SoftwareController;
 use App\Http\Controllers\AdminController;
 use Illuminate\Support\Facades\Route;
 
-
 /*Route::get('/home', function () {
     return view('home');
 });*/
@@ -30,12 +29,12 @@ Route::post('/selecionar-free', [FreeConjuntoController::class, 'selecionar'])->
 Route::get('/', [ConjuntoController::class, 'createFree'])->name('home.create');
 
 
-Route::post('/conjunto-produtos', [ConjuntoLocal::class, 'getConjuntoProdutos'])->name('conjunto.produtos');
+Route::post('/conjunto-produtos', [ConjuntoLocalController::class, 'getConjuntoProdutos'])->name('conjunto.produtos');
 
 Route::resource('/produtos', ProdutoController::class);
 Route::resource('/softwares', SoftwareController::class);
 Route::resource('/usuario-premium', PremiumController::class);
-// Rotas específicas para diferentes funções do AdminController
+
 Route::get('/create-admin', [AdminController::class, 'create'])->name('auth.admin.create');
 Route::get('/dashboard-admin', [AdminController::class, 'dashboard'])->name('admin.dashboard');
 
