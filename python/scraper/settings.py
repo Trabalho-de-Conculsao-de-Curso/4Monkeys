@@ -1,4 +1,19 @@
-DB_NAME = '/home/edudev/Desktop/projetos/Laravel-Sistema/database/database.sqlite'
+import os
+
+# Caminho absoluto do banco de dados
+DB_NAME = r'C:\Projetos\4Monkey\database\database.sqlite'
+DB_DIR = os.path.dirname(DB_NAME)
+
+# Verifica se o diretório existe
+dir_exists = os.path.exists(DB_DIR)
+# Verifica se o arquivo existe
+file_exists = os.path.isfile(DB_NAME)
+
+print(f"Caminho absoluto: {DB_NAME}")
+print(f"Existe o diretório? {dir_exists}")
+print(f"Existe o arquivo? {file_exists}")
+
+
 
 urls_para_processar = [
     {"url": "https://patoloco.com.br/produtos/placa-de-video", "filters": None},
