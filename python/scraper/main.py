@@ -27,7 +27,9 @@ def processar_paginas(url_base, max_paginas=10, filters=None, max_paginas_sem_pr
 
     while True:
         url = f"{base_url_with_filters}{pagina_formatada.format(pagina)}"
+        print(url)
         produtos_da_pagina = scraper.collect_products(url)
+        print(produtos_da_pagina)
 
         if not produtos_da_pagina:
             paginas_sem_produtos += 1

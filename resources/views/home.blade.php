@@ -121,16 +121,12 @@
                                 <h3 class="text-xl font-semibold mb-4">Jogos</h3>
                                 @foreach($softwares as $software)
                                     @if($software->tipo == 1)
-                                        <div class="flex items-center mb-2">
-                                            <div>
-                                                <input type="checkbox" id="software{{ $software->id }}" name="softwares[]" value="{{ $software->id }}" class="form-checkbox h-5 w-5 text-blue-400">
-                                                <label for="software{{ $software->id }}" class="ml-2 text-lg">{{ $software->nome }}</label>
-                                                <button type="button" onclick="toggleDetails({{ $software->id }})" class="text-blue-400 hover:underline">Ler Mais</button>
-                                                <div id="details-{{ $software->id }}" class="text-sm text-gray-400 mt-2" style="display: none;">
-                                                    {{ $software->descricao }}
-                                                </div>
-                                            </div>
+                                        <div id="checkboxDiv{{ $software->id }}" class="flex justify-start items-center border-2 rounded-md border-purple-700 mb-2 p-2 transition duration-300">
+                                            <img src="{{ asset('storage/' . $software->imagem) }}" alt="Imagem de {{ $software->nome }}" class="w-12 h-8 object-cover">
+                                            <input type="checkbox" id="software{{ $software->id }}" name="softwares[]" value="{{ $software->id }}" class="checkbox hidden">
+                                            <label for="software{{ $software->id }}" class="ml-4 text-lg cursor-pointer flex-1">{{ $software->nome }}</label>
                                         </div>
+
                                     @endif
                                 @endforeach
                             </div>
@@ -189,7 +185,7 @@
     </div>
 
 </div>
-{{--
+
     <script>
         // Toggle mobile menu
         document.getElementById('menu-btn').addEventListener('click', function() {
@@ -274,6 +270,6 @@
 
 
 
-    </script> --}}
+    </script>
 </body>
 </html>

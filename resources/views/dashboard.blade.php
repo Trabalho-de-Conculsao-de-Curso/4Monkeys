@@ -97,10 +97,12 @@
                                     <h3 class="text-xl font-semibold mb-4">Jogos</h3>
                                     @foreach($softwares as $software)
                                         @if($software->tipo == 1)
-                                            <div id="checkboxDiv{{ $software->id }}" class="flex items-center mb-2 p-2 rounded-sm border-2 transition duration-300">
+                                            <div id="checkboxDiv{{ $software->id }}" class="flex justify-start items-center border-2 rounded-md border-purple-700 mb-2 p-2 transition duration-300">
+                                                <img src="{{ asset('storage/' . $software->imagem) }}" alt="Imagem de {{ $software->nome }}" class="w-12 h-8 object-cover">
                                                 <input type="checkbox" id="software{{ $software->id }}" name="softwares[]" value="{{ $software->id }}" class="checkbox hidden">
-                                                <label for="software{{ $software->id }}" class="ml-2 text-lg cursor-pointer flex-1">{{ $software->nome }}</label>
+                                                <label for="software{{ $software->id }}" class="ml-4 text-lg cursor-pointer flex-1">{{ $software->nome }}</label>
                                             </div>
+
                                         @endif
                                     @endforeach
                                 </div>
@@ -147,7 +149,7 @@
             </div>
         </div>
     </div>
-{{--<script>
+<script>
     document.addEventListener('DOMContentLoaded', function () {
 // Seleciona todos os checkboxes e suas divs pai
 const checkboxes = document.querySelectorAll('.checkbox');
@@ -268,7 +270,7 @@ updateDivColor();
     })
 });
 
-</script>  --}}
+</script>
     </div>
 </body>
 </html>
