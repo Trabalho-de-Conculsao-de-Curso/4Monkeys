@@ -35,11 +35,9 @@ Route::resource('/produtos', ProdutoController::class);
 Route::resource('/softwares', SoftwareController::class);
 Route::resource('/usuario-premium', PremiumController::class);
 
-Route::get('/create-admin', [AdminController::class, 'create'])->name('auth.admin.index');
-//Route::get('/dashboard-admin', [AdminController::class, 'index'])->name('admin.dashboard');
-Route::get('/dashboard-admin', function () {
-    return view('admin.dashboard'); // Substitua 'admin.dashboard' pelo nome da sua view
-})->name('admin.dashboard');
+Route::get('/create-admin', [AdminController::class, 'index'])->name('auth.admin.index');
+Route::get('/dashboard-admin', [AdminController::class, 'dashboard'])->name('admin.dashboard');
+Route::get('/historico-conjuntos', [ConjuntoController::class, 'historicoConjuntos']);
 
 
 /*Route::middleware(['auth', 'admin'])->group(function () {
