@@ -37,7 +37,7 @@ Route::resource('/usuario-premium', PremiumController::class);
 
 Route::get('/create-admin', [AdminController::class, 'index'])->name('auth.admin.index');
 Route::get('/dashboard-admin', [AdminController::class, 'dashboard'])->name('admin.dashboard');
-
+Route::get('/historico-conjuntos', [ConjuntoController::class, 'historicoConjuntos']);
 
 
 /*Route::middleware(['auth', 'admin'])->group(function () {

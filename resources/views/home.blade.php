@@ -196,7 +196,7 @@
 
                                         <div id="details-{{ $software->id }}" class="details mt-2" style="display: none;">
                                             <!-- Parágrafo com efeito de digitação -->
-                                            <p id="description-{{ $software->id }}" class="concert-one-regular text-2xl description"></p>
+                                            <p id="description-{{ $software->id }}" class="text-1xl description"></p>
                                         </div>
 
                                     @endif
@@ -228,7 +228,7 @@
 
                                         <div id="details-{{ $software->id }}" class="details mt-2" style="display: none;">
                                             <!-- Parágrafo com efeito de digitação -->
-                                            <p id="description-{{ $software->id }}" class="concert-one-regular text-2xl description"></p>
+                                            <p id="description-{{ $software->id }}" class="text-1xl description"></p>
                                         </div>
                                     @endif
                                 @endforeach
@@ -259,7 +259,7 @@
 
                                         <div id="details-{{ $software->id }}" class="details mt-2" style="display: none;">
                                             <!-- Parágrafo com efeito de digitação -->
-                                            <p id="description-{{ $software->id }}" class="concert-one-regular text-2xl description"></p>
+                                            <p id="description-{{ $software->id }}" class="text-1xl description"></p>
                                         </div>
                                     @endif
                                 @endforeach

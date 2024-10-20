@@ -120,7 +120,7 @@
             <ul>
                 <li class="mb-4"><a href="#" class="text-lg hover:underline">Home</a></li>
                 <li class="mb-4"><a href="#" class="text-lg hover:underline">Seleção de Softwares</a></li>
-                <li class="mb-4"><a href="#" class="text-lg hover:underline">Configurações</a></li>
+                <li class="mb-4"><a href="/historico-conjuntos" class="text-lg hover:underline">Histórico</a></li>
                 <li class="mb-4"><a href="#" class="text-lg hover:underline">Ajuda</a></li>
             </ul>
         </div>
@@ -186,7 +186,7 @@
 
                                             <div id="details-{{ $software->id }}" class="details mt-2" style="display: none;">
                                                 <!-- Parágrafo com efeito de digitação -->
-                                                <p id="description-{{ $software->id }}" class="concert-one-regular text-2xl description"></p>
+                                                <p id="description-{{ $software->id }}" class="text-1xl description"></p>
                                             </div>
 
                                         @endif
@@ -218,7 +218,7 @@
 
                                             <div id="details-{{ $software->id }}" class="details mt-2" style="display: none;">
                                                 <!-- Parágrafo com efeito de digitação -->
-                                                <p id="description-{{ $software->id }}" class="concert-one-regular text-2xl description"></p>
+                                                <p id="description-{{ $software->id }}" class="text-1xl description"></p>
                                             </div>
                                         @endif
                                     @endforeach
@@ -249,7 +249,7 @@
 
                                             <div id="details-{{ $software->id }}" class="details mt-2" style="display: none;">
                                                 <!-- Parágrafo com efeito de digitação -->
-                                                <p id="description-{{ $software->id }}" class="concert-one-regular text-2xl description"></p>
+                                                <p id="description-{{ $software->id }}" class="text-1xl description"></p>
                                             </div>
                                         @endif
                                     @endforeach
