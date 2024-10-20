@@ -2,46 +2,66 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Estoque;
+use App\Models\RequisitoSoftware;
 use App\Models\Software;
-use App\Services\FreeGeminiAPIService;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
 class FreeConjuntoController extends Controller
 {
-    protected $FreeGeminiAPIService;
-
-    public function __construct(FreeGeminiAPIService $FreeGeminiAPIService)
-    {
-        $this->FreeGeminiAPIService = $FreeGeminiAPIService;
-    }
-
-
 
     public function selecionar(Request $request)
     {
-        // Recuperar os softwares selecionados e todos os produtos disponíveis
-        $softwaresSelecionados = Software::find($request->input('softwares'));
-        $produtos = Estoque::with('produto')->get()->pluck('produto.nome');
-        // Preparar os dados para enviar ao FreeGeminiAPIService
-        $softwaresData = $softwaresSelecionados->toArray();
-        $produtosData = $produtos->toArray();
+        // Validação: garantir que 3 softwares foram selecionados
+        $request->validate([
+            'softwares' => 'required|array|min:1|max:3',
+            'softwares.*' => 'exists:softwares,id'
+        ]);
 
-        try {
-            // Obter as recomendações da API
-            $recommendations = $this->FreeGeminiAPIService->getRecommendations($softwaresData, $produtosData);
-            Log::info('Resposta bruta da API Free Gemini:', ['response' => $recommendations]);
+        // Receber os IDs dos softwares selecionados
+        $softwareIds = $request->input('softwares');
 
-            // Retornar a view com os dados das recomendações, sem salvar no banco
-            //return response()->json(['desktops' => $recommendations]);
+        // Encontra o software com o maior peso
+        $softwareMaisPesado = Software::whereIn('id', $softwareIds)
+            ->orderBy('peso', 'desc')
+            ->first();
 
-            return view('resultado_free', ['desktops' => $recommendations]);
-
-        } catch (\Exception $e) {
-            // Logar qualquer erro e redirecionar de volta com uma mensagem de erro
-            Log::error("Erro ao processar: " . $e->getMessage());
-            return redirect()->back()->withErrors('Erro ao processar a seleção.');
+        if (!$softwareMaisPesado) {
+            return response()->json(['message' => 'Nenhum software encontrado'], 404);
         }
+
+
+        $requisitos = RequisitoSoftware::where('software_id', $softwareMaisPesado->id)
+            ->get()
+            ->groupBy('requisito_nivel'); // Agrupa os requisitos por nível
+
+        // Preparar o array de resposta com os requisitos agrupados
+        $response = [
+            'Minimo' => [],
+            'Medio' => [],
+            'Recomendado' => []
+        ];
+
+        // Preencher o array de resposta com os requisitos
+        foreach ($requisitos as $nivel => $requisitoNivel) {
+            foreach ($requisitoNivel as $requisito) {
+                $response[$nivel][] = [
+                    'cpu' => $requisito->cpu,
+                    'gpu' => $requisito->gpu,
+                    'ram' => $requisito->ram,
+                    'placa_mae' => $requisito->placa_mae,
+                    'ssd' => $requisito->ssd,
+                    'cooler' => $requisito->cooler,
+                    'fonte' => $requisito->fonte
+                ];
+            }
+        }
+
+        // Retorna a resposta em formato JSON
+        return response()->json([
+            'software_mais_pesado' => $softwareMaisPesado,
+            'requisitos' => $response
+        ]);
     }
 }

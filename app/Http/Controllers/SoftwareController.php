@@ -4,159 +4,165 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreSoftwareRequest;
 use App\Http\Requests\UpdateSoftwareRequest;
+use App\Models\CustomLog;
 use App\Models\Software;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use App\Models\RequisitoSoftware;
 
 class SoftwareController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index(Request $request)
-    {
-    $search = $request->input('search'); // Obtém o parâmetro de busca
+    protected $custom_log;
 
-    if ($search) {
-        // Filtra os softwares com base no nome, descrição ou peso
-        $softwares = Software::where('nome', 'like', "%$search%")
-            ->orWhere('descricao', 'like', "%$search%")
-            ->orWhere('peso', 'like', "%$search%")
-            ->with('requisitos')
-            ->get();
-    } else {
-        // Se não houver pesquisa, obtém todos os softwares
-        $softwares = Software::with('requisitos')->get();
+    public function __construct(CustomLog $custom_log)
+    {
+        $this->custom_log = $custom_log;
     }
 
-    return view('softwares.index', [
-        'softwares' => $softwares,
-        'search' => $search // Envia o termo de busca para a view
-    ]);
-}
+    public function index(Request $request)
+    {
+        try {
+            $search = $request->input('search');
+            if ($search) {
+                $softwares = Software::where('nome', 'like', "%$search%")
+                    ->orWhere('descricao', 'like', "%$search%")
+                    ->orWhere('peso', 'like', "%$search%")
+                    ->with('requisitos')
+                    ->get();
+            } else {
+                $softwares = Software::with('requisitos')->get();
+            }
+        } catch (\Exception $e) {
+            Log::warning('Ocorreu o seguinte erro ao listar Software: ' . $e->getMessage());
+            $softwares = []; // Definindo $softwares como vazio caso ocorra erro
+        }
+        return view('softwares.index', [
+            'softwares' => $softwares,
+            'search' => $search ?? ''
+        ]);
+    }
 
-
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
         return view('softwares.createSoftware');
     }
 
-
-
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit($id)
     {
-        $software = Software::findOrFail($id);
+        try {
+            $software = Software::findOrFail($id);
+            Log::alert('Acessou para editar Software: ' . $id);
 
-        // Busca os requisitos de hardware relacionados
-        $requisitos = [
-            'Minimo' => RequisitoSoftware::where('software_id', $software->id)->where('requisito_nivel', 'Minimo')->first(),
-            'Medio' => RequisitoSoftware::where('software_id', $software->id)->where('requisito_nivel', 'Medio')->first(),
-            'Recomendado' => RequisitoSoftware::where('software_id', $software->id)->where('requisito_nivel', 'Recomendado')->first()
-        ];
+            // Busca os requisitos de hardware relacionados
+            $requisitos = [
+                'Minimo' => RequisitoSoftware::where('software_id', $software->id)->where('requisito_nivel', 'Minimo')->first(),
+                'Medio' => RequisitoSoftware::where('software_id', $software->id)->where('requisito_nivel', 'Medio')->first(),
+                'Recomendado' => RequisitoSoftware::where('software_id', $software->id)->where('requisito_nivel', 'Recomendado')->first()
+            ];
 
-        // Passa o software e os requisitos para a view
-        return view('softwares.editSoftware', compact('software', 'requisitos'));
+            return view('softwares.editSoftware', compact('software', 'requisitos'));
+
+        } catch (\Exception $e) {
+            // Registra log personalizado em caso de erro
+            $this->custom_log->create([
+                'descricao' => $e->getMessage(),
+                'operacao' => 'edit',
+                'user_id' => auth()->id() ?? 1, // Pega o ID do usuário autenticado ou '1' como fallback
+            ]);
+
+            return redirect()->route('softwares.index')->with('error', 'Erro ao acessar o software para edição.');
+        }
     }
-
-
 
     public function store(StoreSoftwareRequest $request)
     {
-        // Verifica se uma imagem foi enviada
-        if ($request->hasFile('software_imagem')) {
-            // Armazena a imagem na pasta 'public/images'
-            $imagemPath = $request->file('software_imagem')->store('images', 'public');
+        try {
+            // Verifica se uma imagem foi enviada
+            if ($request->hasFile('software_imagem')) {
+                // Armazena a imagem na pasta 'public/images'
+                $imagemPath = $request->file('software_imagem')->store('images', 'public');
 
-            // Cria um novo registro no banco de dados
-            $software = Software::create([
-                'tipo' => $request->input('tipo'),
-                'nome' => $request->input('nome'),
-                'descricao' => $request->input('descricao'),
-                'peso' => $request->input('peso'),
-                'imagem' => $imagemPath, // Salva o caminho da imagem
-            ]);
+                // Cria um novo registro no banco de dados para o software
+                $software = Software::create([
+                    'tipo' => $request->input('tipo'),
+                    'nome' => $request->input('nome'),
+                    'descricao' => $request->input('descricao'),
+                    'peso' => $request->input('peso'),
+                    'imagem' => $imagemPath, // Salva o caminho da imagem
+                ]);
 
-            if ($software) {
-                // Criação dos requisitos mínimo, médio e recomendado para esse software
-                $requisitos = [
-                    [
-                        'software_id' => $software->id,
-                        'requisito_nivel' => 'Minimo',
-                        'cpu' => $request->input('cpu_min'),
-                        'gpu' => $request->input('gpu_min'),
-                        'ram' => $request->input('ram_min'),
-                        'placa_mae' => $request->input('placa_mae_min'),
-                        'ssd' => $request->input('ssd_min'),
-                        'cooler' => $request->input('cooler_min'),
-                        'fonte' => $request->input('fonte_min')
-                    ],
-                    [
-                        'software_id' => $software->id,
-                        'requisito_nivel' => 'Medio',
-                        'cpu' => $request->input('cpu_med'),
-                        'gpu' => $request->input('gpu_med'),
-                        'ram' => $request->input('ram_med'),
-                        'placa_mae' => $request->input('placa_mae_med'),
-                        'ssd' => $request->input('ssd_med'),
-                        'cooler' => $request->input('cooler_med'),
-                        'fonte' => $request->input('fonte_med')
-                    ],
-                    [
-                        'software_id' => $software->id,
-                        'requisito_nivel' => 'Recomendado',
-                        'cpu' => $request->input('cpu_rec'),
-                        'gpu' => $request->input('gpu_rec'),
-                        'ram' => $request->input('ram_rec'),
-                        'placa_mae' => $request->input('placa_mae_rec'),
-                        'ssd' => $request->input('ssd_rec'),
-                        'cooler' => $request->input('cooler_rec'),
-                        'fonte' => $request->input('fonte_rec')
-                    ],
-                ];
+                // Log de criação do software
+                $this->custom_log->create([
+                    'descricao' => 'Software criado: ' . $software->nome,
+                    'operacao' => 'create',
+                    'user_id' => auth()->id() ?? 1,
+                ]);
 
-                // Insere os requisitos no banco de dados
-                foreach ($requisitos as $requisito) {
-                    RequisitoSoftware::create($requisito);
+                // Se o software foi criado com sucesso, cria os requisitos
+                if ($software) {
+                    $requisitos = [
+                        [
+                            'software_id' => $software->id,
+                            'requisito_nivel' => 'Minimo',
+                            'cpu' => $request->input('cpu_min'),
+                            'gpu' => $request->input('gpu_min'),
+                            'ram' => $request->input('ram_min'),
+                            'placa_mae' => $request->input('placa_mae_min'),
+                            'ssd' => $request->input('ssd_min'),
+                            'cooler' => $request->input('cooler_min'),
+                            'fonte' => $request->input('fonte_min')
+                        ],
+                        [
+                            'software_id' => $software->id,
+                            'requisito_nivel' => 'Medio',
+                            'cpu' => $request->input('cpu_med'),
+                            'gpu' => $request->input('gpu_med'),
+                            'ram' => $request->input('ram_med'),
+                            'placa_mae' => $request->input('placa_mae_med'),
+                            'ssd' => $request->input('ssd_med'),
+                            'cooler' => $request->input('cooler_med'),
+                            'fonte' => $request->input('fonte_med')
+                        ],
+                        [
+                            'software_id' => $software->id,
+                            'requisito_nivel' => 'Recomendado',
+                            'cpu' => $request->input('cpu_rec'),
+                            'gpu' => $request->input('gpu_rec'),
+                            'ram' => $request->input('ram_rec'),
+                            'placa_mae' => $request->input('placa_mae_rec'),
+                            'ssd' => $request->input('ssd_rec'),
+                            'cooler' => $request->input('cooler_rec'),
+                            'fonte' => $request->input('fonte_rec')
+                        ],
+                    ];
+
+
+                    // Insere os requisitos no banco de dados
+                    foreach ($requisitos as $requisito) {
+                        RequisitoSoftware::create($requisito);
+                    }
+
+                    return redirect()->route('softwares.index')->with('success', 'Software cadastrado com sucesso!');
                 }
-
-                return response()->redirectTo('/softwares');
+            } else {
+                return back()->withErrors(['message' => 'Imagem obrigatória para o cadastro.']);
             }
+
+        } catch (\Exception $e) {
+            // Em caso de erro, registra no log e retorna mensagem de erro
+            Log::error('Erro ao salvar o software: ' . $e->getMessage());
+            return back()->withErrors(['message' => 'Erro ao salvar o software.']);
         }
-
-        // Em caso de falha, retorna um erro ou redireciona
-        return back()->withErrors(['message' => 'Erro ao salvar o software.']);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Request $request)
-    {
-        $search = $request->input('search');
-        $results = Software::where('nome', 'like', "%$search%")
-            ->orWhere('descricao', 'like', "%$search%")
-            ->orWhere('peso', 'like', "%$search%")
-            ->get();
-
-        return view('softwares.searchSoftware', compact('results'));
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(UpdateSoftwareRequest $request, $id)
     {
         // Busca o registro do software pelo ID
         $software = Software::findOrFail($id);
+        $oldData = $software->toArray(); // Captura os dados antigos antes da atualização
 
-
+        // Log da alteração de imagem
         if ($request->has('remover_imagem') && $software->imagem) {
             // Remove a imagem do diretório 'public/storage'
             Storage::disk('public')->delete($software->imagem);
@@ -187,6 +193,11 @@ class SoftwareController extends Controller
         // Salva as alterações no banco de dados
         $software->save();
 
+        // Log de alterações
+        $newData = $software->toArray();
+        $this->logChanges($oldData, $newData, 'update', $software->id);
+
+        // Requisitos
         $requisitos = [
             'Minimo' => [
                 'cpu' => $request->input('cpu_min'),
@@ -219,27 +230,76 @@ class SoftwareController extends Controller
 
         // Atualiza ou cria os requisitos no banco de dados
         foreach ($requisitos as $nivel => $requisito) {
-            RequisitoSoftware::updateOrCreate(
+            // Busca o requisito atual no banco de dados
+            $oldRequisito = RequisitoSoftware::where('software_id', $software->id)
+                ->where('requisito_nivel', $nivel)
+                ->first();
+
+            // Atualiza ou cria os requisitos
+            $updatedRequisito = RequisitoSoftware::updateOrCreate(
                 ['software_id' => $software->id, 'requisito_nivel' => $nivel],
                 $requisito
             );
+
+            Log::info('Requisito atualizado ou criado', ['requisito' => $updatedRequisito->toArray()]);
+
+            // Se o requisito já existia, loga as alterações
+            if ($oldRequisito) {
+                $this->logChanges($oldRequisito->toArray(), $requisito, 'update_requisito', $oldRequisito->id);
+            }
         }
 
         return redirect()->route('softwares.index')->with('success', 'Software atualizado com sucesso!');
     }
 
-
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy($id)
     {
-        $delete = Software::FindOrFail($id);
-        if (request()->has('_token')){
-            $delete->delete();
-            return redirect()->route('softwares.index');
-        } else {
-            return redirect()->route('softwares.index');
+        try {
+            $software = Software::findOrFail($id);
+            $softwareName = $software->nome;
+
+            // Remove os requisitos relacionados
+            RequisitoSoftware::where('software_id', $id)->delete();
+
+            // Remove o software
+            $software->delete();
+
+            // Log da exclusão
+            $this->custom_log->create([
+                'descricao' => 'Software excluído: ' . $softwareName,
+                'operacao' => 'destroy',
+                'user_id' => auth()->id() ?? 1,
+            ]);
+
+            return redirect()->route('softwares.index')->with('success', 'Software excluído com sucesso!');
+        } catch (\Exception $e) {
+            Log::error('Erro ao excluir o software: ' . $e->getMessage());
+            return back()->withErrors(['message' => 'Erro ao excluir o software.']);
+        }
+    }
+
+    private function logChanges($oldData, $newData, $operacao, $softwareId = null)
+    {
+        $changes = [];
+
+        foreach ($newData as $key => $value) {
+            if (array_key_exists($key, $oldData) && $oldData[$key] != $value) {
+                $changes[$key] = [
+                    'old' => $oldData[$key],
+                    'new' => $value,
+                ];
+            }
+        }
+
+        unset($changes['updated_at']);
+
+        if (!empty($changes)) {
+            $this->custom_log->create([
+                'descricao' => json_encode($changes),
+                'operacao' => $operacao,
+                'user_id' => auth()->id() ?? 1,
+                'software_id' => $softwareId
+            ]);
         }
     }
 }

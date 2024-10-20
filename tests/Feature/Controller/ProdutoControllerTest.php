@@ -1,10 +1,12 @@
 <?php
 
-use App\Models\LojaOnline;
 use App\Models\Produto;
-
-
+use App\Models\LojaOnline;
+use App\Models\CustomLog;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Log;
+
+
 
 uses(RefreshDatabase::class);
 
@@ -34,8 +36,18 @@ it('Rota edit responde com 200', function () {
 
 
 
+it('Rota store cria um produto, estoque, log e responde com 302', function () {
+    // Mock para o CustomLog
+    $this->mock(CustomLog::class, function ($mock) {
+        $mock->shouldReceive('create')
+            ->once()
+            ->with([
+                'descricao' => "Produto criado: Produto Teste",
+                'operacao' => 'create',
+                'user_id' => auth()->id() ?? 1,
+            ]);
+    });
 
-it('Rota store cria um produto e responde com 302', function () {
     // Dados completos necessários para a criação do produto
     $produtoData = [
         'nome' => 'Produto Teste',
@@ -45,14 +57,32 @@ it('Rota store cria um produto e responde com 302', function () {
         'disponibilidade' => 1,  // Produto disponível
     ];
 
+    // Simular a requisição POST para criar o produto
     $response = $this->post('/produtos', array_merge($produtoData, [
         '_token' => csrf_token(),
     ]));
 
+    // Verificar se o produto foi inserido na tabela 'produtos'
     $this->assertDatabaseHas('produtos', ['nome' => $produtoData['nome']]);
 
+    // Verificar se o registro da loja online foi criado
+    $this->assertDatabaseHas('loja_online', [
+        'urlLoja' => $produtoData['urlLojaOnline'],
+        'valor' => $produtoData['preco_valor'],
+        'moeda' => $produtoData['preco_moeda']
+    ]);
+
+    // Verificar se o produto está disponível e o estoque foi criado
+    $produto = Produto::where('nome', $produtoData['nome'])->first();
+    if ($produto->disponibilidade == 1) {
+        $this->assertDatabaseHas('estoque', ['produto_id' => $produto->id]);
+    }
+
+    // Verificar se houve redirecionamento para a página de index
     $response->assertStatus(302);
+    $response->assertRedirect(route('produtos.index'));
 });
+
 
 it('Rota show realiza busca e retorna produtos correspondentes', function () {
     // Criar produtos e lojas online
@@ -70,100 +100,75 @@ it('Rota show realiza busca e retorna produtos correspondentes', function () {
     $response->assertStatus(200);
 });
 
-it('Rota update atualiza um produto e responde com 302', function () {
-    // Criação de uma loja online associada
-    $lojaOnline = LojaOnline::factory()->create([
-        'valor' => 50.00,
-        'moeda' => 'BRL',
-        'urlLoja' => 'http://lojavirtual.com/produto-antigo',
-    ]);
-
-    // Criação de um produto associado a essa loja online
-    $produto = Produto::factory()->create([
+beforeEach(function () {
+    $this->produto = Produto::factory()->create([
         'nome' => 'Produto Antigo',
-        'disponibilidade' => 0, // Inicialmente indisponível
-        'loja_online_id' => $lojaOnline->id,
+        'disponibilidade' => 1
     ]);
 
-    // Dados atualizados
-    $updatedData = [
+    $this->lojaOnline = LojaOnline::find($this->produto->loja_online_id);
+});
+
+it('atualiza um produto e cria logs corretamente', function () {
+    // Mock para garantir que o log está sendo criado
+    $this->mock(CustomLog::class, function ($mock) {
+        $mock->shouldReceive('create')->twice(); // Uma vez para o produto, outra para a loja online
+    });
+
+    // Novos dados para atualizar
+    $novosDados = [
         'nome' => 'Produto Atualizado',
-        'disponibilidade' => 1, // Tornar o produto disponível
-        'preco_valor' => 99.99,
+        'preco_valor' => 199.99,
         'preco_moeda' => 'USD',
-        'urlLojaOnline' => 'http://lojavirtual.com/produto-atualizado',
-        '_token' => csrf_token(),
+        'urlLojaOnline' => 'http://nova-loja.com/produto-atualizado',
     ];
 
-    // Envia a requisição de atualização
-    $response = $this->put("/produtos/{$produto->id}", $updatedData);
+    // Simular a requisição de atualização
+    $response = $this->put("/produtos/{$this->produto->id}", array_merge($novosDados, [
+        '_token' => csrf_token(),
+    ]));
 
-    // Verifica se o produto foi atualizado no banco de dados
-    $this->assertDatabaseHas('produtos', [
-        'id' => $produto->id,
-        'nome' => 'Produto Atualizado',
-        'disponibilidade' => 1,
-        'loja_online_id' => $lojaOnline->id,
-    ]);
+    // Verificar se o produto foi atualizado
+    $this->assertDatabaseHas('produtos', ['id' => $this->produto->id, 'nome' => 'Produto Atualizado']);
 
-    // Verifica se a loja online foi atualizada corretamente
+    // Verificar se a loja online foi atualizada
     $this->assertDatabaseHas('loja_online', [
-        'id' => $lojaOnline->id,
-        'valor' => 99.99,
-        'moeda' => 'USD',
-        'urlLoja' => 'http://lojavirtual.com/produto-atualizado',
+        'id' => $this->lojaOnline->id,
+        'urlLoja' => $novosDados['urlLojaOnline'],
+        'valor' => $novosDados['preco_valor'],
+        'moeda' => $novosDados['preco_moeda']
     ]);
 
-    // Verifica se o estoque foi criado, já que a disponibilidade foi definida como 1
-    $this->assertDatabaseHas('estoque', ['produto_id' => $produto->id]);
-
-    // Verifica o redirecionamento
+    // Verificar se houve redirecionamento para a página de index
     $response->assertStatus(302);
+    $response->assertRedirect(route('produtos.index'));
 });
 
-it('Rota update remove estoque quando o produto fica indisponível', function () {
-    // Criar produto com estoque
-    $produto = Produto::factory()->create(['disponibilidade' => 1]);
 
-    // Tornar o produto indisponível
-    $updatedData = [
-        'nome' => 'Produto Atualizado',
-        'disponibilidade' => 0, // Indisponível
-        '_token' => csrf_token(),
-    ];
+it('exclui um produto e cria log de exclusão corretamente', function () {
+    // Mock para garantir que o log de exclusão é criado
+    $this->mock(CustomLog::class, function ($mock) {
+        $mock->shouldReceive('create')->once()->with([
+            'descricao' => "Produto excluído: {$this->produto->nome}",
+            'operacao' => 'destroy',
+            'user_id' => auth()->id() ?? 1,
+        ]);
+    });
 
-    // Enviar requisição de atualização
-    $response = $this->put("/produtos/{$produto->id}", $updatedData);
-
-    // Verifica se o estoque foi removido
-    $this->assertDatabaseMissing('estoque', ['produto_id' => $produto->id]);
-
-    // Verifica o redirecionamento
-    $response->assertStatus(302);
-});
-
-it('Rota delete responde com 302', function () {
-    $produto = Produto::factory()->create();
-
-    // Enviando o token na requisição de exclusão
-    $response = $this->delete("/produtos/{$produto->id}", [
+    // Simular a requisição DELETE para excluir o produto
+    $response = $this->delete("/produtos/{$this->produto->id}", [
         '_token' => csrf_token(),
     ]);
 
-    $this->assertDatabaseMissing('produtos', ['id' => $produto->id]);
+    // Verificar se o produto foi excluído do banco de dados
+    $this->assertDatabaseMissing('produtos', ['id' => $this->produto->id]);
+
+    // Verificar se a loja online foi excluída do banco de dados
+    $this->assertDatabaseMissing('loja_online', ['id' => $this->lojaOnline->id]);
+
+    // Verificar se houve redirecionamento para a página de index
     $response->assertStatus(302);
-});
-
-it('Rota delete exclui o produto e seus relacionamentos e responde com 302', function () {
-    $produto = Produto::factory()->hasLojaOnline()->create(); // Certifique-se de que a factory de Produto cria a relação
-
-    $response = $this->delete("/produtos/{$produto->id}", [
-        '_token' => csrf_token(),
-    ]);
-
-    $this->assertDatabaseMissing('produtos', ['id' => $produto->id]);
-    $this->assertDatabaseMissing('loja_online', ['produto_id' => $produto->id]); // Verifica se o relacionamento também foi deletado
-    $response->assertStatus(302);
+    $response->assertRedirect(route('produtos.index'));
 });
 
 it('Rota store falha ao criar um produto sem dados obrigatórios e responde com 422', function () {

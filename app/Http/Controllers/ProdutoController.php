@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CustomLog;
 use App\Models\Estoque;
 use App\Models\LojaOnline;
 use App\Models\Produto;
@@ -9,21 +10,33 @@ use Illuminate\Http\Request;
 
 class ProdutoController extends Controller
 {
+    protected $custom_log;
+
+    public function __construct(CustomLog $custom_log)
+    {
+        $this->custom_log = $custom_log;
+    }
 
     public function index()
     {
-        $produtos = Produto::with('lojaOnline')->paginate(10000);
-        return view('produtos.index', [
-            'produtos' => $produtos
-        ]);
+        try {
+            $produtos = Produto::with('lojaOnline')->paginate(10000);
+        } catch (\Exception $e) {
+            $this->custom_log->create([
+                'descricao' => $e->getMessage(),
+                'operacao' => 'index',
+                'user_id' => auth()->id() ?? 1,
+            ]);
+            $produtos = [];
+        }
 
+        return view('produtos.index', ['produtos' => $produtos]);
     }
 
     public function create()
     {
         return view('produtos.createProduto');
     }
-
 
     public function store(Request $request)
     {
@@ -35,30 +48,40 @@ class ProdutoController extends Controller
             'disponibilidade' => 'required',
         ]);
 
+        try {
+            $lojaOnline = LojaOnline::create([
+                'valor' => $request->input('preco_valor'),
+                'moeda' => $request->input('preco_moeda'),
+                'urlLoja' => $request->input('urlLojaOnline'),
+            ]);
 
-        $lojaOnline = new LojaOnline();
-        $lojaOnline->valor =$request->input('preco_valor');
-        $lojaOnline->moeda =$request->input('preco_moeda');
-        $lojaOnline->urlLoja = $request->input('urlLojaOnline');
-        $lojaOnline->save();
+            $produto = Produto::create([
+                'nome' => $request->input('nome'),
+                'disponibilidade' => $request->input('disponibilidade'),
+                'loja_online_id' => $lojaOnline->id,
+            ]);
 
-        // Criar o produto associado à loja online
-        $produto = new Produto();
-        $produto->nome = $request->input('nome');
-        $produto->disponibilidade = $request->input('disponibilidade');
-        $produto->loja_online_id = $lojaOnline->id;
+            if ($produto->disponibilidade == 1) {
+                Estoque::create(['produto_id' => $produto->id]);
+            }
 
-        $produto->save();
+            $this->custom_log->create([
+                'descricao' => "Produto criado: {$produto->nome}",
+                'operacao' => 'create',
+                'user_id' => auth()->id() ?? 1,
+            ]);
 
-        if ($produto->disponibilidade == 1) {
-            $estoque = new Estoque();
-            $estoque->produto_id = $produto->id;
-            $estoque->save();
+            return redirect()->route('produtos.index')->with('success', 'Produto criado com sucesso!');
+        } catch (\Exception $e) {
+            $this->custom_log->create([
+                'descricao' => $e->getMessage(),
+                'operacao' => 'store',
+                'user_id' => auth()->id() ?? 1,
+            ]);
+
+            return back()->withErrors('Erro ao criar o produto.');
         }
-
-        return redirect('/produtos');
     }
-
 
     public function show(Request $request)
     {
@@ -66,74 +89,124 @@ class ProdutoController extends Controller
 
         $results = Produto::where(function($query) use ($search) {
             $query->where('id', 'like', "%$search%")
-                ->orWhere('preco', 'like', "%$search%")
-                ->orWhere('lojasOnline', 'like', "%$search%");
+                ->orWhere('nome', 'like', "%$search%");
         })
             ->orWhereHas('lojaOnline', function($query) use ($search) {
-                $query->where('nome', 'like', "%$search%")
-                    ->orWhere('urlLoja', 'like', "%$search%")
+                $query->where('urlLoja', 'like', "%$search%")
                     ->orWhere('valor', 'like', "%$search%")
                     ->orWhere('moeda', 'like', "%$search%");
             })
-            ->paginate(10)->appends(['search' => $search]); // Adicionando o parâmetro de busca à paginação
+            ->paginate(10)->appends(['search' => $search]);
 
         return view('produtos.searchProduto', compact('results'));
     }
 
-
     public function edit($id)
     {
-        $produto= Produto::with( 'lojaOnline')->find($id);
-        return view('produtos.editProduto',compact('produto'));
+        try {
+            $produto = Produto::with('lojaOnline')->findOrFail($id);
+            return view('produtos.editProduto', compact('produto'));
+        } catch (\Exception $e) {
+            $this->custom_log->create([
+                'descricao' => $e->getMessage(),
+                'operacao' => 'edit',
+                'user_id' => auth()->id() ?? 1,
+            ]);
+
+            return redirect()->route('produtos.index')->withErrors('Erro ao acessar o produto para edição.');
+        }
     }
 
-
-    public function update( Request $request,$id)
+    public function update(Request $request, $id)
     {
-        $produto = Produto::find($id);
-        $produto->disponibilidade = $request->input('disponibilidade');
-        $produto->update($request->all());
+        try {
+            $produto = Produto::findOrFail($id);
+            $oldValues = $produto->getAttributes();
 
+            $produto->update($request->all());
+            $newValues = $produto->getAttributes();
+            $this->logChanges($oldValues, $newValues, 'update', $id);
 
+            $lojaOnline = LojaOnline::find($produto->loja_online_id);
+            $oldLojaValues = $lojaOnline->getAttributes();
 
-        $lojaOnline = LojaOnline::find($produto->loja_online_id);
-        $lojaOnline->update([
-            'urlLoja' => $request->input('urlLojaOnline'),
-            'valor' => $request->input('preco_valor'),
-            'moeda' => $request->input('preco_moeda')
-        ]);
+            $lojaOnline->update([
+                'urlLoja' => $request->input('urlLojaOnline'),
+                'valor' => $request->input('preco_valor'),
+                'moeda' => $request->input('preco_moeda'),
+            ]);
 
-        if ($produto->disponibilidade == 1) {
-            $estoque = new Estoque();
-            $estoque->produto_id = $produto->id;
-            $estoque->save();
-        } else {
-            // Remove o produto do estoque
-            $estoque = Estoque::where('produto_id', $produto->id)->first();
-            if ($estoque) {
-                $estoque->delete();
+            $newLojaValues = $lojaOnline->getAttributes();
+            $this->logChanges($oldLojaValues, $newLojaValues, 'update', $id, 'loja online');
+
+            $this->updateEstoque($produto);
+
+            return redirect()->route('produtos.index')->with('success', 'Produto atualizado com sucesso!');
+        } catch (\Exception $e) {
+            $this->custom_log->create([
+                'descricao' => $e->getMessage(),
+                'operacao' => 'update',
+                'user_id' => auth()->id() ?? 1,
+            ]);
+
+            return back()->withErrors('Erro ao atualizar o produto.');
+        }
+    }
+
+    public function destroy($id)
+    {
+        try {
+            $produto = Produto::findOrFail($id);
+
+            // Excluir a loja online associada
+            $produto->lojaOnline()->delete();
+
+            // Excluir o produto
+            $produto->delete();
+
+            $this->custom_log->create([
+                'descricao' => "Produto excluído: {$produto->nome}",
+                'operacao' => 'destroy',
+                'user_id' => auth()->id() ?? 1,
+            ]);
+
+            return redirect()->route('produtos.index')->with('success', 'Produto excluído com sucesso!');
+        } catch (\Exception $e) {
+            $this->custom_log->create([
+                'descricao' => $e->getMessage(),
+                'operacao' => 'destroy',
+                'user_id' => auth()->id() ?? 1,
+            ]);
+
+            return back()->withErrors('Erro ao excluir o produto.');
+        }
+    }
+
+    private function logChanges($oldValues, $newValues, $operation, $id, $entity = 'produto')
+    {
+        $changes = [];
+
+        foreach ($newValues as $key => $newValue) {
+            if ($key !== 'updated_at' && array_key_exists($key, $oldValues) && $oldValues[$key] != $newValue) {
+                $changes[$key] = ['old' => $oldValues[$key], 'new' => $newValue];
             }
         }
 
-
-
-
-        return redirect()->route('produtos.index');
+        if (!empty($changes)) {
+            $this->custom_log->create([
+                'descricao' => json_encode(['id' => $id, 'entity' => $entity, 'changes' => $changes]),
+                'operacao' => $operation,
+                'user_id' => auth()->id() ?? 1,
+            ]);
+        }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy($id)
+    private function updateEstoque($produto)
     {
-
-        if (request()->has('_token')){
-            $produto = Produto::findOrFail($id);
-            $produto->lojaOnline()->delete();
-            $produto->delete();
-            return redirect()->route('produtos.index');
+        if ($produto->disponibilidade == 1) {
+            Estoque::firstOrCreate(['produto_id' => $produto->id]);
         } else {
-            return redirect()->route('produtos.index');
+            Estoque::where('produto_id', $produto->id)->delete();
         }
     }
 }

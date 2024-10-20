@@ -22,33 +22,27 @@ class UpdateSoftwareRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'nome' => 'required|string',
+            // Validações gerais para o software
+            'nome' => 'required|string|max:255',
+            'tipo' => 'required|string|max:255',
+            'descricao' => 'required|string',
+            'peso' => 'required|string|max:255',
             'software_imagem' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
 
-            // Validação dos campos de requisitos
-            'cpu_min' => 'required|string',
-            'gpu_min' => 'required|string',
-            'ram_min' => 'required|string',
-            'placa_mae_min' => 'nullable|string',
-            'ssd_min' => 'nullable|string',
-            'cooler_min' => 'nullable|string',
-            'fonte_min' => 'nullable|string',
+            // Requisitos Mínimos
+            'cpu_min' => 'required|string|max:255',
+            'gpu_min' => 'required|string|max:255',
+            'ram_min' => 'required|string|max:255',
 
-            'cpu_med' => 'required|string',
-            'gpu_med' => 'required|string',
-            'ram_med' => 'required|string',
-            'placa_mae_med' => 'nullable|string',
-            'ssd_med' => 'nullable|string',
-            'cooler_med' => 'nullable|string',
-            'fonte_med' => 'nullable|string',
+            // Requisitos Médios
+            'cpu_med' => 'nullable|string|max:255',
+            'gpu_med' => 'nullable|string|max:255',
+            'ram_med' => 'nullable|string|max:255',
 
-            'cpu_rec' => 'required|string',
-            'gpu_rec' => 'required|string',
-            'ram_rec' => 'required|string',
-            'placa_mae_rec' => 'nullable|string',
-            'ssd_rec' => 'nullable|string',
-            'cooler_rec' => 'nullable|string',
-            'fonte_rec' => 'nullable|string',
+            // Requisitos Recomendados
+            'cpu_rec' => 'nullable|string|max:255',
+            'gpu_rec' => 'nullable|string|max:255',
+            'ram_rec' => 'nullable|string|max:255',
         ];
     }
 }

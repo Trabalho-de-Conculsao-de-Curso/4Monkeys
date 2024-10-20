@@ -149,7 +149,7 @@
             </div>
         </div>
     </div>
-<script>
+{{--<script>
     document.addEventListener('DOMContentLoaded', function () {
 // Seleciona todos os checkboxes e suas divs pai
 const checkboxes = document.querySelectorAll('.checkbox');
@@ -270,7 +270,7 @@ updateDivColor();
     })
 });
 
-</script>
+</script>--}}
     </div>
 </body>
 </html>

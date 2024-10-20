@@ -186,7 +186,7 @@
 
 </div>
 
-    <script>
+   {{-- <script>
         // Toggle mobile menu
         document.getElementById('menu-btn').addEventListener('click', function() {
             var menu = document.getElementById('mobile-menu');
@@ -270,6 +270,6 @@
 
 
 
-    </script>
+    </script> --}}
 </body>
 </html>
