@@ -1,4 +1,4 @@
-@extends('padrao')
+@extends('layouts.admin')
 
 @section('titulo', 'Softwares')
 
@@ -19,8 +19,8 @@
     <div class="page-inner py-5">
         <div class="d-flex align-items-left align-items-md-center flex-column flex-md-row">
             <div>
-                <h2 class="text-white pb-2 fw-bold">Produtos</h2>
-                <h5 class="text-white op-7 mb-2">Cadastro de Produtos</h5>
+                <h2 class="text-dark pb-2 fw-bold">Lista de Hardwares</h2>
+                <h5 class="text-dark op-7 mb-2">Gerenciamento de Hardwares</h5>
             </div>
         </div>
     </div>
