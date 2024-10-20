@@ -9,27 +9,88 @@
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
-
     <script>
-        function toggleDetails(id) {
-            var details = document.getElementById('details-' + id);
+        document.addEventListener('DOMContentLoaded', function() {
+            const checkboxes = document.querySelectorAll('input[name="softwares[]"]');
+
+            // Desmarcar todos os checkboxes ao carregar a página
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = false;
+            });
+
+            // Adicionar um listener para impedir a seleção de mais de 3
+            checkboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const checkedCount = document.querySelectorAll('input[name="softwares[]"]:checked').length;
+
+                    if (checkedCount > 3) {
+                        alert('Você só pode selecionar no máximo 3 softwares.');
+                        checkbox.checked = false;  // Desmarca o checkbox que ultrapassou o limite
+                    }
+                });
+            });
+        });
+
+        // Função para alternar o estado do card e o checkbox, mas impedindo ação se já houver 3 selecionados
+        function toggleFillAndDetails(id, description) {
+            const checkedCount = document.querySelectorAll('input[name="softwares[]"]:checked').length;
+
+            // Verifica se já existem 3 selecionados antes de permitir preencher o card
+            const checkbox = document.getElementById(`software${id}`);
+            if (!checkbox.checked && checkedCount >= 3) {
+                alert('Você só pode selecionar no máximo 3 softwares.');
+                return;  // Sai da função sem preencher o card ou exibir detalhes
+            }
+
+            // Lógica de preenchimento do card
+            toggleFillCard(id);
+
+            // Lógica para exibir/ocultar detalhes do software com efeito de digitação
+            toggleDetails(id, description);
+
+            // Alterna o checkbox para marcado/desmarcado
+            toggleCheckbox(id);
+        }
+
+        function toggleFillCard(id) {
+            const card = document.getElementById(`checkboxDiv${id}`);
+            card.classList.toggle('filled-card');
+        }
+
+        function toggleDetails(id, description) {
+            const details = document.getElementById('details-' + id);
             if (details.style.display === 'none') {
                 details.style.display = 'block';
+                typeWriterEffect(`description-${id}`, description);
             } else {
                 details.style.display = 'none';
             }
         }
 
-        function validateForm(event) {
-            var checkboxes = document.querySelectorAll('input[name="softwares[]"]');
-            var isChecked = Array.from(checkboxes).some(checkbox => checkbox.checked);
+        // Função para alternar o estado do checkbox
+        function toggleCheckbox(id) {
+            const checkbox = document.getElementById(`software${id}`);
+            checkbox.checked = !checkbox.checked;  // Inverte o estado do checkbox
+        }
 
-            if (!isChecked) {
-                event.preventDefault();
-                alert("Por favor, selecione pelo menos um software.");
+        // Função para o efeito de digitação
+        function typeWriterEffect(elementId, text, speed = 50) {
+            const element = document.getElementById(elementId);
+            element.innerHTML = '';  // Limpa o conteúdo existente antes de iniciar o efeito
+            let i = 0;
+
+            function type() {
+                if (i < text.length) {
+                    element.innerHTML += text.charAt(i);
+                    i++;
+                    setTimeout(type, speed);  // Define a velocidade de digitação
+                }
             }
+
+            type();  // Inicia a função de digitação
         }
     </script>
+
 </head>
 
 <body class="bg-zinc-900 text-gray-200 flex flex-col h-screen">
@@ -43,7 +104,22 @@
         <span class="mr-2">ASSINAR AGORA</span>
         <img src="{{ asset('images/seta-direita.png') }}" alt="Descrição da imagem" class="w-10 h-8 object-cover ml-2">
     </button>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Concert+One&display=swap');
 
+        .concert-one-regular {
+            font-family: "Concert One", sans-serif;
+            font-weight: 400;
+            font-style: normal;
+        }
+        .filled-card {
+            background: rgb(249,69,226);
+            background: linear-gradient(65deg, rgba(249,69,226,0.5606617647058824) 0%, rgba(148,187,233,0.0032387955182072714) 100%);
+            transition: background-color 0.3s ease;
+        }
+
+
+    </style>
 </header>
 
 <!-- Conteúdo Principal -->
@@ -81,50 +157,46 @@
 
         <div class="flex flex-col md:flex-row">
             <div class="md:flex-1 ml-20 mr-20 md:ml-55 p-3">
-                <h1 class="text-3xl font-bold mb-0">Encontre o Hardware Ideal para Seus Softwares</h1>
-                <h1 class="text-3xl mb-10 font-bold bg-gradient-to-r from-blue-600 via-indigo-800 via-purple-700 to-purple-900 text-transparent bg-clip-text">
+                <h1 class="text-4xl font-bold mb-0">Encontre o Hardware Ideal para Seus Softwares</h1>
+                <h1 class="concert-one-regular text-3xl mb-10 font-bold bg-gradient-to-r from-purple-500 via-pink-500 to-rose-500 text-transparent bg-clip-text">
                     Conectando Tecnologia com Precisão
                 </h1>
-                <div class="p-5 grid grid-cols-1 gap-4 md:grid-cols-3 lg:grid-cols-6">
-                    <div class="flex justify-start items-center border-2 rounded-md border-purple-700">
-                        <img src="{{ asset('images/csgo2.png') }}" alt="Descrição da imagem" class="w-8 h-8 object-cover">
-                        <span class="ml-2">Counter Strike</span>
-                    </div>
-                    <div class="flex justify-start items-center border-2 rounded-md border-purple-700">
-                        <img src="{{ asset('images/pubg.jpg') }}" alt="Descrição da imagem" class="w-12 h-8 object-cover">
-                        <span class="ml-5">PUBG</span>
-                    </div>
-                    <div class="flex justify-start items-center border-2 rounded-md border-purple-700">
-                        <img src="{{ asset('images/valorant.png') }}" alt="Descrição da imagem" class="w-12 h-8 object-cover">
-                        <span class="ml-5">Valorant</span>
-                    </div>
-                    <div class="flex justify-start items-center border-2 rounded-md border-purple-700">
-                        <img src="{{ asset('images/rockstar.jpg') }}" alt="Descrição da imagem" class="w-12 h-8 object-cover rounded-sm">
-                        <span class="ml-5">GTA V</span>
-                    </div>
-                    <div class="flex justify-start items-center border-2 rounded-md border-purple-700">
-                        <img src="{{ asset('images/minecraft.jpg') }}" alt="Descrição da imagem" class="w-12 h-8 object-cover">
-                        <span class="ml-4">Minecraft</span>
-                    </div>
-                    <div class="flex justify-start items-center border-2 rounded-md border-purple-700">
-                        <img src="{{ asset('images/vs-code-logo.png') }}" alt="Descrição da imagem" class="w-12 h-8 object-cover">
-                        <span class="ml-4">VS Code</span>
-                    </div>
-                </div>
+
                 <div>
-                    <form id="software-selection-form" action="{{ auth()->check() ? route('free.selecionar') : route('free.selecionar') }}" method="POST" class="bg-zinc-800 relative rounded-lg shadow p-6 border border-gray-600" onsubmit="validateForm(event)">
+                    <form id="software-selection-form" action="{{ auth()->check() ? route('free.selecionar') : route('free.selecionar') }}" method="POST" class="bg-zinc-800 relative rounded-lg shadow p-6 border border-gray-600">
                         @csrf
-                        <h2 class="text-2xl font-semibold mb-4">Selecione os Softwares Desejados:</h2>
+                        <h2 class="concert-one-regular text-4xl font-semibold mb-4">
+                            Selecione os softwares desejados:
+                        </h2>
+
                         <div class="mb-6 grid grid-cols-1 md:grid-cols-3 gap-6">
                             <!-- Coluna de Jogos -->
                             <div>
-                                <h3 class="text-xl font-semibold mb-4">Jogos</h3>
+                                <h3 class="concert-one-regular text-center text-4xl font-bold mb-6 bg-gradient-to-r from-purple-200 via-pink-200 to-blue-100 text-transparent bg-clip-text animate-fade-in">
+                                    Jogos
+                                </h3>
                                 @foreach($softwares as $software)
                                     @if($software->tipo == 1)
-                                        <div id="checkboxDiv{{ $software->id }}" class="flex justify-start items-center border-2 rounded-md border-purple-700 mb-2 p-2 transition duration-300">
-                                            <img src="{{ asset('storage/' . $software->imagem) }}" alt="Imagem de {{ $software->nome }}" class="w-12 h-8 object-cover">
-                                            <input type="checkbox" id="software{{ $software->id }}" name="softwares[]" value="{{ $software->id }}" class="checkbox hidden">
-                                            <label for="software{{ $software->id }}" class="ml-4 text-lg cursor-pointer flex-1">{{ $software->nome }}</label>
+                                        <div id="checkboxDiv{{ $software->id }}"
+                                             class="flex justify-start items-center border-2 rounded-lg border-purple-700 mb-4 p-3 bg-transparent shadow-none hover:shadow-lg transition-shadow duration-300 transform hover:scale-105 cursor-pointer"
+                                             onclick="toggleFillAndDetails({{ $software->id }}, '{{ addslashes($software->descricao) }}')">
+
+                                            <img src="{{ asset('storage/' . $software->imagem) }}" alt="Imagem de {{ $software->nome }}" class="w-16 h-12 object-cover rounded-md transition-transform duration-300 hover:scale-110">
+
+                                            <div class="relative ml-4">
+                                                <!-- Checkbox oculto, mas funcional para seleção -->
+                                                <input type="checkbox" id="software{{ $software->id }}" name="softwares[]" value="{{ $software->id }}" class="hidden">
+
+                                                <!-- Exibindo o nome do software -->
+                                                <label for="software{{ $software->id }}" class="block text-lg font-semibold flex items-center space-x-2">
+                                                    <span>{{ $software->nome }}</span>
+                                                </label>
+                                            </div>
+                                        </div>
+
+                                        <div id="details-{{ $software->id }}" class="details mt-2" style="display: none;">
+                                            <!-- Parágrafo com efeito de digitação -->
+                                            <p id="description-{{ $software->id }}" class="concert-one-regular text-2xl description"></p>
                                         </div>
 
                                     @endif
@@ -132,43 +204,73 @@
                             </div>
                             <!-- Coluna de Trabalho -->
                             <div>
-                                <h3 class="text-xl font-semibold mb-4">Trabalho</h3>
+                                <h3 class="concert-one-regular text-center text-4xl font-bold mb-6 bg-gradient-to-r from-purple-200 via-pink-200 to-blue-100 text-transparent bg-clip-text animate-fade-in">
+                                    Trabalho
+                                </h3>
                                 @foreach($softwares as $software)
                                     @if($software->tipo == 2)
-                                        <div class="flex items-center mb-2">
-                                            <div>
-                                                <input type="checkbox" id="software{{ $software->id }}" name="softwares[]" value="{{ $software->id }}" class="form-checkbox h-5 w-5 text-blue-400">
-                                                <label for="software{{ $software->id }}" class="ml-2 text-lg">{{ $software->nome }}</label>
-                                                <button type="button" onclick="toggleDetails({{ $software->id }})" class="text-blue-400 hover:underline">Ler Mais</button>
-                                                <div id="details-{{ $software->id }}" class="text-sm text-gray-400 mt-2" style="display: none;">
-                                                    {{ $software->descricao }}
-                                                </div>
+                                        <div id="checkboxDiv{{ $software->id }}"
+                                             class="flex justify-start items-center border-2 rounded-lg border-purple-700 mb-4 p-3 bg-transparent shadow-none hover:shadow-lg transition-shadow duration-300 transform hover:scale-105 cursor-pointer"
+                                             onclick="toggleFillAndDetails({{ $software->id }}, '{{ addslashes($software->descricao) }}')">
+
+                                            <img src="{{ asset('storage/' . $software->imagem) }}" alt="Imagem de {{ $software->nome }}" class="w-16 h-12 object-cover rounded-md transition-transform duration-300 hover:scale-110">
+
+                                            <div class="relative ml-4">
+                                                <!-- Checkbox oculto, mas funcional para seleção -->
+                                                <input type="checkbox" id="software{{ $software->id }}" name="softwares[]" value="{{ $software->id }}" class="hidden">
+
+                                                <!-- Exibindo o nome do software -->
+                                                <label for="software{{ $software->id }}" class="block text-lg font-semibold flex items-center space-x-2">
+                                                    <span>{{ $software->nome }}</span>
+                                                </label>
                                             </div>
+                                        </div>
+
+                                        <div id="details-{{ $software->id }}" class="details mt-2" style="display: none;">
+                                            <!-- Parágrafo com efeito de digitação -->
+                                            <p id="description-{{ $software->id }}" class="concert-one-regular text-2xl description"></p>
                                         </div>
                                     @endif
                                 @endforeach
                             </div>
                             <!-- Coluna de Dispositivos -->
                             <div>
-                                <h3 class="text-xl font-semibold mb-4">Dispositivos</h3>
+                                <h3 class="concert-one-regular text-center text-4xl font-bold mb-6 bg-gradient-to-r from-purple-200 via-pink-200 to-blue-100 text-transparent bg-clip-text animate-fade-in">
+                                    Dispositivos
+                                </h3>
                                 @foreach($softwares as $software)
                                     @if($software->tipo == 3)
-                                        <div class="flex items-center mb-2">
-                                            <div>
-                                                <input type="checkbox" id="software{{ $software->id }}" name="softwares[]" value="{{ $software->id }}" class="form-checkbox h-5 w-5 text-blue-400">
-                                                <label for="software{{ $software->id }}" class="ml-2 text-lg">{{ $software->nome }}</label>
-                                                <button type="button" onclick="toggleDetails({{ $software->id }})" class="text-blue-400 hover:underline">Ler Mais</button>
-                                                <div id="details-{{ $software->id }}" class="text-sm text-gray-400 mt-2" style="display: none;">
-                                                    {{ $software->descricao }}
-                                                </div>
+                                        <div id="checkboxDiv{{ $software->id }}"
+                                             class="flex justify-start items-center border-2 rounded-lg border-purple-700 mb-4 p-3 bg-transparent shadow-none hover:shadow-lg transition-shadow duration-300 transform hover:scale-105 cursor-pointer"
+                                             onclick="toggleFillAndDetails({{ $software->id }}, '{{ addslashes($software->descricao) }}')">
+
+                                            <img src="{{ asset('storage/' . $software->imagem) }}" alt="Imagem de {{ $software->nome }}" class="w-16 h-12 object-cover rounded-md transition-transform duration-300 hover:scale-110">
+
+                                            <div class="relative ml-4">
+                                                <!-- Checkbox oculto, mas funcional para seleção -->
+                                                <input type="checkbox" id="software{{ $software->id }}" name="softwares[]" value="{{ $software->id }}" class="hidden">
+
+                                                <!-- Exibindo o nome do software -->
+                                                <label for="software{{ $software->id }}" class="block text-lg font-semibold flex items-center space-x-2">
+                                                    <span>{{ $software->nome }}</span>
+                                                </label>
                                             </div>
+                                        </div>
+
+                                        <div id="details-{{ $software->id }}" class="details mt-2" style="display: none;">
+                                            <!-- Parágrafo com efeito de digitação -->
+                                            <p id="description-{{ $software->id }}" class="concert-one-regular text-2xl description"></p>
                                         </div>
                                     @endif
                                 @endforeach
                             </div>
                         </div>
                         <!-- Botão de Submissão -->
-                        <button type="submit" class="bg-purple-800 text-white py-2 px-4 rounded hover:bg-purple-600 transition duration-300">Selecionar Softwares</button>
+                        <div class="flex justify-center mt-6">
+                            <button type="submit" class="concert-one-regular bg-gradient-to-r from-purple-700 via-pink-600 to-rose-600 text-white py-4 px-8 text-2xl rounded-lg shadow-lg hover:bg-gradient-to-r hover:from-purple-600 hover:via-pink-500 hover:to-rose-500 transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-purple-300">
+                                Selecionar Softwares
+                            </button>
+                        </div>
 
                         <!-- Animação de Carregamento -->
                         <div id="loading-spinner" class="absolute inset-0 bg-zinc-800 flex flex-col items-center justify-center z-10 hidden rounded-sm">
@@ -186,7 +288,7 @@
 
 </div>
 
-   {{-- <script>
+{{--<script>
         // Toggle mobile menu
         document.getElementById('menu-btn').addEventListener('click', function() {
             var menu = document.getElementById('mobile-menu');
@@ -270,6 +372,6 @@
 
 
 
-    </script> --}}
+    </script>--}}
 </body>
 </html>
