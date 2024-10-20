@@ -36,6 +36,7 @@
     </div>
     <!-- Fim do conteúdo -->
 </div>
+
 @include('scripts')
 
 <script>

@@ -1,4 +1,4 @@
-@extends('padrao')
+@extends('layouts.admin')
 
 @section('titulo', 'Produtos')
 
@@ -19,8 +19,8 @@
         <div class="page-inner py-5">
             <div class="d-flex align-items-left align-items-md-center flex-column flex-md-row">
                 <div>
-                    <h2 class="text-white pb-2 fw-bold">Lista de Hardwares</h2>
-                    <h5 class="text-white op-7 mb-2">Gerenciamento de Hardwares</h5>
+                    <h2 class="text-dark pb-2 fw-bold">Lista de Hardwares</h2>
+                    <h5 class="text-dark op-7 mb-2">Gerenciamento de Hardwares</h5>
                 </div>
             </div>
         </div>
@@ -31,7 +31,7 @@
             <div class="col-md-12">
                 <div class="card">
                     <div class="card-header">
-                        <div class="d-flex align-items-center">
+                        <div class="d-flex justify-content-between align-items-center">
                             <h4 class="card-title">Lista de Produtos</h4>
                             <a href="{{ route('produtos.create') }}" class="btn btn-primary btn-round ml-auto">
                                 <i class="fa fa-plus"></i>
@@ -92,4 +92,5 @@
             </div>
         </div>
     </div>
+    @include('scripts')
 @endsection

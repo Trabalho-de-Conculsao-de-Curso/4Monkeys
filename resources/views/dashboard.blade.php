@@ -21,6 +21,7 @@
     }
     </style>
     <body class="font-sans antialiased">
+        
         <div class="min-h-screen bg-zinc-900">
             @include('layouts.navigation')
         <div class="flex flex-1">
@@ -34,6 +35,7 @@
                 <li class="mb-4"><a href="#" class="text-lg hover:underline">Ajuda</a></li>
             </ul>
         </div>
+        
 
         <!-- Conteúdo Principal com ajuste para responsividade -->
         <div class="flex-1 container mx-auto py-8">

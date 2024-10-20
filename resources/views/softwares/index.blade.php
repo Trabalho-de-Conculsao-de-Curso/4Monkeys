@@ -1,4 +1,4 @@
-@extends('padrao')
+@extends('layouts.admin')
 
 @section('titulo', 'Softwares')
 
@@ -7,26 +7,27 @@
         <div class="page-inner py-5">
             <div class="d-flex align-items-left align-items-md-center flex-column flex-md-row">
                 <div>
-                    <h2 class="text-white pb-2 fw-bold">Softwares</h2>
-                    <h5 class="text-white op-7 mb-2">Gerenciamento de Softwares</h5>
+                    <h2 class="text-dark pb-2 fw-bold">Softwares</h2>
+                    <h5 class="text-dark op-7 mb-2">Gerenciamento de Softwares</h5>
                 </div>
             </div>
         </div>
-    </div>
-
+    </div>    
     <div class="page-inner mt--5">
         <div class="row">
             <div class="col-md-12">
                 <div class="card">
                     <div class="card-header">
-                        <div class="d-flex align-items-center">
+                        <div class="d-flex justify-content-between align-items-center">
                             <h4 class="card-title">Lista de Softwares</h4>
-                            <a href="{{ route('softwares.create') }}" class="btn btn-primary btn-round ml-auto">
-                                <i class="fa fa-plus"></i>
-                                Cadastrar Novo Software
-                            </a>
+                            <div>
+                                <a href="{{ route('softwares.create') }}" class="btn btn-primary btn-round">
+                                    <i class="fa fa-plus"></i>
+                                    Cadastrar Novo Software
+                                </a>
+                            </div>
                         </div>
-                    </div>
+                    </div>               
                     <div class="card-body">
                         <div class="table-responsive">
                             <table id="add-row" class="display table table-striped table-hover">
@@ -55,6 +56,7 @@
                                     </tr>
                                 </tfoot>
                                 <tbody>
+                                    
                                     @foreach($softwares as $software)
                                         <tr>
                                             <td>{{ $software->id }}</td>
@@ -80,7 +82,7 @@
                                                     <form action="{{ route('softwares.destroy', $software->id) }}" method="POST" class="d-inline">
                                                         @csrf
                                                         @method('DELETE')
-                                                        <button class="btn btn-link btn-danger btn-lg"
+                                                        <button class="btn btn-link btn-danger btn-lg "
                                                                 data-toggle="tooltip" data-original-title="Excluir"
                                                                 onclick="return confirm('Tem certeza que deseja excluir {{ $software->nome }}?')">
                                                             <i class="fa fa-times"></i>
@@ -98,4 +100,15 @@
             </div>
         </div>
     </div>
+    <div class="row justify-content-end">
+        <div class="col-md-12 text-right">
+            @include('scripts')
+            <script>
+                @if (Session::has('sucesso'))
+                notificacao('Sucesso', "{{Session::get('sucesso')}}");
+                @endif
+            </script>
+        </div>
+    </div>
+       
 @endsection
