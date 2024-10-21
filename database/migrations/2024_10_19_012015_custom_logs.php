@@ -13,10 +13,10 @@ return new class extends Migration
     {
         Schema::create('custom_logs', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('admin_id');
             $table->longText('descricao');
             $table->string('operacao');
-            $table-> foreign('user_id')->references('id')->on('users');
+            $table-> foreign('admin_id')->references('id')->on('admins');
             $table->timestamps();
         });
     }

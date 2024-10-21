@@ -19,7 +19,7 @@ class ProdutoSeeder extends Seeder
      */
     public function run(): void
     {
-        Produto::create([
+       /* Produto::create([
             'nome' => 'CPU',
             'marca_id' => 1,
             'especificacoes_id' => 1,
@@ -818,7 +818,7 @@ class ProdutoSeeder extends Seeder
             'preco_id' => 100,
             'loja_online_id' => 100,
         ]);
-
+*/
 
 
     }

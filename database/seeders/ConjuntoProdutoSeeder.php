@@ -13,7 +13,7 @@ class ConjuntoProdutoSeeder extends Seeder
      */
     public function run(): void
     {
-        ConjuntoProduto::create([
+       /* ConjuntoProduto::create([
             'conjunto_id' => '1',
             'produto_id'  => '37',
         ]);
@@ -1533,6 +1533,6 @@ class ConjuntoProdutoSeeder extends Seeder
             'conjunto_id' => '45',
             'produto_id'  => '65',
         ]);
-
+*/
     }
 }

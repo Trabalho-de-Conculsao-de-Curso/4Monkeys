@@ -13,7 +13,7 @@ class ConjuntoSeeder extends Seeder
      */
     public function run(): void
     {
-        Conjunto::create([
+        /*Conjunto::create([
             'nome' => 'bronze',
             'categoria_id'  => '1',
             'user_id' => 'null',
@@ -312,10 +312,6 @@ class ConjuntoSeeder extends Seeder
             'user_id' => 'null',
 
         ]);
-
-
-
-
-
+*/
     }
 }

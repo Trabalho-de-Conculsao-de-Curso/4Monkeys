@@ -1,8 +1,10 @@
 <?php
 
 use App\Http\Controllers\AdminDashboardController;
+use App\Http\Controllers\ChartController;
 use App\Http\Controllers\ConjuntoLocalController;
 use App\Http\Controllers\FreeConjuntoController;
+use App\Http\Controllers\LogController;
 use App\Http\Controllers\PremiumController;
 use App\Http\Controllers\ProdutoController;
 use App\Http\Controllers\ConjuntoController;
@@ -45,6 +47,16 @@ Route::get('/historico-conjuntos', [ConjuntoController::class, 'historicoConjunt
 
 Route::get('/login-admin', [AdminController::class, 'showLoginForm'])->name('admin.login');
 Route::post('/login-admin', [AdminController::class, 'login']);
+
+Route::get('/tables', [LogController::class, 'index'])->name('auth.admin.logs');
+
+Route::get('/logs/export', [LogController::class, 'export'])->name('logs.export');
+
+Route::get('/charts', function () {
+    return view('admin.charts');
+})->name('admin.charts');
+
+Route::get('/api/charts-data', [ChartController::class, 'getChartData']);
 
 /*Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/admin', [AdminController::class, 'index'])->name('auth.admin.AdminDashboard');

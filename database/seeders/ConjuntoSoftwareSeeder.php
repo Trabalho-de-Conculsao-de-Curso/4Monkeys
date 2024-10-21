@@ -13,7 +13,7 @@ class ConjuntoSoftwareSeeder extends Seeder
      */
     public function run(): void
     {
-        ConjuntoSoftware::create([
+       /* ConjuntoSoftware::create([
             'conjunto_id' => '1',
             'software_id'  => '1',
         ]);
@@ -237,6 +237,6 @@ class ConjuntoSoftwareSeeder extends Seeder
             'conjunto_id' => '45',
             'software_id'  => '15',
         ]);
-
+*/
     }
 }

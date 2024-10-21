@@ -13,7 +13,7 @@ class LojaOnlineSeeder extends Seeder
      */
     public function run(): void
     {
-        LojaOnline::create([
+        /*LojaOnline::create([
             'nome' => 'TeraByteShop',
             'UrlLoja' => 'https://www.terabyteshop.com.br/produto/23858/processador-amd-ryzen-9-7950x3d-42ghz-57ghz-turbo-16-cores-32-threads-am5-sem-cooler-100-100000908wof?p=139255&utm_source=craftmybox&utm_medium=afiliados&utm_campaign=craftmybox',
         ]);
@@ -512,7 +512,7 @@ class LojaOnlineSeeder extends Seeder
             'nome' => 'KABUM',
             'UrlLoja' => 'https://www.kabum.com.br/produto/369658/fonte-msi-mag-a650bn-650w-80-plus-bronze-pfc-ativo-com-cabo-preto-306-7zp2b22-ce0',
         ]);
-
+*/
 
     }
 }

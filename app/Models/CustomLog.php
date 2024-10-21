@@ -14,7 +14,6 @@ class CustomLog extends Model
     public $fillable = [
         'descricao',
         'operacao',
-        'user_id'];
-
-
+        'admin_id',
+        ];
 }

@@ -48,33 +48,6 @@ class SoftwareController extends Controller
         return view('softwares.createSoftware');
     }
 
-    public function edit($id)
-    {
-        try {
-            $software = Software::findOrFail($id);
-            Log::alert('Acessou para editar Software: ' . $id);
-
-            // Busca os requisitos de hardware relacionados
-            $requisitos = [
-                'Minimo' => RequisitoSoftware::where('software_id', $software->id)->where('requisito_nivel', 'Minimo')->first(),
-                'Medio' => RequisitoSoftware::where('software_id', $software->id)->where('requisito_nivel', 'Medio')->first(),
-                'Recomendado' => RequisitoSoftware::where('software_id', $software->id)->where('requisito_nivel', 'Recomendado')->first()
-            ];
-
-            return view('softwares.editSoftware', compact('software', 'requisitos'));
-
-        } catch (\Exception $e) {
-            // Registra log personalizado em caso de erro
-            $this->custom_log->create([
-                'descricao' => $e->getMessage(),
-                'operacao' => 'edit',
-                'user_id' => auth()->id() ?? 1, // Pega o ID do usuário autenticado ou '1' como fallback
-            ]);
-
-            return redirect()->route('softwares.index')->with('error', 'Erro ao acessar o software para edição.');
-        }
-    }
-
     public function store(StoreSoftwareRequest $request)
     {
         try {
@@ -96,7 +69,7 @@ class SoftwareController extends Controller
                 $this->custom_log->create([
                     'descricao' => 'Software criado: ' . $software->nome,
                     'operacao' => 'create',
-                    'user_id' => auth()->id() ?? 1,
+                    'admin_id' => auth()->guard('admin')->id(),
                 ]);
 
                 // Se o software foi criado com sucesso, cria os requisitos
@@ -155,6 +128,36 @@ class SoftwareController extends Controller
             return back()->withErrors(['message' => 'Erro ao salvar o software.']);
         }
     }
+
+
+    public function edit($id)
+    {
+        try {
+            $software = Software::findOrFail($id);
+            Log::alert('Acessou para editar Software: ' . $id);
+
+            // Busca os requisitos de hardware relacionados
+            $requisitos = [
+                'Minimo' => RequisitoSoftware::where('software_id', $software->id)->where('requisito_nivel', 'Minimo')->first(),
+                'Medio' => RequisitoSoftware::where('software_id', $software->id)->where('requisito_nivel', 'Medio')->first(),
+                'Recomendado' => RequisitoSoftware::where('software_id', $software->id)->where('requisito_nivel', 'Recomendado')->first()
+            ];
+
+            return view('softwares.editSoftware', compact('software', 'requisitos'));
+
+        } catch (\Exception $e) {
+            // Registra log personalizado em caso de erro
+            $this->custom_log->create([
+                'descricao' => $e->getMessage(),
+                'operacao' => 'edit',
+                'admin_id' => auth()->guard('admin')->id(), // Pega o ID do usuário autenticado ou '1' como fallback
+            ]);
+
+            return redirect()->route('softwares.index')->with('error', 'Erro ao acessar o software para edição.');
+        }
+    }
+
+
 
     public function update(UpdateSoftwareRequest $request, $id)
     {
@@ -268,7 +271,7 @@ class SoftwareController extends Controller
             $this->custom_log->create([
                 'descricao' => 'Software excluído: ' . $softwareName,
                 'operacao' => 'destroy',
-                'user_id' => auth()->id() ?? 1,
+                'admin_id' => auth()->guard('admin')->id(),
             ]);
 
             return redirect()->route('softwares.index')->with('success', 'Software excluído com sucesso!');
@@ -297,7 +300,7 @@ class SoftwareController extends Controller
             $this->custom_log->create([
                 'descricao' => json_encode($changes),
                 'operacao' => $operacao,
-                'user_id' => auth()->id() ?? 1,
+                'admin_id' => auth()->guard('admin')->id(),
                 'software_id' => $softwareId
             ]);
         }

@@ -7,6 +7,7 @@ use App\Models\Estoque;
 use App\Models\LojaOnline;
 use App\Models\Produto;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class ProdutoController extends Controller
 {
@@ -22,14 +23,10 @@ class ProdutoController extends Controller
         try {
             $produtos = Produto::with('lojaOnline')->paginate(10000);
         } catch (\Exception $e) {
-            $this->custom_log->create([
-                'descricao' => $e->getMessage(),
-                'operacao' => 'index',
-                'user_id' => auth()->id() ?? 1,
-            ]);
+            Log::warning('Ocorreu o seguinte erro ao listar Software: ' . $e->getMessage());
             $produtos = [];
         }
-
+        // Renderiza a view com os produtos
         return view('produtos.index', ['produtos' => $produtos]);
     }
 
@@ -40,6 +37,7 @@ class ProdutoController extends Controller
 
     public function store(Request $request)
     {
+        // Validações dos campos obrigatórios
         $request->validate([
             'nome' => 'required',
             'preco_valor' => 'required',
@@ -49,39 +47,52 @@ class ProdutoController extends Controller
         ]);
 
         try {
+            // Verifica se há um admin autenticado
+            if (!auth()->guard('admin')->check()) {
+                throw new \Exception('Nenhum administrador autenticado para criar o produto.');
+            }
+
+            // Criação do registro na tabela LojaOnline
             $lojaOnline = LojaOnline::create([
                 'valor' => $request->input('preco_valor'),
                 'moeda' => $request->input('preco_moeda'),
                 'urlLoja' => $request->input('urlLojaOnline'),
             ]);
 
+            // Criação do produto
             $produto = Produto::create([
                 'nome' => $request->input('nome'),
                 'disponibilidade' => $request->input('disponibilidade'),
                 'loja_online_id' => $lojaOnline->id,
             ]);
 
+            // Se o produto estiver disponível, crie um registro no estoque
             if ($produto->disponibilidade == 1) {
                 Estoque::create(['produto_id' => $produto->id]);
             }
 
+            // Cria o log com o admin_id do administrador autenticado
             $this->custom_log->create([
                 'descricao' => "Produto criado: {$produto->nome}",
                 'operacao' => 'create',
-                'user_id' => auth()->id() ?? 1,
+                'admin_id' => auth()->guard('admin')->id(),
             ]);
-
+            // Redireciona com sucesso
             return redirect()->route('produtos.index')->with('success', 'Produto criado com sucesso!');
         } catch (\Exception $e) {
-            $this->custom_log->create([
-                'descricao' => $e->getMessage(),
-                'operacao' => 'store',
-                'user_id' => auth()->id() ?? 1,
-            ]);
-
+            // Log de erro com o admin_id do administrador autenticado
+            if (auth()->guard('admin')->check()) {
+                $this->custom_log->create([
+                    'descricao' => $e->getMessage(),
+                    'operacao' => 'store',
+                    'admin_id' => auth()->guard('admin')->id(),
+                ]);
+            }
+            // Retorna com erro caso ocorra falha
             return back()->withErrors('Erro ao criar o produto.');
         }
     }
+
 
     public function show(Request $request)
     {
@@ -110,7 +121,7 @@ class ProdutoController extends Controller
             $this->custom_log->create([
                 'descricao' => $e->getMessage(),
                 'operacao' => 'edit',
-                'user_id' => auth()->id() ?? 1,
+                'admin_id' => auth()->guard('admin')->id(),
             ]);
 
             return redirect()->route('produtos.index')->withErrors('Erro ao acessar o produto para edição.');
@@ -146,7 +157,7 @@ class ProdutoController extends Controller
             $this->custom_log->create([
                 'descricao' => $e->getMessage(),
                 'operacao' => 'update',
-                'user_id' => auth()->id() ?? 1,
+                'admin_id' => auth()->guard('admin')->id(),
             ]);
 
             return back()->withErrors('Erro ao atualizar o produto.');
@@ -167,7 +178,7 @@ class ProdutoController extends Controller
             $this->custom_log->create([
                 'descricao' => "Produto excluído: {$produto->nome}",
                 'operacao' => 'destroy',
-                'user_id' => auth()->id() ?? 1,
+                'admin_id' => auth()->guard('admin')->id(),
             ]);
 
             return redirect()->route('produtos.index')->with('success', 'Produto excluído com sucesso!');
@@ -175,7 +186,7 @@ class ProdutoController extends Controller
             $this->custom_log->create([
                 'descricao' => $e->getMessage(),
                 'operacao' => 'destroy',
-                'user_id' => auth()->id() ?? 1,
+                'admin_id' => auth()->guard('admin')->id()
             ]);
 
             return back()->withErrors('Erro ao excluir o produto.');
@@ -196,7 +207,7 @@ class ProdutoController extends Controller
             $this->custom_log->create([
                 'descricao' => json_encode(['id' => $id, 'entity' => $entity, 'changes' => $changes]),
                 'operacao' => $operation,
-                'user_id' => auth()->id() ?? 1,
+                'admin_id' => auth()->guard('admin')->id(),
             ]);
         }
     }
