@@ -25,6 +25,8 @@
         </div>
     </div>
 </div>
+<div class="card mb-4">
+</div>  
 
 <div class="page-inner mt--5">
     <div class="row">

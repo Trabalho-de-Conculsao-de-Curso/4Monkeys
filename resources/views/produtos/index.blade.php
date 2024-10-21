@@ -25,6 +25,8 @@
             </div>
         </div>
     </div>
+    <div class="card mb-4">
+    </div> 
 
     <div class="page-inner mt--5">
         <div class="row">
@@ -41,7 +43,7 @@
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
-                            <table id="add-row" class="display table table-striped table-hover">
+                            <table id="datatablesSimple" class="display table table-striped table-hover">
                                 <thead>
                                     <tr>
                                         <th>ID</th>
@@ -92,5 +94,4 @@
             </div>
         </div>
     </div>
-    @include('scripts')
 @endsection

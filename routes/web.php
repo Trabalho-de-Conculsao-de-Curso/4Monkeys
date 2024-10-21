@@ -8,6 +8,8 @@ use App\Http\Controllers\ConjuntoController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SoftwareController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\LogController;
+use App\Http\Controllers\ChartController;
 use Illuminate\Support\Facades\Route;
 
 /*Route::get('/home', function () {
@@ -35,10 +37,19 @@ Route::resource('/produtos', ProdutoController::class);
 Route::resource('/softwares', SoftwareController::class);
 Route::resource('/usuario-premium', PremiumController::class);
 
-Route::get('/create-admin', [AdminController::class, 'index'])->name('auth.admin.index');
-Route::get('/dashboard-admin', [AdminController::class, 'dashboard'])->name('admin.dashboard');
+Route::get('/create-admin', [AdminController::class, 'create'])->name('auth.admin.index');
+Route::get('/dashboard-admin', [AdminController::class, 'index'])->name('admin.dashboard');
 Route::get('/historico-conjuntos', [ConjuntoController::class, 'historicoConjuntos']);
 
+Route::get('/tables', [LogController::class, 'index'])->name('auth.admin.logs');
+
+Route::get('/logs/export', [LogController::class, 'export'])->name('logs.export');
+
+Route::get('/charts', function () {
+    return view('admin.charts'); 
+})->name('admin.charts');
+
+Route::get('/api/charts-data', [ChartController::class, 'getChartData']);
 
 /*Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/admin', [AdminController::class, 'index'])->name('auth.admin.AdminDashboard');

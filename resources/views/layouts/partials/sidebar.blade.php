@@ -1,7 +1,7 @@
 <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
     <div class="sb-sidenav-menu">
         <div class="nav">
-            <div class="sb-sidenav-menu-heading">Core</div>
+            <div class="sb-sidenav-menu-heading">Essencial</div>
 
             <a class="nav-link" href="{{url('dashboard-admin')}}">
                 <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
@@ -10,9 +10,9 @@
 
             <a class="nav-link" href="{{url('admin/category')}}">
                 <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
-                Category
+                Categoria
             </a>
-            <div class="sb-sidenav-menu-heading">Interface</div>
+            <div class="sb-sidenav-menu-heading">Administrar</div>
             <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseLayouts" aria-expanded="false" aria-controls="collapseLayouts">
                 <div class="sb-nav-link-icon"><i class="fas fa-columns"></i></div>
                 Produtos
@@ -56,18 +56,18 @@
                 </nav>
             </div>
             <div class="sb-sidenav-menu-heading">Addons</div>
-            <a class="nav-link" href="charts.html">
+            <a class="nav-link" href="{{url('charts')}}">
                 <div class="sb-nav-link-icon"><i class="fas fa-chart-area"></i></div>
-                Charts
+                Gráficos
             </a>
-            <a class="nav-link" href="tables.html">
+            <a class="nav-link" href="{{url('tables')}}">
                 <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
-                Tables
+                Tabelas
             </a>
         </div>
     </div>
     <div class="sb-sidenav-footer">
-        <div class="small">Logged in as:</div>
-        Start Bootstrap
+        <div class="small">Logado como:</div>
+        Mateus Ferreira
     </div>
 </nav>
