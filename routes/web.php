@@ -31,6 +31,7 @@ Route::middleware('auth')->group(function () {
 
 Route::post('/selecionar-free', [FreeConjuntoController::class, 'selecionar'])->name('free.selecionar');
 
+
 Route::post('/conjunto-produtos', [ConjuntoLocalController::class, 'getConjuntoProdutos'])->name('conjunto.produtos');
 
 Route::resource('/produtos', ProdutoController::class)->middleware(AdminAuthenticated::class);

@@ -37,21 +37,6 @@ Route::middleware('guest')->group(function () {
                 ->name('password.store');
 });
 
-////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////
-
-/*Route::get('register-admin', [RegisteredAdminController::class, 'create'])
-    ->name('register-admin');
-
-Route::post('register-admin', [RegisteredAdminController::class, 'store']);
-
-Route::get('login-admin', [AuthenticatedSessionController::class, 'createAdmin'])
-            ->name('login-admin');
-
-Route::post('login-admin', [AuthenticatedSessionController::class, 'storeAdmin']);*/
-
-////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////
 
 Route::middleware('auth')->group(function () {
     Route::get('verify-email', EmailVerificationPromptController::class)

@@ -124,4 +124,5 @@ class AdminController extends Controller
 
         return back()->withErrors(['email' => 'Credenciais inválidas']);
     }
+
 }
