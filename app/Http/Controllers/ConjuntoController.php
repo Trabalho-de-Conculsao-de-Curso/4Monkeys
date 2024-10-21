@@ -8,6 +8,7 @@ use App\Models\Conjunto;
 use App\Models\Software;
 use App\Services\GeminiAPIService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -30,13 +31,16 @@ class ConjuntoController extends Controller
      */
     public function create()
     {
+        // Obtem todos os softwares
         $softwares = Software::all();
-        return view('dashboard', compact('softwares'));
-    }
 
-    public function createFree()
-    {
-        $softwares = Software::all();
+        // Verifica se o usuário está logado
+        if (Auth::check()) {
+            // Se o usuário estiver autenticado, renderiza a view do dashboard
+            return view('dashboard', compact('softwares'));
+        }
+
+        // Se o usuário não estiver autenticado, renderiza a view da home
         return view('home', compact('softwares'));
     }
 

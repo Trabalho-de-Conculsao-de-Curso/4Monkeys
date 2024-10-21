@@ -15,10 +15,10 @@ class AdminController extends Controller
     public function index()
     {
         // Busca todos os administradores no banco de dados
-       // $admins = Admin::paginate(10); // Paginação de 10 administradores por página
+        $admins = Admin::paginate(10); // Paginação de 10 administradores por página
 
         // Retorna a view com os dados dos administradores
-        return view('admin.dashboard', compact('admins'));
+        return view('auth.admin.index', compact('admins'));
     }
 
     public function create()
@@ -107,5 +107,21 @@ class AdminController extends Controller
         }else{
             return redirect()->route('create-admin.index');
         }
+    }
+
+    public function showLoginForm()
+    {
+        return view('auth.admin.adminLogin'); // Retorna a view de login
+    }
+
+    public function login(Request $request)
+    {
+        $credentials = $request->only('email', 'password');
+
+        if (Auth::guard('admin')->attempt($credentials)) {
+            return redirect()->route('admin.dashboard');
+        }
+
+        return back()->withErrors(['email' => 'Credenciais inválidas']);
     }
 }
