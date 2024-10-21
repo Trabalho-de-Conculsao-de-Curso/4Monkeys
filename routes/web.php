@@ -32,13 +32,11 @@ Route::middleware('auth')->group(function () {
 Route::post('/selecionar-free', [FreeConjuntoController::class, 'selecionar'])->name('free.selecionar');
 
 
-
 Route::post('/conjunto-produtos', [ConjuntoLocalController::class, 'getConjuntoProdutos'])->name('conjunto.produtos');
 
 Route::resource('/produtos', ProdutoController::class)->middleware(AdminAuthenticated::class);
 Route::resource('/softwares', SoftwareController::class)->middleware(AdminAuthenticated::class);
 Route::resource('/usuario-premium', PremiumController::class)->middleware(AdminAuthenticated::class);
-
 
 Route::resource('/create-admin', AdminController::class)->middleware(AdminAuthenticated::class);
 
