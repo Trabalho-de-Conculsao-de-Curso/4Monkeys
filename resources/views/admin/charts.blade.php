@@ -55,13 +55,10 @@ document.addEventListener('DOMContentLoaded', function () {
             const response = await fetch('/api/charts-data');
             const data = await response.json();
 
-            // Pega o total de softwares do backend
             const totalSoftwares = data.total_softwares;
 
-            // Pega os IDs dos softwares (caso precise para algum outro uso)
             const softwareIds = data.software_ids;
 
-            // Exibe o total no gráfico
             createBarChart(totalSoftwares);
         } catch (error) {
             console.error("Erro ao buscar dados do gráfico:", error);
@@ -73,10 +70,10 @@ document.addEventListener('DOMContentLoaded', function () {
         new Chart(ctxBar, {
             type: 'bar',
             data: {
-                labels: ['Total de Softwares'], // Rótulo do gráfico
+                labels: ['Total de Softwares'], 
                 datasets: [{
                     label: 'Quantidade de Softwares',
-                    data: [total], // Passa o total de softwares
+                    data: [total], 
                     backgroundColor: 'rgba(75, 192, 192, 0.2)',
                     borderColor: 'rgba(75, 192, 192, 1)',
                     borderWidth: 1
@@ -84,7 +81,7 @@ document.addEventListener('DOMContentLoaded', function () {
             },
             options: {
                 scales: {
-                    y: { // Para Chart.js 3.x ou mais recente
+                    y: { 
                         beginAtZero: true
                     }
                 },
