@@ -1,24 +1,23 @@
 import time
 from urllib.parse import urlencode
-from database import salvar_produtos_no_banco
-from pato_scraper import PatoScraper
-from kabum_scraper import KabumScraper
-from settings import urls_para_processar
+from .database import salvar_produtos_no_banco, salvar_log_no_banco
+from .pato_scraper import PatoScraper
+from .kabum_scraper import KabumScraper
+from .settings import urls_para_processar
 
 def processar_paginas(url_base, max_paginas=10, filters=None, max_paginas_sem_produtos=3):
     if "kabum.com.br" in url_base:
         scraper = KabumScraper()
-        if filters:
-            base_url_with_filters = f"{url_base}?{urlencode(filters)}"
-        else:
-            base_url_with_filters = url_base
-        pagina_formatada = "&page_number={}"  # Formato para Kabum
+        base_url_with_filters = f"{url_base}?{urlencode(filters)}" if filters else url_base
+        pagina_formatada = "&page_number={}"
     elif "patoloco.com.br" in url_base:
         scraper = PatoScraper()
         base_url_with_filters = url_base
-        pagina_formatada = "/{}"  # Formato correto para o Pato
+        pagina_formatada = "/{}"
     else:
-        print(f"Site não suportado: {url_base}")
+        mensagem = f"Site não suportado: {url_base}"
+        print(mensagem)
+        salvar_log_no_banco(url_base, 0, mensagem)
         return
 
     pagina = 1
@@ -29,20 +28,27 @@ def processar_paginas(url_base, max_paginas=10, filters=None, max_paginas_sem_pr
         url = f"{base_url_with_filters}{pagina_formatada.format(pagina)}"
         produtos_da_pagina = scraper.collect_products(url)
 
-
         if not produtos_da_pagina:
             paginas_sem_produtos += 1
-            print(f"Nenhum produto encontrado na página {pagina}. {paginas_sem_produtos} páginas sem produtos.")
+            mensagem = f"Nenhum produto encontrado na página {pagina}. {paginas_sem_produtos} páginas sem produtos."
+            print(mensagem)
+            salvar_log_no_banco(url_base, pagina, mensagem)
             if paginas_sem_produtos >= max_paginas_sem_produtos:
-                print(f"Encerrando scraping para {url_base} após {paginas_sem_produtos} páginas sem produtos.")
+                mensagem = f"Encerrando scraping para {url_base} após {paginas_sem_produtos} páginas sem produtos."
+                print(mensagem)
+                salvar_log_no_banco(url_base, pagina, mensagem)
                 break
         else:
             paginas_sem_produtos = 0
             todos_produtos.extend(produtos_da_pagina)
-            print(f"Página {pagina} processada para URL: {url_base}")
+            mensagem = f"Página {pagina} processada para URL: {url_base}"
+            print(mensagem)
+            salvar_log_no_banco(url_base, pagina, mensagem)
 
         if pagina >= max_paginas:
-            print(f"Limite máximo de páginas ({max_paginas}) atingido para {url_base}.")
+            mensagem = f"Limite máximo de páginas ({max_paginas}) atingido para {url_base}."
+            print(mensagem)
+            salvar_log_no_banco(url_base, pagina, mensagem)
             break
 
         pagina += 1
@@ -50,9 +56,12 @@ def processar_paginas(url_base, max_paginas=10, filters=None, max_paginas_sem_pr
 
     if todos_produtos:
         salvar_produtos_no_banco(todos_produtos)
-        print(f"Total de produtos coletados e salvos para {url_base}: {len(todos_produtos)}")
+        mensagem = f"Total de produtos coletados e salvos para {url_base}: {len(todos_produtos)}"
     else:
-        print(f"Nenhum produto foi coletado para a URL {url_base}.")
+        mensagem = f"Nenhum produto foi coletado para a URL {url_base}."
+
+    print(mensagem)
+    salvar_log_no_banco(url_base, pagina, mensagem)
 
 # Processar todas as URLs com seus filtros
 for item in urls_para_processar:

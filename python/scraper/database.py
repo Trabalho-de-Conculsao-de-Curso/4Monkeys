@@ -1,6 +1,6 @@
 import sqlite3
 import logging
-from settings import DB_NAME
+from .settings import DB_NAME
 
 # Configuração do logger
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -68,3 +68,16 @@ def salvar_produtos_no_banco(produtos):
     finally:
         conn.close()
         logging.info("Conexão com o banco de dados encerrada.")
+
+
+import sqlite3
+
+def salvar_log_no_banco(url, pagina, mensagem):
+    conexao = sqlite3.connect("C:/Projetos/4Monkey/database/database.sqlite")
+    cursor = conexao.cursor()
+    cursor.execute(
+        "INSERT INTO logs_scraper (url, pagina, mensagem, created_at) VALUES (?, ?, ?, CURRENT_TIMESTAMP)",
+        (url, pagina, mensagem),
+    )
+    conexao.commit()
+    conexao.close()
