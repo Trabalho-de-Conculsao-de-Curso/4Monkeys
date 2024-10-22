@@ -5,6 +5,7 @@ use App\Http\Controllers\ChartController;
 use App\Http\Controllers\ConjuntoLocalController;
 use App\Http\Controllers\FreeConjuntoController;
 use App\Http\Controllers\LogController;
+use App\Http\Controllers\LogRoboController;
 use App\Http\Controllers\PremiumController;
 use App\Http\Controllers\ProdutoController;
 use App\Http\Controllers\ConjuntoController;
@@ -40,7 +41,7 @@ Route::resource('/produtos', ProdutoController::class)->middleware(AdminAuthenti
 Route::resource('/softwares', SoftwareController::class)->middleware(AdminAuthenticated::class);
 Route::resource('/usuario-premium', PremiumController::class)->middleware(AdminAuthenticated::class);
 
-Route::resource('/create-admin', AdminController::class)->middleware(AdminAuthenticated::class);
+Route::resource('/create-admin', AdminController::class);//->middleware(AdminAuthenticated::class);
 
 Route::get('/dashboard-admin', [AdminDashboardController::class, 'index'])->name('admin.dashboard')->middleware(AdminAuthenticated::class);
 Route::get('/historico-conjuntos', [ConjuntoController::class, 'historicoConjuntos']);
@@ -48,6 +49,7 @@ Route::get('/historico-conjuntos', [ConjuntoController::class, 'historicoConjunt
 Route::get('/login-admin', [AdminController::class, 'showLoginForm'])->name('admin.login');
 Route::post('/login-admin', [AdminController::class, 'login']);
 
+Route::get('/logRobo', [LogRoboController::class, 'index'])->name('auth.admin.logs');
 Route::get('/tables', [LogController::class, 'index'])->name('auth.admin.logs');
 
 Route::get('/logs/export', [LogController::class, 'export'])->name('logs.export');

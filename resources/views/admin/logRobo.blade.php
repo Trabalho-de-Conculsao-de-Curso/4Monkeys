@@ -3,7 +3,7 @@
 @section('content')
            
 <div class="container-fluid px-4">
-    <h1 class="mt-4">Tables</h1>
+    <h1 class="mt-4">Administrar Robô</h1>
     <ol class="breadcrumb mb-4">
         <li class="breadcrumb-item"><a href="{{url('dashboard-admin')}}">Dashboard</a></li>
         <li class="breadcrumb-item active">Tables</li>
@@ -19,31 +19,28 @@
             <table id="datatablesSimple">
                 <thead>
                     <tr>
-                        <th>ID do usuario</th>
-                        <th>Descrição</th>
-                        <th>operação</th>
-                        <th>Data Criação</th>
-                        <th>Data Alteração</th>
+                        <th>URL </th>
+                        <th>Página</th>
+                        <th>Mensagem </th>
+                        <th>Log</th>
                     </tr>
                 </thead>
                 <tfoot>
                     <tr>
-                        <th>ID do usuario</th>
-                        <th>Descrição</th>
-                        <th>operação</th>
-                        <th>Data Criação</th>
-                        <th>Data Alteração</th>
+                        <th>URL </th>
+                        <th>Página</th>
+                        <th>Mensagem </th>
+                        <th>Log</th>
                     </tr>
                 </tfoot>
                 <tbody>
-                    @foreach($custom_log as $custom_logs) 
+                    @foreach($log_scraper as $log_scrapers) 
 
                     <tr>
-                        <td>{{ $custom_logs->admin_id }}</td>
-                        <td>{{ $custom_logs->descricao }}</td>
-                        <td>{{ $custom_logs->operacao }}</td>
-                        <td>{{ $custom_logs->created_at }}</td>
-                        <td>{{ $custom_logs->updated_at }}</td> 
+                        <td><a href="{{ $log_scrapers->url }}" target="_blank">{{ $log_scrapers->url }}</a></td>
+                        <td>{{ $log_scrapers->pagina }}</td>
+                        <td>{{ $log_scrapers->mensagem }}</td>
+                        <td>{{ $log_scrapers->created_at }}</td>
                     </tr>
                     @endforeach
                 </tbody>
