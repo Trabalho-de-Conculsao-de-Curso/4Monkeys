@@ -12,7 +12,7 @@ def executar_verificadores():
 
 if __name__ == "__main__":
     # Agenda a execução a cada 1 minuto
-    schedule.every(1).minutes.do(executar_verificadores)
+    schedule.every(0.08).minutes.do(executar_verificadores)
 
     # Mantém o script rodando indefinidamente
     while True:
