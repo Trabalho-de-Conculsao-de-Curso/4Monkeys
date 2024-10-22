@@ -34,7 +34,7 @@
                             <a class="dropdown-item" href="{{ route('logout') }}"
                                onclick="event.preventDefault();
                                this.closest('form').submit();">
-                                {{ __('CustomLog Out')}}
+                                {{ __('Log Out')}}
                             </a>
                         </form>
                     </li>
