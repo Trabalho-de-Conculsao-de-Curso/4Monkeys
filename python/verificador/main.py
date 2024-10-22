@@ -11,8 +11,8 @@ def executar_verificadores():
     verificador_pato.processar_produtos()
 
 if __name__ == "__main__":
-    # Agenda a execução a cada 30 minutos
-    schedule.every(180).minutes.do(executar_verificadores)
+    # Agenda a execução a cada 1 minuto
+    schedule.every(1).minutes.do(executar_verificadores)
 
     # Mantém o script rodando indefinidamente
     while True:

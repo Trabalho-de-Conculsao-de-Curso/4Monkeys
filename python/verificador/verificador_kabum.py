@@ -1,6 +1,8 @@
 import requests
 from bs4 import BeautifulSoup
 from .verificador_base import VerificadorProdutos
+from scraper.settings import DB_NAME
+from scraper.database import salvar_log_no_banco  # Importa a função de logging
 
 class VerificadorProdutoKabum(VerificadorProdutos):
     def verificar_disponibilidade_produto(self, url):

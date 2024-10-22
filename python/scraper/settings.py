@@ -1,4 +1,5 @@
-DB_NAME = '/home/edudev/Desktop/projetos/Laravel-Sistema/database/database.sqlite'
+DB_NAME = r"C:\Projetos\4Monkey\database\database.sqlite"
+
 
 urls_para_processar = [
     {"url": "https://patoloco.com.br/produtos/placa-de-video", "filters": None},

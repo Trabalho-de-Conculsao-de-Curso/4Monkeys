@@ -2,12 +2,12 @@
     .navbar-custom {
         height: 70px; /* Ajuste conforme necessário */
     }
-    
+
     .sb-topnav.navbar {
         padding: 15px 20px; /* Ajuste conforme necessário */
     }
     </style>
-    
+
     <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark navbar-custom">
         <!-- Navbar Brand-->
         <a class="navbar-brand ps-3" href="{{ url('admin/dashboard')}}">Administrador</a>
@@ -31,10 +31,10 @@
                     <li>
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
-                            <a class="dropdown-item" href="{{ route('logout') }}" 
+                            <a class="dropdown-item" href="{{ route('logout') }}"
                                onclick="event.preventDefault();
                                this.closest('form').submit();">
-                                {{ __('Log Out')}}
+                                {{ __('CustomLog Out')}}
                             </a>
                         </form>
                     </li>
@@ -42,4 +42,3 @@
             </li>
         </ul>
     </nav>
-    
