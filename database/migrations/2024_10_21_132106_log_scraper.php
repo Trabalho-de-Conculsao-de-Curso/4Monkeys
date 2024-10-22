@@ -11,14 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('custom_logs', function (Blueprint $table) {
+        Schema::create('logs_scraper', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('admin_id');
-            $table->longText('descricao');
-            $table->string('operacao');
-            $table-> foreign('admin_id')->references('id')->on('admins');
-            $table->timestamps();
-            //$table->timestamp('created_at')->useCurrent();
+            $table->longText('url');
+            $table->string('pagina');
+            $table->text('mensagem');
+            $table->timestamp('created_at')->useCurrent();
         });
     }
 

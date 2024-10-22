@@ -38,7 +38,7 @@ it('Rota edit responde com 200', function () {
 
 it('Rota store cria um produto, estoque, log e responde com 302', function () {
     // Mock para o CustomLog
-    $this->mock(CustomLog::class, function ($mock) {
+    $this->mock(Log::class, function ($mock) {
         $mock->shouldReceive('create')
             ->once()
             ->with([
@@ -111,7 +111,7 @@ beforeEach(function () {
 
 it('atualiza um produto e cria logs corretamente', function () {
     // Mock para garantir que o log está sendo criado
-    $this->mock(CustomLog::class, function ($mock) {
+    $this->mock(Log::class, function ($mock) {
         $mock->shouldReceive('create')->twice(); // Uma vez para o produto, outra para a loja online
     });
 
@@ -147,7 +147,7 @@ it('atualiza um produto e cria logs corretamente', function () {
 
 it('exclui um produto e cria log de exclusão corretamente', function () {
     // Mock para garantir que o log de exclusão é criado
-    $this->mock(CustomLog::class, function ($mock) {
+    $this->mock(Log::class, function ($mock) {
         $mock->shouldReceive('create')->once()->with([
             'descricao' => "Produto excluído: {$this->produto->nome}",
             'operacao' => 'destroy',

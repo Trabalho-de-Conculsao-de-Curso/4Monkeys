@@ -1,5 +1,8 @@
 import sqlite3
 from abc import ABC, abstractmethod
+from scraper.settings import DB_NAME
+from scraper.database import salvar_log_no_banco  # Importa a função de logging
+
 
 class VerificadorProdutos(ABC):
     def processar_produtos(self):
@@ -21,6 +24,7 @@ class VerificadorProdutos(ABC):
         for produto_banco in produtos_no_banco:
             produto_id, nome_banco, preco_banco, url, disponibilidade_atual = produto_banco
             print(f"Verificando produto com URL: {url}")
+            salvar_log_no_banco(url, 0, f"Verificando produto com URL: {url}")
             dados_produto_pagina = self.coletar_dados_produto_pagina(url)
             disponivel = self.verificar_disponibilidade_produto(url)
 
@@ -28,12 +32,15 @@ class VerificadorProdutos(ABC):
                 print(f"Produto com URL {url} está indisponível. Alterando disponibilidade para 0.")
                 cursor.execute('UPDATE produtos SET disponibilidade = 0 WHERE id = ?', (produto_id,))
                 conn.commit()
+                salvar_log_no_banco(url, produto_id, f"Produto com URL {url} está indisponível.")
+
                 cursor.execute('SELECT id FROM estoque WHERE produto_id = ?', (produto_id,))
                 estoque_item = cursor.fetchone()
                 if estoque_item:
                     print(f"Removendo produto com ID {produto_id} da tabela estoque.")
                     cursor.execute('DELETE FROM estoque WHERE produto_id = ?', (produto_id,))
                     conn.commit()
+                    salvar_log_no_banco(url, produto_id, f"Produto com ID {produto_id} removido do estoque.")
             else:
                 if dados_produto_pagina:
                     nome_atualizado = dados_produto_pagina['nome']
@@ -47,6 +54,7 @@ class VerificadorProdutos(ABC):
                             WHERE id = ?
                         ''', (nome_atualizado, produto_id))
                         conn.commit()
+                        salvar_log_no_banco(url, produto_id, f"Nome atualizado de '{nome_banco}' para '{nome_atualizado}'")
 
                     if preco_atualizado != preco_banco:
                         print(f"Preço diferente encontrado. Atualizando de {preco_banco} para {preco_atualizado}")
@@ -56,11 +64,13 @@ class VerificadorProdutos(ABC):
                             WHERE id = (SELECT loja_online_id FROM produtos WHERE id = ?)
                         ''', (preco_atualizado, produto_id))
                         conn.commit()
+                        salvar_log_no_banco(url, produto_id, f"Preço atualizado de {preco_banco} para {preco_atualizado}")
 
                     if disponibilidade_atual == 0:
                         print(f"Produto com URL {url} está disponível, mas marcado como indisponível no banco.")
                         cursor.execute('UPDATE produtos SET disponibilidade = 1 WHERE id = ?', (produto_id,))
                         conn.commit()
+                        salvar_log_no_banco(url, produto_id, f"Produto com URL {url} marcado como disponível.")
 
                         cursor.execute('SELECT id FROM estoque WHERE produto_id = ?', (produto_id,))
                         estoque_item = cursor.fetchone()
@@ -71,8 +81,10 @@ class VerificadorProdutos(ABC):
                                 VALUES (?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
                             ''', (produto_id,))
                             conn.commit()
+                            salvar_log_no_banco(url, produto_id, f"Produto com ID {produto_id} adicionado de volta ao estoque.")
                 else:
                     print(f"Não foi possível coletar os dados do produto com URL: {url}. Removendo do banco.")
+                    salvar_log_no_banco(url, produto_id, f"Dados do produto não coletados, removendo do banco.")
 
                     # Primeiro, remova o produto do estoque baseado no produto_id
                     cursor.execute('DELETE FROM estoque WHERE produto_id = ?', (produto_id,))
@@ -83,7 +95,6 @@ class VerificadorProdutos(ABC):
 
                     # Commit das alterações no banco
                     conn.commit()
-
 
         conn.close()
 
