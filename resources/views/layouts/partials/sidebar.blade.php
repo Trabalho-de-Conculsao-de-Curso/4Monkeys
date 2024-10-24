@@ -44,6 +44,10 @@
                 <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
                 Tabelas
             </a>
+            <a class="nav-link" href="{{url('logRobo')}}">
+                <div class="sb-nav-link-icon"><i class="fas fa-robot"></i></div>
+                Robô
+            </a>
         </div>
     </div>
     <div class="sb-sidenav-footer">
