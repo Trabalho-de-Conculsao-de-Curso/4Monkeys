@@ -73,7 +73,7 @@ def salvar_produtos_no_banco(produtos):
 import sqlite3
 
 def salvar_log_no_banco(url, pagina, mensagem):
-    conexao = sqlite3.connect("C:/Projetos/4Monkey/database/database.sqlite")
+    conexao = sqlite3.connect(DB_NAME)
     cursor = conexao.cursor()
     cursor.execute(
         "INSERT INTO logs_scraper (url, pagina, mensagem, created_at) VALUES (?, ?, ?, CURRENT_TIMESTAMP)",
