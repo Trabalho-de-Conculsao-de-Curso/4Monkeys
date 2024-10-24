@@ -56,6 +56,4 @@ class LogController extends Controller
 
     exit; 
 }
-
-
 } 

@@ -21,7 +21,7 @@
                     <tr>
                         <th>URL </th>
                         <th>Página</th>
-                        <th>Mensagem </th>
+                        <th>Mensagem</th>
                         <th>Log</th>
                     </tr>
                 </thead>
