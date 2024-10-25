@@ -1,4 +1,4 @@
-DB_NAME = r"C:\Users\vinic\Desktop\ProjetoFaculdade\Laravel-Sistema\database\database.sqlite"
+DB_NAME = '/home/edudev/Desktop/projetos/Laravel-Sistema/database/database.sqlite'
 
 
 urls_para_processar = [

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Categoria;
+use App\Models\Estoque;
 use App\Models\Produto;
 use App\Models\Conjunto;
 use App\Models\Software;
@@ -111,7 +112,7 @@ class ConjuntoController extends Controller
 
     protected function obterTodosProdutos()
     {
-        return Produto::all()->toArray();
+        return Produto::whereHas('estoque')->get()->toArray();
     }
 
     protected function buscarCategoriaPorId($categoryId)
@@ -131,18 +132,36 @@ class ConjuntoController extends Controller
     protected function associarProdutosAoConjunto(Conjunto $conjunto, array $componentes)
     {
         foreach ($componentes as $componentName) {
+            // Encontrar o produto pelo nome do componente usando similaridade
             $productId = $this->geminiAPIService->findProductIdBySimilarity($componentName);
 
             if ($productId) {
+                // Associa o produto ao conjunto
                 $conjunto->produtos()->attach($productId);
                 Log::info("Produto: $componentName associado ao Conjunto.");
+
+                // Recupera o produto e o valor (preço) da loja online associada ao produto
+                $produto = Produto::find($productId);
+                $lojaOnline = $produto->lojaOnline; // Acessa a loja online relacionada ao produto
+
+                // Verifica se a loja online existe e recupera o valor (preço)
+                if ($lojaOnline && $lojaOnline->valor) {
+                    $preco = $lojaOnline->valor;  // Valor obtido da tabela loja_online
+                    // Salva o histórico do produto com o preço congelado da loja online
+                    $this->salvarConjuntoHistorico($productId, $preco);
+                    Log::info("Histórico do produto ID: $productId salvo com o preço: $preco.");
+                } else {
+                    Log::warning("Preço não encontrado para o produto ID: $productId na loja online.");
+                }
             } else {
                 Log::warning("Produto não encontrado Controller: $componentName");
-                return false;
+                return false;  // Se não encontrar um produto, a execução é interrompida
             }
         }
         return true;
     }
+
+
 
     protected function associarSoftwaresAoConjunto(Conjunto $conjunto, array $softwaresSelecionados)
     {
@@ -226,6 +245,21 @@ class ConjuntoController extends Controller
         return response()->json([
             'historico' => $historico,
         ]);
+    }
+
+    protected function salvarConjuntoHistorico($produtoId, $valor)
+    {
+        // Verifica se o produto e o valor são válidos
+        if ($produtoId && $valor) {
+            // Insere um registro na tabela conjunto_historicos
+            DB::table('conjunto_historicos')->insert([
+                'produto_id' => $produtoId,
+                'valor' => $valor,
+                'created_at' => now(),
+            ]);
+        } else {
+            Log::warning("Produto ID ou valor inválido ao salvar no histórico.");
+        }
     }
 
 
