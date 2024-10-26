@@ -178,7 +178,7 @@ class ConjuntoController extends Controller
         // Buscar todos os conjuntos do usuário específico SEM filtrar por nome
         $conjuntos = Conjunto::where('user_id', $userId)
             ->orderBy('created_at', 'asc') // Ordenar por data de criação
-            ->with(['produtos', 'softwares']) // Carregar produtos e softwares relacionados
+            ->with(['produtos.lojaOnline', 'softwares']) // Carregar produtos com suas lojas online e softwares relacionados
             ->get();
 
         // Verificar se há conjuntos retornados
@@ -203,16 +203,24 @@ class ConjuntoController extends Controller
             ];
 
             foreach ($conjuntosPorData as $conjunto) {
+                // Pegar os IDs dos produtos do conjunto atual
+                $produtoIds = $conjunto->produtos->pluck('id');
+
+                // Calcular o total dos valores dos produtos do conjunto na tabela conjunto_historicos
+                $totalConjunto = DB::table('conjunto_historicos')
+                    ->whereIn('produto_id', $produtoIds)  // Somente os produtos relacionados ao conjunto
+                    ->sum('valor'); //
+
                 $historicoPorData['conjuntos'][] = [
                     'id' => $conjunto->id,
                     'nome' => $conjunto->nome,
                     'categoria' => $conjunto->categoria_id,
+                    'total' => $totalConjunto, // Adiciona o total calculado
                     'produtos' => $conjunto->produtos->map(function ($produto) {
                         return [
                             'id' => $produto->id,
                             'nome' => $produto->nome,
-                            'descricao' => $produto->descricao,
-                            // Adicione mais campos de produto aqui, se necessário
+                            'url' => $produto->lojaOnline->urlLoja ?? 'URL não disponível', // Adiciona a URL da loja online
                         ];
                     }),
                     'softwares' => $conjunto->softwares->map(function ($software) {
