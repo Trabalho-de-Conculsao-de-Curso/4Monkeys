@@ -42,7 +42,7 @@ Route::resource('/softwares', SoftwareController::class)->middleware(AdminAuthen
 Route::resource('/usuario-premium', PremiumController::class)->middleware(AdminAuthenticated::class);
 
 
-Route::resource('/create-admin', AdminController::class)->middleware(AdminAuthenticated::class);
+Route::resource('/create-admin', AdminController::class);//->middleware(AdminAuthenticated::class);
 
 
 Route::get('/dashboard-admin', [AdminDashboardController::class, 'index'])->name('admin.dashboard')->middleware(AdminAuthenticated::class);

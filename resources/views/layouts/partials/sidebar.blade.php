@@ -35,7 +35,7 @@
                     <a class="nav-link" href="{{url('usuario-premium')}}">Usuários Premium</a>
                 </nav>
             </div>
-            <div class="sb-sidenav-menu-heading">Addons</div>
+            <div class="sb-sidenav-menu-heading">Logs e Tabelas</div>
             <a class="nav-link" href="{{url('charts')}}">
                 <div class="sb-nav-link-icon"><i class="fas fa-chart-area"></i></div>
                 Gráficos

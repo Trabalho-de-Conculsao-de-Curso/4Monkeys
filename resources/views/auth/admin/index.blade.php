@@ -1,68 +1,88 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <title>Lista de Administradores</title>
-</head>
-<body class="font-sans antialiased dark:bg-black dark:text-white/50">
-<div class="container mx-auto p-4">
-    <h1 class="text-2xl font-bold mb-4 text-center">Lista de Administradores</h1>
+@extends('layouts.admin')
 
-    <div class="mb-4 flex justify-between items-center">
-        <form action="{{ url('/create-admin/search') }}" method="GET" class="flex items-center">
-            <input type="text" name="search" placeholder="Procurar administrador" class="border rounded-l py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
-            <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-r focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">Search</button>
-        </form>
+@section('titulo', 'Administradores')
 
-        <a href="/create-admin/create" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">Cadastrar Novo Admin</a>
+@section('content')
+    <div class="panel-header bg-dark-gradient">
+        <div class="page-inner py-5">
+            <div class="d-flex align-items-left align-items-md-center flex-column flex-md-row">
+                <div>
+                    <h2 class="text-dark pb-2 fw-bold">Administradores</h2>
+                    <h5 class="text-dark op-7 mb-2">Gerenciamento de Administradores</h5>
+                </div>
+            </div>
+        </div>
     </div>
-
-    <div class="overflow-x-auto">
-        <table class="min-w-full border border-solid text-sm">
-            <thead>
-            <tr class="bg-gray-200">
-                <th class="py-2 px-3">ID</th>
-                <th class="py-2 px-3">Nome</th>
-                <th class="py-2 px-3">Email</th>
-                <th class="py-2 px-3">Criado Em</th>
-                <th class="py-2 px-3">Atualizado Em</th>
-                <th class="py-2 px-3">Ações</th>
-            </tr>
-            </thead>
-            <tbody>
-            @foreach($admins as $admin)
-                <tr>
-                    <td class="py-2 px-3">{{ $admin->id }}</td>
-                    <td class="py-2 px-3">{{ $admin->name }}</td>
-                    <td class="py-2 px-3">{{ $admin->email }}</td>
-                    <td class="py-2 px-3">{{ $admin->created_at }}</td>
-                    <td class="py-2 px-3">{{ $admin->updated_at }}</td>
-                    <td class="py-2 px-3">
-                        <div class="border-blue-600 rounded mb-1">
-                            <a href="{{ url("create-admin/$admin->id/edit") }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">Editar</a>
+    <div class="card mb-4">
+    </div>   
+    <div class="page-inner mt--5">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h4 class="card-title">Lista de Administradores</h4>
+                            <div>
+                                
+                                <a href="{{ route('create-admin.create') }}" class="btn btn-primary btn-round ml-3">
+                                    <i class="fa fa-plus"></i> Cadastrar Novo Admin
+                                </a>
+                            </div>
                         </div>
-
-                        <form method="POST" action="{{ url("create-admin/$admin->id") }}">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit"
-                                    class="bg-red-500 hover:bg-red-700 text-white mt-2
-                                        font-bold py-2 px-3.5 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                                    onclick="return confirm('Tem certeza que deseja excluir? {{ $admin->name }} ?')">Excluir</button>
-                        </form>
-                    </td>
-                </tr>
-            @endforeach
-            </tbody>
-        </table>
-    </div>
-
-    <div class="mt-4">
-        {{ $admins->links() }}
-    </div>
-</div>
-</body>
-</html>
+                    </div>               
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table id="datatablesSimple" class="display table table-striped table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Nome</th>
+                                        <th>Email</th>
+                                        <th>Criado Em</th>
+                                        <th>Atualizado Em</th>
+                                        <th class="text-center" style="width: 10%">Ações</th>
+                                    </tr>
+                                </thead>
+                                <tfoot>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Nome</th>
+                                        <th>Email</th>
+                                        <th>Criado Em</th>
+                                        <th>Atualizado Em</th>
+                                        <th class="text-center" style="width: 10%">Ações</th>
+                                    </tr>
+                                </tfoot>
+                                <tbody>
+                                    @foreach($admins as $admin)
+                                        <tr>
+                                            <td>{{ $admin->id }}</td>
+                                            <td>{{ $admin->name }}</td>
+                                            <td>{{ $admin->email }}</td>
+                                            <td>{{ $admin->created_at->format('d/m/Y H:i') }}</td>
+                                            <td>{{ $admin->updated_at->format('d/m/Y H:i') }}</td>
+                                            <td class="text-center">
+                                                <div class="form-button-action">
+                                                    <a href="{{ route('create-admin.edit', $admin->id) }}" class="btn btn-link btn-primary btn-lg" data-toggle="tooltip" data-original-title="Editar">
+                                                        <i class="fa fa-edit"></i>
+                                                    </a>
+                                                    <form action="{{ route('create-admin.destroy', $admin->id) }}" method="POST" class="d-inline">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button class="btn btn-link btn-danger btn-lg" data-toggle="tooltip" data-original-title="Excluir" onclick="return confirm('Tem certeza que deseja excluir {{ $admin->name }}?')">
+                                                            <i class="fa fa-times"></i>
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>       
+@endsection

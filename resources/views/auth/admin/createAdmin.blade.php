@@ -1,49 +1,60 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <title>Cadastro - Laravel</title>
-</head>
-<body class="bg-gray-200 font-sans antialiased dark:bg-black dark:text-white/50">
 
-<div class="container mx-auto p-4">
-    <button class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-xs px-3 py-1.5 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
-        <a href="/create-admin">Home</a>
-    </button>
+@extends('layouts.admin')
 
-    <form method="POST" action="/create-admin" class="max-w-lg mx-auto bg-white p-6 rounded-lg shadow-md">
-        @csrf
-        <h1 class="text-xl font-bold mb-4 text-center">Cadastro de Administrador</h1>
+@section('titulo', 'Softwares')
 
-        <div class="mb-4">
-            <label for="name" class="block text-sm font-medium text-gray-700">Nome</label>
-            <input type="text" id="name" name="name" required class="border-2 form-input mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
+@section('content')
+
+<div class="panel-header bg-dark-gradient">
+    <div class="page-inner py-5">
+        <div class="d-flex align-items-left align-items-md-center flex-column flex-md-row">
+            <div>
+                <h2 class="text-dark pb-2 fw-bold">Administradores</h2>
+                <h5 class="text-dark op-7 mb-2">Gerenciamento de Admnistradores</h5>
+            </div>
         </div>
-
-        <div class="mb-4">
-            <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
-            <input type="email" id="email" name="email" required class="border-2 form-input mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
-        </div>
-
-        <div class="mb-4">
-            <label for="password" class="block text-sm font-medium text-gray-700">Senha</label>
-            <input type="password" id="password" name="password" required class="border-2 form-input mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
-        </div>
-
-        <div class="mb-4">
-            <label for="password_confirmation" class="block text-sm font-medium text-gray-700">Confirme a Senha</label>
-            <input type="password" id="password_confirmation" name="password_confirmation" required class="border-2 form-input mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
-        </div>
-
-        <div class="flex justify-center">
-            <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
-                Registrar
-            </button>
-        </div>
-    </form>
+    </div>
 </div>
+<div class="card mb-4">
+</div>  
+        <div class="page-inner mt--5">
+            <div class="row">
+                <div class="col-md-5">
+                    <div class="card">
+                        <div class="d-flex align-items-center">
+                            <h4 class="card-title">Criar Conta de Administrador</h4>
+                        </div>
+                        <form method="POST" action="/create-admin" class="user">
+                            @csrf
+                            <div class="form-group">
+                                <input type="text" class="form-control form-control-user" id="name" name="name" required placeholder="Nome">
+                            </div>
+                            <hr>
+                            <div class="form-group">
+                                <input type="email" class="form-control form-control-user" id="email" name="email" required placeholder="Email">
+                            </div>
+                            <hr>
+                            <div class="form-group">
+                                <input type="password" class="form-control form-control-user" id="password" name="password" required placeholder="Senha">
+                            </div>
+                            <hr>
+                            <div class="form-group">
+                                <input type="password" class="form-control form-control-user" id="password_confirmation" name="password_confirmation" required placeholder="Confirme a Senha">
+                            </div>
+                            <hr>
+                            <div class="text-center">
+                                <button type="submit" class="btn btn-primary btn-user btn-block">
+                                    Registrar
+                                </button>
+                            </div>                            
+                            <hr>
+                        </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endsection
 
-</body>
-</html>
+
