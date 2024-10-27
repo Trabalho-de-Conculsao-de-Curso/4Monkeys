@@ -8,23 +8,22 @@
     <!-- Topbar Search -->
     <div
         class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
+        <i class="fa-sharp fa-regular fa-monkey"></i>
         <div class="input-group">
-            <h3>4 Monkeys Setups</h3>
+            <img src="{{ asset('img/logo4.svg') }}" alt="Logo" class="logo-size">
         </div>
-        
     </div>
-    
-
+    <i class="fa-sharp fa-regular fa-monkey"></i>
     <!-- Topbar Navbar -->
     <ul class="navbar-nav ml-auto">
 
-        <!-- Nav Item - Search Dropdown (Visible Only XS) -->
+        
         <li class="nav-item dropdown no-arrow d-sm-none">
             <a class="nav-link dropdown-toggle" href="#" id="searchDropdown" role="button"
                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 <i class="fas fa-search fa-fw"></i>
             </a>
-            <!-- Dropdown - Messages -->
+            
             <div class="dropdown-menu dropdown-menu-right p-3 shadow animated--grow-in"
                 aria-labelledby="searchDropdown">
                 <form class="form-inline mr-auto w-100 navbar-search">
@@ -42,15 +41,15 @@
             </div>
         </li>
 
-        <!-- Nav Item - Alerts -->
+       
         <li class="nav-item dropdown no-arrow mx-1">
             <a class="nav-link dropdown-toggle" href="#" id="alertsDropdown" role="button"
                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 <i class="fas fa-bell fa-fw"></i>
-                <!-- Counter - Alerts -->
+                
                 <span class="badge badge-danger badge-counter">3+</span>
             </a>
-            <!-- Dropdown - Alerts -->
+           
             <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in"
                 aria-labelledby="alertsDropdown">
                 <h6 class="dropdown-header">
@@ -161,33 +160,32 @@
 
         <div class="topbar-divider d-none d-sm-block"></div>
 
-        <!-- Nav Item - User Information -->
+       
         <li class="nav-item dropdown no-arrow">
             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <span class="mr-2 d-none d-lg-inline text-gray-600 small">Douglas McGee</span>
+                <span class="mr-2 d-none d-lg-inline text-gray-600 small"><div>{{ Auth::user()->name }}</div></span>
                 <img class="img-profile rounded-circle"
                     src="img/undraw_profile.svg">
             </a>
-            <!-- Dropdown - User Information -->
+            
             <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
                 aria-labelledby="userDropdown">
-                <a class="dropdown-item" href="#">
+                <a class="dropdown-item" href="{{ url('profile')}}">
                     <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
                     Profile
-                </a>
-                <a class="dropdown-item" href="#">
-                    <i class="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i>
-                    Settings
-                </a>
-                <a class="dropdown-item" href="#">
-                    <i class="fas fa-list fa-sm fa-fw mr-2 text-gray-400"></i>
-                    Activity Log
                 </a>
                 <div class="dropdown-divider"></div>
                 <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
                     <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
-                    Logout
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <a class="dropdown-item" href="{{ route('logout') }}"
+                        onclick="event.preventDefault();
+                        this.closest('form').submit();">
+                            {{ __('Sair')}}
+                        </a>
+                    </form>
                 </a>
             </div>
         </li>

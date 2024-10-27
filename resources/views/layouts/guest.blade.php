@@ -14,18 +14,25 @@
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="font-sans text-gray-100 antialiased">
-        <div class="min-h-screen flex items-end justify-end bg-gradient-to-r from-purple-500 to-purple-900  dark:bg-gray-900">
-            <div class="w-full sm:max-w-md bg-zinc-900 dark:bg-gray-800 shadow-md overflow-hidden  flex flex-col min-h-screen">
-                <div class="flex-none p-4">
+    <body class="font-sans text-gray-800 antialiased">
+        <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-500  to-purple-900 dark:bg-gray-900">
+            <div class="w-full sm:max-w-md bg-white dark:bg-gray-800 shadow-md overflow-hidden rounded-lg">
+                <!-- Logo do login -->
+                
+    
+                <!-- Logo adicional com o link (opcional) -->
+                <div class="flex justify-center p-4">
                     <a href="/">
                         <x-application-logo class="w-20 h-20 fill-current text-gray-100 dark:text-gray-200" />
                     </a>
                 </div>
-                <div class="flex-grow p-6">
+    
+                <!-- Conteúdo de login -->
+                <div class="p-6">
                     {{ $slot }}
                 </div>
             </div>
         </div>
     </body>
+    
 </html>

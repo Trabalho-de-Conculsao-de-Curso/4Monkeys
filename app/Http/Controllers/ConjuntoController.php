@@ -78,18 +78,14 @@ class ConjuntoController extends Controller
                         $produtoNaoEncontrado = true;
                         break;
                     }
-
                     $this->associarSoftwaresAoConjunto($conjunto, $softwaresSelecionados);
-
 
                 }
                 $conjuntos = $recommendations;
 
-
-
                 if (!$produtoNaoEncontrado) {
                     DB::commit();
-                    return response()->json(['conjuntos' => $conjuntos]);
+                    return view('conjuntos', compact('conjuntos'));
                 } else {
                     DB::rollBack();
                 }
