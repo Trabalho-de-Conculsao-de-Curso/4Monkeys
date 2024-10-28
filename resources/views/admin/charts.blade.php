@@ -89,7 +89,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     tooltip: {
                         callbacks: {
                             label: function(tooltipItem) {
-                                return `Total de Softwares: ${tooltipItem.raw}`; // Exibe o total no tooltip
+                                return `Total de Softwares: ${tooltipItem.raw}`; 
                             }
                         }
                     }

@@ -1,10 +1,10 @@
 <section class="space-y-6 ">
     <header>
-        <h2 class="text-lg font-medium text-zinc-200">
+        <h2 class="text-lg font-medium text-gray-800">
             {{ __('Delete Account') }}
         </h2>
 
-        <p class="mt-1 text-sm text-zinc-200">
+        <p class="mt-1 text-sm text-gray-800">
             {{ __('Uma vez que sua conta seja excluída, todos os seus recursos e dados serão permanentemente excluídos. Antes de excluir sua conta, por favor, baixe qualquer dado ou informação que você deseje manter.') }}
         </p>
     </header>

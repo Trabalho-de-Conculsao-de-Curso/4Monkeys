@@ -1,10 +1,10 @@
 <section>
     <header>
-        <h2 class="text-lg font-medium text-zinc-200">
+        <h2 class="text-lg font-medium text-zinc-800">
             {{ __('Update Password') }}
         </h2>
 
-        <p class="mt-1 text-sm text-zinc-200">
+        <p class="mt-1 text-sm text-zinc-800">
             {{ __('Garanta que sua conta esteja usando uma senha longa e aleatória para se manter segura.') }}
         </p>
     </header>

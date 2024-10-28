@@ -270,7 +270,7 @@ class SoftwareController extends Controller
             // Log da exclusão
             $this->custom_log->create([
                 'descricao' => 'Software excluído: ' . $softwareName,
-                'operacao' => 'destroy',
+                'operacao' => 'Deletar',
                 'admin_id' => auth()->guard('admin')->id(),
             ]);
 
@@ -283,25 +283,28 @@ class SoftwareController extends Controller
 
     private function logChanges($oldData, $newData, $operacao, $softwareId = null)
     {
-        $changes = [];
+        $logs = [];
+
+        // Remover campos indesejados dos dados
+        unset($oldData['updated_at'], $newData['updated_at']);
 
         foreach ($newData as $key => $value) {
             if (array_key_exists($key, $oldData) && $oldData[$key] != $value) {
-                $changes[$key] = [
-                    'old' => $oldData[$key],
-                    'new' => $value,
-                ];
+                // Monta a string no formato: "campo: De: X, Para: Y"
+                $logs[] = "$key: De: {$oldData[$key]}, Para: $value";
             }
         }
 
-        unset($changes['updated_at']);
+        if (!empty($logs)) {
+            // Concatena os logs em uma única string
+            $descricao = implode("; ", $logs);
 
-        if (!empty($changes)) {
+            // Grava o log no banco de dados
             $this->custom_log->create([
-                'descricao' => json_encode($changes),
-                'operacao' => $operacao,
-                'admin_id' => auth()->guard('admin')->id(),
-                'software_id' => $softwareId
+                'descricao'   => $descricao,
+                'operacao'    => $operacao,
+                'admin_id'    => auth()->guard('admin')->id(),
+                'software_id' => $softwareId,
             ]);
         }
     }

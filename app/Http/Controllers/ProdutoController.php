@@ -195,19 +195,29 @@ class ProdutoController extends Controller
 
     private function logChanges($oldValues, $newValues, $operation, $id, $entity = 'produto')
     {
-        $changes = [];
+        $logs = [];
 
+        // Itera sobre os novos valores para detectar mudanças
         foreach ($newValues as $key => $newValue) {
-            if ($key !== 'updated_at' && array_key_exists($key, $oldValues) && $oldValues[$key] != $newValue) {
-                $changes[$key] = ['old' => $oldValues[$key], 'new' => $newValue];
+            if (
+                $key !== 'updated_at' && // Ignora a coluna updated_at
+                array_key_exists($key, $oldValues) &&
+                $oldValues[$key] != $newValue
+            ) {
+                // Formata a mudança no estilo desejado
+                $logs[] = "$key: De: {$oldValues[$key]}, Para: $newValue";
             }
         }
 
-        if (!empty($changes)) {
+        if (!empty($logs)) {
+            // Junta todas as mudanças em uma string separada por "; "
+            $descricao = implode("; ", $logs);
+
+            // Grava o log formatado no banco de dados
             $this->custom_log->create([
-                'descricao' => json_encode(['id' => $id, 'entity' => $entity, 'changes' => $changes]),
-                'operacao' => $operation,
-                'admin_id' => auth()->guard('admin')->id(),
+                'descricao'  => "ID: $id, Entidade: $entity, Mudanças: $descricao",
+                'operacao'   => $operation,
+                'admin_id'   => auth()->guard('admin')->id(),
             ]);
         }
     }
