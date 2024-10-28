@@ -30,33 +30,30 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::post('/selecionar', [ConjuntoController::class, 'selecionar'])->name('home.selecionar');
-    Route::get('/selecionar', [ConjuntoController::class, 'selecionar'])->name('home.selecionar');
 });
 
+
 Route::post('/selecionar-free', [FreeConjuntoController::class, 'selecionar'])->name('free.selecionar');
-
-
 Route::post('/conjunto-produtos', [ConjuntoLocalController::class, 'getConjuntoProdutos'])->name('conjunto.produtos');
+Route::get('/historico-conjuntos', [ConjuntoController::class, 'historicoConjuntos']);
 
 Route::resource('/produtos', ProdutoController::class)->middleware(AdminAuthenticated::class);
 Route::resource('/softwares', SoftwareController::class)->middleware(AdminAuthenticated::class);
 Route::resource('/usuario-premium', PremiumController::class)->middleware(AdminAuthenticated::class);
 
-
-Route::resource('/create-admin', AdminController::class);//->middleware(AdminAuthenticated::class);
-
-
-Route::get('/dashboard-admin', [AdminDashboardController::class, 'index'])->name('admin.dashboard')->middleware(AdminAuthenticated::class);
-Route::get('/historico-conjuntos', [ConjuntoController::class, 'historicoConjuntos']);
-
 Route::get('/login-admin', [AdminController::class, 'showLoginForm'])->name('admin.login');
 Route::post('/login-admin', [AdminController::class, 'login']);
+Route::resource('/create-admin', AdminController::class)->middleware(AdminAuthenticated::class);
+Route::post('/admin/logout', function () {
+    auth()->guard('admin')->logout();  // Faz o logout usando o guard 'admin'
+    return redirect('/');  // Redireciona para a página de login do admin (ou outra rota que você definir)
+})->name('admin.logout');
+
+Route::get('/dashboard-admin', [AdminDashboardController::class, 'index'])->name('admin.dashboard')->middleware(AdminAuthenticated::class);
 
 Route::get('/logRobo', [LogRoboController::class, 'index'])->name('auth.admin.logs');
 Route::get('/tables', [LogController::class, 'index'])->name('auth.admin.logs');
-
 Route::get('/logs/export', [LogController::class, 'export'])->name('logs.export');
-
 Route::get('/charts', function () {
     return view('admin.charts');
 })->name('admin.charts');
