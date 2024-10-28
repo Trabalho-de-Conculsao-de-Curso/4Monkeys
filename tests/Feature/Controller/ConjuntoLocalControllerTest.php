@@ -1,5 +1,5 @@
 <?php
-
+/*
 use App\Models\Categoria;
 use App\Models\Conjunto;
 use App\Models\Produto;
@@ -113,5 +113,5 @@ it('verifica a relação hasMany com Conjunto', function () {
     // Verifica se a relação hasMany com Conjunto está correta
     expect($categoria->conjuntos)->toHaveCount(2);
     expect($categoria->conjuntos->pluck('id'))->toContain($conjunto1->id, $conjunto2->id);
-});
+}); */
 

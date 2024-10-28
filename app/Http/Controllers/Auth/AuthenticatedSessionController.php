@@ -44,10 +44,13 @@ class AuthenticatedSessionController extends Controller
     {
         Auth::guard('web')->logout();
 
+        // Invalida a sessão inteira (não apenas o user_id)
         $request->session()->invalidate();
 
+        // Regenera o token CSRF para segurança
         $request->session()->regenerateToken();
 
+        // Redireciona para a página inicial
         return redirect('/');
     }
 }

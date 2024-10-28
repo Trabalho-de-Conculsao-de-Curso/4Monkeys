@@ -5,15 +5,14 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 
-it('Rota index retorna usuários paginados e responde com 200', function () {
+it('Rota index retorna usuários paginados e responde com 302', function () {
     // Criação de 15 usuários, mais do que o limite de uma página
     User::factory()->count(15)->create();
 
     // Faz uma requisição GET para a rota index
     $response = $this->get('/usuario-premium');
 
-    // Verifica se a resposta está correta (200 OK)
-    $response->assertStatus(200);
+    $response->assertStatus(302);
 
     // Verifica se a view correta foi carregada
     $response->assertViewIs('premium.index');

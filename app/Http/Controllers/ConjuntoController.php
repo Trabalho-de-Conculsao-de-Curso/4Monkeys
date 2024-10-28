@@ -105,22 +105,22 @@ class ConjuntoController extends Controller
     }
 
 
-    protected function obterSoftwaresSelecionados(Request $request)
+    public function obterSoftwaresSelecionados(Request $request)
     {
         return Software::find($request->input('softwares'))->toArray();
     }
 
-    protected function obterTodosProdutos()
+    public function obterTodosProdutos()
     {
         return Produto::whereHas('estoque')->get()->toArray();
     }
 
-    protected function buscarCategoriaPorId($categoryId)
+    public function buscarCategoriaPorId($categoryId)
     {
         return Categoria::find($categoryId);
     }
 
-    protected function criarConjunto(Categoria $categoria, $user)
+    public function criarConjunto(Categoria $categoria, $user)
     {
         return $user->conjuntos()->create([
             'nome' => 'Conjunto ' . ucfirst($categoria->nome),
@@ -147,8 +147,8 @@ class ConjuntoController extends Controller
                 // Verifica se a loja online existe e recupera o valor (preço)
                 if ($lojaOnline && $lojaOnline->valor) {
                     $preco = $lojaOnline->valor;  // Valor obtido da tabela loja_online
-                    // Salva o histórico do produto com o preço congelado da loja online
-                    $this->salvarConjuntoHistorico($productId, $preco);
+                    // Salva o histórico do produto com o preço congelado da loja online, incluindo o conjunto_id
+                    $this->salvarConjuntoHistorico($productId, $preco, $conjunto->id); // Passa o conjunto_id
                     Log::info("Histórico do produto ID: $productId salvo com o preço: $preco.");
                 } else {
                     Log::warning("Preço não encontrado para o produto ID: $productId na loja online.");
@@ -160,7 +160,6 @@ class ConjuntoController extends Controller
         }
         return true;
     }
-
 
 
     protected function associarSoftwaresAoConjunto(Conjunto $conjunto, array $softwaresSelecionados)
@@ -206,11 +205,13 @@ class ConjuntoController extends Controller
                 // Pegar os IDs dos produtos do conjunto atual
                 $produtoIds = $conjunto->produtos->pluck('id');
 
-                // Calcular o total dos valores dos produtos do conjunto na tabela conjunto_historicos
+                // Calcular o total dos valores mais recentes dos produtos no conjunto específico (com base no conjunto_id)
                 $totalConjunto = DB::table('conjunto_historicos')
-                    ->whereIn('produto_id', $produtoIds)  // Somente os produtos relacionados ao conjunto
-                    ->sum('valor'); //
+                    ->where('conjunto_id', $conjunto->id) // Filtrar pelo conjunto atual
+                    ->whereIn('produto_id', $produtoIds) // Somente os produtos relacionados ao conjunto
+                    ->sum('valor'); // Somar os valores
 
+                // Adicionar o conjunto ao histórico por data
                 $historicoPorData['conjuntos'][] = [
                     'id' => $conjunto->id,
                     'nome' => $conjunto->nome,
@@ -255,18 +256,19 @@ class ConjuntoController extends Controller
         ]);
     }
 
-    protected function salvarConjuntoHistorico($produtoId, $valor)
+    protected function salvarConjuntoHistorico($produtoId, $valor, $conjuntoId)
     {
-        // Verifica se o produto e o valor são válidos
-        if ($produtoId && $valor) {
+        // Verifica se o produto, o valor e o conjunto_id são válidos
+        if ($produtoId && $valor && $conjuntoId) {
             // Insere um registro na tabela conjunto_historicos
             DB::table('conjunto_historicos')->insert([
                 'produto_id' => $produtoId,
+                'conjunto_id' => $conjuntoId,  // Adiciona o conjunto_id
                 'valor' => $valor,
                 'created_at' => now(),
             ]);
         } else {
-            Log::warning("Produto ID ou valor inválido ao salvar no histórico.");
+            Log::warning("Produto ID, valor ou conjunto ID inválidos ao salvar no histórico.");
         }
     }
 

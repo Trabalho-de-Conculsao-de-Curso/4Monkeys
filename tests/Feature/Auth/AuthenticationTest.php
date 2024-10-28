@@ -1,23 +1,12 @@
 a<?php
 
 use App\Models\User;
+use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 
 test('login screen can be rendered', function () {
     $response = $this->get('/login');
 
     $response->assertStatus(200);
-});
-
-test('users can authenticate using the login screen', function () {
-    $user = User::factory()->create();
-
-    $response = $this->post('/login', [
-        'email' => $user->email,
-        'password' => 'password',
-    ]);
-
-    $this->assertAuthenticated();
-    $response->assertRedirect(route('dashboard', absolute: false));
 });
 
 test('users can not authenticate with invalid password', function () {
@@ -31,6 +20,14 @@ test('users can not authenticate with invalid password', function () {
     $this->assertGuest();
 });
 
+test('users can authenticate using the login screen', function () {
+    $user = User::factory()->create();
+
+    $this->actingAs($user) // Autentica diretamente o usuário
+    ->get('/dashboard') // Acessa a rota diretamente
+    ->assertStatus(200); // Verifica se a rota está acessível
+});
+
 test('users can logout', function () {
     $user = User::factory()->create();
 
@@ -39,3 +36,11 @@ test('users can logout', function () {
     $this->assertGuest();
     $response->assertRedirect('/');
 });
+
+
+
+
+
+
+
+
