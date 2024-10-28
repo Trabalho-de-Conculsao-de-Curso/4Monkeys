@@ -11,16 +11,12 @@ class Produto extends Model
 
     protected $fillable = [
         'nome',
-        'preco_id',
         'loja_online_id',
+        'disponibilidade',
         'created_at',
         'updated_at',
     ];
 
-
-    public function preco(){
-        return $this->belongsTo(Preco::class);
-    }
 
     public function lojaOnline(){
         return $this->belongsTo(LojaOnline::class);
@@ -34,5 +30,10 @@ class Produto extends Model
     public static function search($term)
     {
         return self::where('nome', 'like', '%' . $term . '%');
+    }
+
+    public function estoque()
+    {
+        return $this->hasOne(Estoque::class);
     }
 }

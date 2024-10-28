@@ -1,11 +1,10 @@
-<section>
-    <header>
-        <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">
-            {{ __('Profile Information') }}
+<header>
+        <h2 class="text-lg font-medium text-zinc-800">
+            {{ __('Informações do Perfil') }}
         </h2>
 
-        <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
-            {{ __("Update your account's profile information and email address.") }}
+        <p class="mt-1 text-sm text-zinc-500">
+            {{ __("Atualize as informações do perfil e o endereço de e-mail da sua conta.") }}
         </p>
     </header>
 
@@ -48,7 +47,7 @@
         </div>
 
         <div class="flex items-center gap-4">
-            <x-primary-button>{{ __('Save') }}</x-primary-button>
+            <x-primary-button>{{ __('Salvar') }}</x-primary-button>
 
             @if (session('status') === 'profile-updated')
                 <p
@@ -61,4 +60,4 @@
             @endif
         </div>
     </form>
-</section>
+

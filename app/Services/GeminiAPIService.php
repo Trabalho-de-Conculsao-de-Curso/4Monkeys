@@ -2,10 +2,7 @@
 namespace App\Services;
 
 use App\Models\LojaOnline;
-use App\Models\Preco;
 use App\Models\Produto;
-use Gemini\Laravel\Facades\Gemini;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 
@@ -23,24 +20,32 @@ class GeminiAPIService
 
     public function getRecommendations(array $softwares, array $produtos)
     {
-
+        // Gere o prompt com base nos softwares e produtos fornecidos
         $prompt = $this->generatePrompt($softwares, $produtos);
 
-        $response = Http::withHeaders([
-            'Authorization' => 'Bearer ' . $this->apiKey,
-            'Content-Type' => 'application/json'
-        ])->post($this->apiUrl, [
-            'prompt' => $prompt,
-            'model' =>'text-davinci-003'
-        ]);
-        if ($response=Gemini::geminiPro()->generateContent([$prompt])) {
-            $recommendations = $this->parseResponse($response);
-            return $this->calculateTotals($recommendations['desktops']);
-        } else {
-            Log::error('Erro ao chamar a API do Gemini: ');
-            throw new \Exception('Erro ao chamar a API do Gemini');
+        try {
+            // Instancia o cliente Gemini com a chave da API
+            $client = \Gemini::client($this->apiKey);
+
+            // Faz a chamada à API usando o SDK do Gemini
+            $response = $client->geminiPro()->generateContent($prompt);
+
+            // Verifica se a resposta contém candidatos válidos
+            if ($response) {
+                // Parseia a resposta da API
+                $recommendations = $this->parseResponse($response);
+                // Calcula e retorna os totais com base nas recomendações
+                return $this->calculateTotals($recommendations['desktops']);
+            } else {
+                Log::error('Resposta inesperada da API do Gemini: ' . json_encode($response));
+                throw new \Exception('Resposta inesperada da API do Gemini');
+            }
+        } catch (\Exception $e) {
+            Log::error('Erro na comunicação com a API do Gemini: ' . $e->getMessage());
+            throw new \Exception('Erro ao tentar obter recomendações do Gemini: ' . $e->getMessage());
         }
     }
+
 
     protected function generatePrompt(array $softwares, array $produtos)
     {
@@ -48,26 +53,28 @@ class GeminiAPIService
         $prompt = "Avalie os softwares selecionados e utilize como base para montar três desktops categorizados como bronze, silver e gold.\n\n";
         $prompt .= "Monte os desktops de forma que atendam aos requisitos mínimos dos softwares escolhidos, focando na custo-efetividade dos componentes utilizados.\n";
         $prompt .= "Crie um arquivo JSON mostrando todos os produtos necessários para que cada desktop atenda os requisitos das categorias de acordo com os produtos cadastrados no banco de dados.\n\n";
-        $prompt .= "Certifique-se de que todos os componentes são compatíveis entre si e que cada desktop inclui os seguintes componentes essenciais: CPU, GPU, RAM, HD ou SSD, Fonte, MOTHERBOARD e Cooler.\n\n";
+        $prompt .= "Certifique-se de que todos os componentes são compatíveis entre si e que cada desktop inclui os seguintes componentes essenciais: CPU, GPU, RAM, HD, Fonte, placa_mae e Cooler.\n\n";
         $prompt .= "Retorne os dados estruturados no seguinte formato JSON, mantendo apenas os nomes dos componentes e removendo qualquer informação adicional:\n\n";
-        $prompt .= "{ \"desktops\": [ { \"categoria\": \"1\", \"componentes\": { \"CPU\": \"Nome do Produto\", \"GPU\": \"Nome do Produto\", \"RAM\": \"Nome do Produto\", \"Fonte\": \"Nome do Produto\", \"MOTHERBOARD\": \"Nome do Produto\", \"Cooler\": \"Nome do Produto\", \"HD\": \"Nome do Produto\" }, \"total\": VALOR_DA_SOMA_TOTAL_DOS_ITENS_SELECIONADOS }, { \"categoria\": \"2\", \"componentes\": { \"CPU\": \"Nome do Produto\", \"GPU\": \"Nome do Produto\", \"RAM\": \"Nome do Produto\", \"Fonte\": \"Nome do Produto\", \"MOTHERBOARD\": \"Nome do Produto\", \"Cooler\": \"Nome do Produto\", \"HD\": \"Nome do Produto\" }, \"total\": VALOR_DA_SOMA_TOTAL_DOS_ITENS SELECIONADOS }, { \"categoria\": \"3\", \"componentes\": { \"CPU\": \"Nome do Produto\", \"GPU\": \"Nome do Produto\", \"RAM\": \"Nome do Produto\", \"Fonte\": \"Nome do Produto\", \"MOTHERBOARD\": \"Nome do Produto\", \"Cooler\": \"Nome do Produto\", \"HD\": \"Nome do Produto\" }, \"total\": VALOR_DA_SOMA TOTAL_DOS ITENS SELECIONADOS } ] }\n\n";
+        $prompt .= "{ \"desktops\": [ { \"categoria\": \"1\", \"componentes\": { \"CPU\": \"Nome do Produto\", \"GPU\": \"Nome do Produto\", \"RAM\": \"Nome do Produto\", \"Fonte\": \"Nome do Produto\", \"placa_mae\": \"Nome do Produto\", \"Cooler\": \"Nome do Produto\", \"HD\": \"Nome do Produto\" }, \"total\": VALOR_DA_SOMA_TOTAL_DOS_ITENS_SELECIONADOS }, { \"categoria\": \"2\", \"componentes\": { \"CPU\": \"Nome do Produto\", \"GPU\": \"Nome do Produto\", \"RAM\": \"Nome do Produto\", \"Fonte\": \"Nome do Produto\", \"placa_mae\": \"Nome do Produto\", \"Cooler\": \"Nome do Produto\", \"HD\": \"Nome do Produto\" }, \"total\": VALOR_DA_SOMA_TOTAL_DOS_ITENS SELECIONADOS }, { \"categoria\": \"3\", \"componentes\": { \"CPU\": \"Nome do Produto\", \"GPU\": \"Nome do Produto\", \"RAM\": \"Nome do Produto\", \"Fonte\": \"Nome do Produto\", \"placa_mae\": \"Nome do Produto\", \"Cooler\": \"Nome do Produto\", \"HD\": \"Nome do Produto\" }, \"total\": VALOR_DA_SOMA TOTAL_DOS ITENS SELECIONADOS } ] }\n\n";
         $prompt .= "Garanta a integridade e consistência de todas as informações.\n\n";
         $prompt .= "Softwares selecionados e seus requisitos:\n";
 
         foreach ($softwares as $software) {
             $prompt .= "- Nome: {$software['nome']}\n";
         }
-        $prompt .= "Utilize APENAS os seguintes produtos disponíveis\n";
-        $prompt .= "\nProdutos Disponíveis:\n";
+        $prompt .= "\nUtilize APENAS os seguintes produtos disponíveis:\n";
         foreach ($produtos as $produto) {
-            $preco = Preco::find($produto['preco_id'])->valor ?? 'N/A';
-            $url = LojaOnline::find($produto['loja_online_id'])->url ?? 'URL não disponível';
+
+            $lojaOnline = LojaOnline::find($produto['loja_online_id']);
+            $preco = $lojaOnline->valor ?? 'N/A';
+            $moeda = $lojaOnline->moeda ?? 'BRL';
+            $url = $lojaOnline->urlLoja ?? 'URL não disponível';
 
             if ($preco !== 'N/A') {
-                $prompt .= "- Nome: {$produto['nome']}, Preço: R$ {$preco}, URL: {$url}\n";
+                $prompt .= "- Nome: {$produto['nome']}, Preço: {$moeda} {$preco}, URL: {$url}\n";
             } else {
                 Log::warning("Preço não encontrado para o produto ID: {$produto['id']}");
-                $prompt .= "- Nome: {$produto['nome']}, Preço: N/A\n";
+                $prompt .= "- Nome: {$produto['nome']}, Preço: N/A, URL: {$url}\n";
             }
             $prompt .= "\nGaranta que seja passado exatamente o mesmo nome do array\n";
             $prompt .= "- Nome: {$produto['nome']}, Preço: R$ {$preco}\n";
@@ -75,6 +82,7 @@ class GeminiAPIService
 
 
         $prompt .= "\nDicas adicionais:\n";
+        $prompt .= "- Sempre serão 7 componentes, CPU,GPU,RAM,Fonte,placa_mae,Cooler,HD.\n";
         $prompt .= "- Priorize componentes com melhor relação custo-efetividade.\n";
         $prompt .= "- Para a categoria 1, escolha componentes que atendam aos requisitos mínimos dos softwares com o menor custo.\n";
         $prompt .= "- Para a categoria 2, escolha componentes que ofereçam um bom equilíbrio entre desempenho e custo.\n";
@@ -148,21 +156,27 @@ class GeminiAPIService
             'gold' => 0,
         ];
 
-
         foreach ($desktops as &$desktop) {
             $category = $desktop['categoria'];
             $components = $desktop['componentes'];
             $total = 0;
 
             foreach ($components as $componentName) {
-
+                // Encontrar o ID do produto baseado no nome ou similaridade
                 $productId = $this->findProductIdBySimilarity($componentName);
 
                 if ($productId) {
+                    // Encontrar o produto e o preço associado na tabela loja_online
                     $produto = Produto::find($productId);
-                    $price = $produto->preco->valor;
-                    Log::info("Produto: {$produto->nome}, Preço: $price");
-                    $total += $price;
+                    if ($produto) {
+                        $lojaOnline = LojaOnline::find($produto->loja_online_id);
+                        $price = $lojaOnline->valor ?? 0;  // Use o valor da tabela loja_online
+
+                        Log::info("Produto: {$produto->nome}, Preço: {$lojaOnline->moeda} $price");
+                        $total += $price;
+                    } else {
+                        Log::warning("Produto com ID $productId não encontrado na tabela produtos.");
+                    }
                 } else {
                     Log::warning("Produto não encontrado: $componentName");
                 }

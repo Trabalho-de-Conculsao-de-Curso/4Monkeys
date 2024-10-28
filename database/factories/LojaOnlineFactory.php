@@ -20,8 +20,9 @@ class LojaOnlineFactory extends Factory
     {
 
         return [
-            'nome' => $this->faker->word,
             'urlLoja' => $this->faker->randomElement(['ZZZ', 'XXXX', 'YYYY']),
+            'valor'=> $this->faker->randomFloat(2, 10, 100),
+            'moeda'=> $this->faker->randomElement(['BRL', 'USD']),
         ];
     }
 }

@@ -19,6 +19,11 @@ class AuthenticatedSessionController extends Controller
         return view('auth.user.login');
     }
 
+    public function createAdmin(): View
+    {
+        return view('auth.admin.adminLogin');
+    }
+
     /**
      * Handle an incoming authentication request.
      */
@@ -31,6 +36,7 @@ class AuthenticatedSessionController extends Controller
         return redirect()->intended(route('dashboard', absolute: false));
     }
 
+
     /**
      * Destroy an authenticated session.
      */
@@ -38,10 +44,13 @@ class AuthenticatedSessionController extends Controller
     {
         Auth::guard('web')->logout();
 
+        // Invalida a sessão inteira (não apenas o user_id)
         $request->session()->invalidate();
 
+        // Regenera o token CSRF para segurança
         $request->session()->regenerateToken();
 
+        // Redireciona para a página inicial
         return redirect('/');
     }
 }

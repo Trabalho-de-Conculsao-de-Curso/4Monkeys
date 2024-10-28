@@ -1,51 +1,87 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <title>Crud das Entidades</title>
-</head>
-<body class="bg-gray-200 font-sans antialiased dark:bg-black dark:text-white/50">
+@extends('layouts.admin')
 
-<div class="container mx-auto p-4">
-    <button class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-xs px-3 py-1.5 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
-        <a href="/produtos">Home</a>
-    </button>
+@section('titulo', 'Softwares')
 
-    <form action="/produtos/" method="POST" class="max-w-lg mx-auto bg-white p-6 rounded-lg shadow-md">
-        <h1 class="text-xl font-bold mb-4 text-center">Criar Produto</h1>
+@section('content')
 
-        <div class="mb-4">
-            <label for="nome" class="block text-sm font-medium text-gray-700">Nome</label>
-            <input type="text" name="nome" id="nome" required class="border-2 form-input mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
-        </div>
+@if ($errors->any())
+    <div class="alert alert-danger">
+        <ul>
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+    <br/>
+@endif
 
-        <h3 class="text-lg font-semibold mb-2">Preço</h3>
-        <div class="grid grid-cols-2 gap-4">
+<div class="panel-header bg-dark-gradient">
+    <div class="page-inner py-5">
+        <div class="d-flex align-items-left align-items-md-center flex-column flex-md-row">
             <div>
-                <label for="preco_valor" class="block text-sm font-medium text-gray-700">Valor</label>
-                <input type="number" name="preco_valor" id="preco_valor" required class="border-2 form-input mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
-            </div>
-            <div>
-                <label for="preco_moeda" class="block text-sm font-medium text-gray-700">Moeda</label>
-                <input type="text" name="preco_moeda" id="preco_moeda" required class="border-2 form-input mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
+                <h2 class="text-dark pb-2 fw-bold">Lista de Hardwares</h2>
+                <h5 class="text-dark op-7 mb-2">Gerenciamento de Hardwares</h5>
             </div>
         </div>
+    </div>
+</div>
+<div class="card mb-4">
+</div> 
 
-        <h3 class="text-lg font-semibold mt-6 mb-2">Lojas Online</h3>
+<div class="page-inner mt--5">
+    <div class="row">
+        <div class="col-md-5">
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex align-items-center">
+                        <h4 class="card-title">Cadastro de Produtos</h4>
+                    </div>
+                </div>
 
-        <div class="mb-6">
-            <label for="urlLojaOnline" class="block text-sm font-medium text-gray-700">URL da Loja Online</label>
-            <input type="text" name="urlLojaOnline" id="urlLojaOnline" required class="border-2 form-input mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
+                <form action="/produtos/" method="POST" enctype="multipart/form-data" class="space-y-4">
+                    @csrf
+                    <h1 class="text-xl font-bold mb-4 ml-4">Criar Produto</h1>
+
+                    <div class="form-group">
+                        <label for="nome">Nome</label>
+                        <br/>
+                        <input type="text" name="nome" id="nome" required class="form-control">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="disponibilidade">Disponibilidade</label>
+                        <br/>
+                        <input type="number" name="disponibilidade" id="disponibilidade" required class="form-control">
+                    </div>
+
+                    <h3 class="text-lg font-semibold mt-4">Preço</h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="form-group">
+                            <label for="preco_valor">Valor</label>
+                            <br/>
+                            <input type="number" name="preco_valor" id="preco_valor" required class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="preco_moeda">Moeda</label>
+                            <br/>
+                            <input type="text" name="preco_moeda" id="preco_moeda" required class="form-control">
+                        </div>
+                    </div>
+
+                    <h3 class="text-lg font-semibold mt-4">Loja Online</h3>
+                    <div class="form-group">
+                        <label for="urlLojaOnline">URL da Loja Online</label>
+                        <br/>
+                        <input type="text" name="urlLojaOnline" id="urlLojaOnline" required class="form-control">
+                    </div>
+
+                    <div class="form-group">
+                        <input type="submit" value="Enviar" class="btn btn-primary" value="enviar">
+                    </div>
+                </form>
+            </div>
         </div>
-
-        <div class="flex justify-center">
-            <input type="submit" value="Enviar" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
-            <input type="hidden" name="_token" value="{{ csrf_token() }}">
-        </div>
-    </form>
+    </div>
 </div>
 
-</body>
-</html>
+@endsection
