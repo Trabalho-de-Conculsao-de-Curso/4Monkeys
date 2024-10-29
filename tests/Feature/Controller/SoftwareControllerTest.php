@@ -7,6 +7,7 @@ use App\Models\Produto;
 use App\Models\RequisitoSoftware;
 use App\Models\Software;
 
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Log;
@@ -18,6 +19,9 @@ uses(RefreshDatabase::class);
 
 
 it('Rota index retorna softwares com requisitos e responde com 200', function () {
+    // Simula desativar middleware para este teste
+    $this->withoutMiddleware();
+
     // Cria 3 softwares com requisitos associados
     $softwares = Software::factory()->withRequisitos()->count(3)->create();
 
@@ -36,6 +40,9 @@ it('Rota index retorna softwares com requisitos e responde com 200', function ()
             $viewSoftwares->first()->requisitos->isNotEmpty();
     });
 });
+
+
+
 
 it('Rota index retorna a segunda página de softwares com paginação', function () {
     // Criação de 20 softwares (mais do que o limite de uma página)

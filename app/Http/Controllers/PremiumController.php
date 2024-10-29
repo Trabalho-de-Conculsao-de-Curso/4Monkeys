@@ -14,6 +14,7 @@ class PremiumController extends Controller
      */
     public function index()
     {
+
         $usuarios = User::paginate(10); // Paginar 10 usuários por página
         return view('premium.index', compact('usuarios'));
     }
