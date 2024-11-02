@@ -1,9 +1,9 @@
 import time
 from urllib.parse import urlencode
-from .database import salvar_produtos_no_banco, salvar_log_no_banco
-from .pato_scraper import PatoScraper
-from .kabum_scraper import KabumScraper
-from .settings import urls_para_processar
+from scraper.database import salvar_produtos_no_banco, salvar_log_no_banco
+from scraper.pato_scraper import PatoScraper
+from scraper.kabum_scraper import KabumScraper
+from scraper.settings import urls_para_processar
 
 def processar_paginas(url_base, max_paginas=10, filters=None, max_paginas_sem_produtos=3):
     if "kabum.com.br" in url_base:
