@@ -30,12 +30,13 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::post('/selecionar', [ConjuntoController::class, 'selecionar'])->name('home.selecionar');
+    Route::get('/historico-conjuntos', [ConjuntoController::class, 'historicoConjuntos']);
 });
 
 
 Route::post('/selecionar-free', [FreeConjuntoController::class, 'selecionar'])->name('free.selecionar');
 Route::post('/conjunto-produtos', [ConjuntoLocalController::class, 'getConjuntoProdutos'])->name('conjunto.produtos');
-Route::get('/historico-conjuntos', [ConjuntoController::class, 'historicoConjuntos']);
+
 
 Route::resource('/produtos', ProdutoController::class)->middleware(AdminAuthenticated::class);
 Route::resource('/softwares', SoftwareController::class)->middleware(AdminAuthenticated::class);
@@ -63,5 +64,10 @@ Route::get('/api/charts-data', [ChartController::class, 'getChartData']);
 /*Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/admin', [AdminController::class, 'index'])->name('auth.admin.AdminDashboard');
 });*/ //implementação da rota com o token
+
+//rotas para teste
+Route::get('/produtos/search', [ProdutoController::class, 'show'])->name('produtos.search');
+Route::get('/softwares/search', [SoftwareController::class, 'show'])->name('softwares.search');
+
 
 require __DIR__.'/auth.php';

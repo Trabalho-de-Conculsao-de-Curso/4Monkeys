@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Categoria;
 use App\Models\Estoque;
+use App\Models\GeminiLog;
 use App\Models\Produto;
 use App\Models\Conjunto;
 use App\Models\Software;
@@ -93,6 +94,12 @@ class ConjuntoController extends Controller
 
             } catch (\Exception $e) {
                 DB::rollBack();
+                GeminiLog::create([
+                    'descricao' => 'Erro na comunicação com a API do Gemini: ' . $e->getMessage(),
+                    'operacao' => 'getRecommendations',
+                    'status' => 'erro',
+                    'user_id' => auth()->id(),
+                ]);
                 Log::error("Erro ao processar: " . $e->getMessage());
                 return redirect()->back()->withErrors('Erro ao processar a seleção.');
             }
@@ -118,51 +125,105 @@ class ConjuntoController extends Controller
 
     public function criarConjunto(Categoria $categoria, $user)
     {
-        return $user->conjuntos()->create([
-            'nome' => 'Conjunto ' . ucfirst($categoria->nome),
-            'categoria_id' => $categoria->id,
-        ]);
-    }
+        try {
+            $conjunto = $user->conjuntos()->create([
+                'nome' => 'Conjunto ' . ucfirst($categoria->nome),
+                'categoria_id' => $categoria->id,
+            ]);
 
+            GeminiLog::create([
+                'descricao' => 'Conjunto criado com sucesso',
+                'operacao' => 'criarConjunto',
+                'status' => 'sucesso',
+                'user_id' => $user->id,
+            ]);
 
-    protected function associarProdutosAoConjunto(Conjunto $conjunto, array $componentes)
-    {
-        foreach ($componentes as $componentName) {
-            // Encontrar o produto pelo nome do componente usando similaridade
-            $productId = $this->geminiAPIService->findProductIdBySimilarity($componentName);
+            return $conjunto;
 
-            if ($productId) {
-                // Associa o produto ao conjunto
-                $conjunto->produtos()->attach($productId);
-                Log::info("Produto: $componentName associado ao Conjunto.");
-
-                // Recupera o produto e o valor (preço) da loja online associada ao produto
-                $produto = Produto::find($productId);
-                $lojaOnline = $produto->lojaOnline; // Acessa a loja online relacionada ao produto
-
-                // Verifica se a loja online existe e recupera o valor (preço)
-                if ($lojaOnline && $lojaOnline->valor) {
-                    $preco = $lojaOnline->valor;  // Valor obtido da tabela loja_online
-                    // Salva o histórico do produto com o preço congelado da loja online, incluindo o conjunto_id
-                    $this->salvarConjuntoHistorico($productId, $preco, $conjunto->id); // Passa o conjunto_id
-                    Log::info("Histórico do produto ID: $productId salvo com o preço: $preco.");
-                } else {
-                    Log::warning("Preço não encontrado para o produto ID: $productId na loja online.");
-                }
-            } else {
-                Log::warning("Produto não encontrado Controller: $componentName");
-                return false;  // Se não encontrar um produto, a execução é interrompida
-            }
+        } catch (\Exception $e) {
+            GeminiLog::create([
+                'descricao' => 'Erro ao criar conjunto: ' . $e->getMessage(),
+                'operacao' => 'criarConjunto',
+                'status' => 'erro',
+                'user_id' => $user->id,
+            ]);
+            throw $e;
         }
-        return true;
     }
 
 
-    protected function associarSoftwaresAoConjunto(Conjunto $conjunto, array $softwaresSelecionados)
+    public function associarProdutosAoConjunto(Conjunto $conjunto, array $componentes)
     {
-        foreach ($softwaresSelecionados as $softwareSelecionado) {
-            $conjunto->softwares()->attach($softwareSelecionado['id']);
-            Log::info("Software ID: {$softwareSelecionado['id']} associado ao Conjunto.");
+        try {
+            foreach ($componentes as $componentName) {
+                $productId = $this->geminiAPIService->findProductIdBySimilarity($componentName);
+
+                if ($productId) {
+                    $conjunto->produtos()->attach($productId);
+
+                    $produto = Produto::find($productId);
+                    $lojaOnline = $produto->lojaOnline;
+
+                    if ($lojaOnline && $lojaOnline->valor) {
+                        $preco = $lojaOnline->valor;
+                        $this->salvarConjuntoHistorico($productId, $preco, $conjunto->id);
+                    } else {
+                        Log::warning("Preço não encontrado para o produto ID: $productId na loja online.");
+                    }
+                } else {
+                    GeminiLog::create([
+                        'descricao' => "Produto $componentName não encontrado para associação ao conjunto",
+                        'operacao' => 'associarProdutosAoConjunto',
+                        'status' => 'erro',
+                        'user_id' => auth()->id(),
+                    ]);
+                    return false;
+                }
+            }
+
+            // Log consolidado ao final da função, indicando sucesso
+            GeminiLog::create([
+                'descricao' => "Produtos associados com sucesso ao conjunto ID: {$conjunto->id}",
+                'operacao' => 'associarProdutosAoConjunto',
+                'status' => 'sucesso',
+                'user_id' => auth()->id(),
+            ]);
+
+            return true;
+        } catch (\Exception $e) {
+            GeminiLog::create([
+                'descricao' => 'Erro ao associar produtos ao conjunto: ' . $e->getMessage(),
+                'operacao' => 'associarProdutosAoConjunto',
+                'status' => 'erro',
+                'user_id' => auth()->id(),
+            ]);
+            throw $e;
+        }
+    }
+
+    public function associarSoftwaresAoConjunto(Conjunto $conjunto, array $softwaresSelecionados)
+    {
+        try {
+            foreach ($softwaresSelecionados as $softwareSelecionado) {
+                $conjunto->softwares()->attach($softwareSelecionado['id']);
+            }
+
+            // Log consolidado ao final da função, indicando sucesso
+            GeminiLog::create([
+                'descricao' => "Softwares associados com sucesso ao conjunto ID: {$conjunto->id}",
+                'operacao' => 'associarSoftwaresAoConjunto',
+                'status' => 'sucesso',
+                'user_id' => auth()->id(),
+            ]);
+
+        } catch (\Exception $e) {
+            GeminiLog::create([
+                'descricao' => 'Erro ao associar softwares ao conjunto: ' . $e->getMessage(),
+                'operacao' => 'associarSoftwaresAoConjunto',
+                'status' => 'erro',
+                'user_id' => auth()->id(),
+            ]);
+            throw $e;
         }
     }
 
@@ -252,7 +313,7 @@ class ConjuntoController extends Controller
         ]);
     }
 
-    protected function salvarConjuntoHistorico($produtoId, $valor, $conjuntoId)
+    public function salvarConjuntoHistorico($produtoId, $valor, $conjuntoId)
     {
         // Verifica se o produto, o valor e o conjunto_id são válidos
         if ($produtoId && $valor && $conjuntoId) {
