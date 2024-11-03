@@ -30,6 +30,7 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::post('/selecionar', [ConjuntoController::class, 'selecionar'])->name('home.selecionar');
+    //Route::get('/resultados', [ConjuntoController::class, 'mostrarResultados'])->name('home.resultados');
 });
 
 
@@ -54,6 +55,7 @@ Route::get('/dashboard-admin', [AdminDashboardController::class, 'index'])->name
 Route::get('/logRobo', [LogRoboController::class, 'index'])->name('auth.admin.logs');
 Route::get('/tables', [LogController::class, 'index'])->name('auth.admin.logs');
 Route::get('/logs/export', [LogController::class, 'export'])->name('logs.export');
+
 Route::get('/charts', function () {
     return view('admin.charts');
 })->name('admin.charts');

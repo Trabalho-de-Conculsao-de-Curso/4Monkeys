@@ -82,10 +82,16 @@ class ConjuntoController extends Controller
 
                 }
                 $conjuntos = $recommendations;
+                
+                //return view('resultados', ['desktops' => $conjuntos['desktops']]);
+                
 
-                if (!$produtoNaoEncontrado) {
+               if (!$produtoNaoEncontrado) {
+                    //return view('resultados', compact('resultado'));
                     DB::commit();
-                    return view('conjuntos', compact('conjuntos'));
+                    Log::info('O código chegou até o dd');
+                    dd($conjuntos);//return view('resultados', ['desktops' => $conjuntos['desktops']]);
+                    //return dd($conjuntos); //response()->json(['resultado' => $conjuntos], 200);
                 } else {
                     DB::rollBack();
                 }

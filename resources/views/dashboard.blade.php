@@ -8,7 +8,6 @@
         <h3 class="concert-one-regular text-center text-4xl font-bold mb-6 bg-gradient-to-r from-orange-500 via-pink-400 to-blue-300 text-transparent bg-clip-text animate-fade-in">
             Selecionar Softwares
         </h3>
-        
        
         <div class="flex justify-between space-x-4">
             
