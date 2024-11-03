@@ -1,6 +1,7 @@
 <?php
 namespace App\Services;
 
+use App\Models\GeminiLog;
 use App\Models\LojaOnline;
 use App\Models\Produto;
 use Illuminate\Support\Facades\Log;
@@ -20,28 +21,30 @@ class GeminiAPIService
 
     public function getRecommendations(array $softwares, array $produtos)
     {
-        // Gere o prompt com base nos softwares e produtos fornecidos
         $prompt = $this->generatePrompt($softwares, $produtos);
 
         try {
-            // Instancia o cliente Gemini com a chave da API
             $client = \Gemini::client($this->apiKey);
-
-            // Faz a chamada à API usando o SDK do Gemini
             $response = $client->geminiPro()->generateContent($prompt);
 
-            // Verifica se a resposta contém candidatos válidos
             if ($response) {
-                // Parseia a resposta da API
                 $recommendations = $this->parseResponse($response);
-                // Calcula e retorna os totais com base nas recomendações
-                return $this->calculateTotals($recommendations['desktops']);
+                $totals = $this->calculateTotals($recommendations['desktops']);
+
+                // Log de sucesso
+                GeminiLog::create([
+                    'descricao' => 'Recomendações obtidas com sucesso',
+                    'operacao' => 'getRecommendations',
+                    'status' => 'sucesso',
+                    'user_id' => auth()->id(),
+                ]);
+
+                return $totals;
             } else {
-                Log::error('Resposta inesperada da API do Gemini: ' . json_encode($response));
                 throw new \Exception('Resposta inesperada da API do Gemini');
             }
         } catch (\Exception $e) {
-            Log::error('Erro na comunicação com a API do Gemini: ' . $e->getMessage());
+
             throw new \Exception('Erro ao tentar obter recomendações do Gemini: ' . $e->getMessage());
         }
     }
@@ -93,33 +96,39 @@ class GeminiAPIService
 
     protected function parseResponse($response)
     {
-
         $candidates = $response->candidates ?? [];
 
         foreach ($candidates as $candidate) {
             $content = $candidate->content->parts[0]->text ?? null;
             if ($content) {
-                Log::info('Resposta da API Gemini: ' . $content);
-
                 $cleanContent = preg_replace('/```json|```/', '', $content);
                 $cleanContent = trim($cleanContent);
 
-
-                Log::info('Tentando decodificar o seguinte JSON: ' . $cleanContent);
                 $decodedContent = json_decode($cleanContent, true);
 
                 if (json_last_error() === JSON_ERROR_NONE) {
-                    Log::info('JSON decodificado com sucesso: ' . print_r($decodedContent, true));
+                    GeminiLog::create([
+                        'descricao' => 'JSON decodificado com sucesso',
+                        'operacao' => 'parseResponse',
+                        'status' => 'sucesso',
+                        'user_id' => auth()->id(),
+                    ]);
+
                     return $decodedContent;
                 } else {
-                    Log::error('Erro ao decodificar o JSON: ' . json_last_error_msg());
+                    GeminiLog::create([
+                        'descricao' => 'Erro ao decodificar o JSON: ' . json_last_error_msg(),
+                        'operacao' => 'parseResponse',
+                        'status' => 'erro',
+                        'user_id' => auth()->id(),
+                    ]);
+
                     throw new \Exception('Erro ao decodificar a resposta JSON: ' . json_last_error_msg());
                 }
             }
         }
 
         throw new \Exception('Resposta da API do Gemini não está no formato esperado');
-
     }
 
     public function findProductIdBySimilarity($componentName)

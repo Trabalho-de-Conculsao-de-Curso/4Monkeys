@@ -1,6 +1,16 @@
-import pytest
-from kabum_scraper import KabumScraper
+import os
+import sys
 from unittest.mock import patch, MagicMock
+
+import pytest
+
+# Adiciona o caminho do scraper apenas se ainda não estiver no sys.path, para evitar duplicações.
+scraper_path = os.path.abspath("C:/Projetos/4Monkey/python/scraper")
+if scraper_path not in sys.path:
+    sys.path.append(scraper_path)
+
+import kabum_scraper  # Importação do módulo completo, se necessário
+from kabum_scraper import KabumScraper  # Importação direta da classe para uso específico
 
 from urllib.parse import urlencode
 

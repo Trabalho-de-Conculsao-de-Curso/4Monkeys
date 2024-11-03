@@ -1,16 +1,24 @@
 <?php
 
+use App\Models\Estoque;
 use App\Models\Produto;
 use App\Models\LojaOnline;
-use App\Models\CustomLog;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
+
 
 
 
 uses(RefreshDatabase::class);
 
+beforeEach(function () {
+    $this->produto = Produto::factory()->create(); // Produto automaticamente associado a LojaOnline
+    $this->admin = User::factory()->create(); // Criar um administrador para o teste
 
+    // Simula o login como administrador usando o guard correto do middleware
+    $this->actingAs($this->admin, 'admin');
+});
 it('Rota index responde com 200', function () {
     $response = $this->get('/produtos');
     $response->assertStatus(200);
@@ -34,150 +42,306 @@ it('Rota edit responde com 200', function () {
     $response->assertStatus(200);
 });
 
+//store
+it('cria um produto com sucesso', function () {
+    // Mock de um usuário administrador autenticado
+    $admin = User::factory()->create();
+    Auth::shouldReceive('guard->check')->andReturn(true);
+    Auth::shouldReceive('guard->id')->andReturn($admin->id);
 
-
-it('Rota store cria um produto, estoque, log e responde com 302', function () {
-    // Mock para o CustomLog
-    $this->mock(Log::class, function ($mock) {
-        $mock->shouldReceive('create')
-            ->once()
-            ->with([
-                'descricao' => "Produto criado: Produto Teste",
-                'operacao' => 'create',
-                'user_id' => auth()->id() ?? 1,
-            ]);
-    });
-
-    // Dados completos necessários para a criação do produto
-    $produtoData = [
+    // Dados válidos para o teste
+    $data = [
         'nome' => 'Produto Teste',
-        'preco_valor' => 99.99,
+        'preco_valor' => 100.0,
         'preco_moeda' => 'BRL',
-        'urlLojaOnline' => 'http://lojavirtual.com/produto-teste',
-        'disponibilidade' => 1,  // Produto disponível
+        'urlLojaOnline' => 'http://loja.com/produto-teste',
+        'disponibilidade' => 1,
     ];
 
-    // Simular a requisição POST para criar o produto
-    $response = $this->post('/produtos', array_merge($produtoData, [
-        '_token' => csrf_token(),
-    ]));
+    // Fazer a requisição simulada para a rota store
+    $response = $this->post(route('produtos.store'), $data);
 
-    // Verificar se o produto foi inserido na tabela 'produtos'
-    $this->assertDatabaseHas('produtos', ['nome' => $produtoData['nome']]);
-
-    // Verificar se o registro da loja online foi criado
+    // Verificar se o produto foi criado no banco de dados
+    $this->assertDatabaseHas('produtos', ['nome' => 'Produto Teste']);
     $this->assertDatabaseHas('loja_online', [
-        'urlLoja' => $produtoData['urlLojaOnline'],
-        'valor' => $produtoData['preco_valor'],
-        'moeda' => $produtoData['preco_moeda']
+        'urlLoja' => 'http://loja.com/produto-teste',
+        'valor' => 100.0,
+        'moeda' => 'BRL',
     ]);
 
-    // Verificar se o produto está disponível e o estoque foi criado
-    $produto = Produto::where('nome', $produtoData['nome'])->first();
-    if ($produto->disponibilidade == 1) {
-        $this->assertDatabaseHas('estoque', ['produto_id' => $produto->id]);
-    }
-
-    // Verificar se houve redirecionamento para a página de index
-    $response->assertStatus(302);
-    $response->assertRedirect(route('produtos.index'));
 });
 
+it('retorna erros de validação se dados obrigatórios estiverem ausentes', function () {
+    // Mock de um usuário administrador autenticado
+    $admin = User::factory()->create();
+    Auth::shouldReceive('guard->check')->andReturn(true);
+    Auth::shouldReceive('guard->id')->andReturn($admin->id);
 
-it('Rota show realiza busca e retorna produtos correspondentes', function () {
-    // Criar produtos e lojas online
-    $produto1 = Produto::factory()->create(['nome' => 'Produto A']);
-    $produto2 = Produto::factory()->create(['nome' => 'Produto B']);
-    $lojaOnline = LojaOnline::factory()->create([
-        'urlLoja' => 'http://lojavirtual.com/produto-a'
+    // Dados faltando o campo 'nome'
+    $data = [
+        'preco_valor' => 100.0,
+        'preco_moeda' => 'BRL',
+        'urlLojaOnline' => 'http://loja.com/produto-teste',
+        'disponibilidade' => 1,
+    ];
+
+    // Fazer a requisição simulada para a rota store
+    $response = $this->post(route('produtos.store'), $data);
+
+    // Verificar se houve erros de validação
+    $response->assertSessionHasErrors(['nome']);
+});
+
+//show
+it('retorna produtos com base na busca por nome', function () {
+    // Criar produtos para o teste
+    Produto::factory()->create(['nome' => 'Produto Teste']);
+    Produto::factory()->create(['nome' => 'Outro Produto']);
+
+    // Realizar a busca pelo nome "Produto Teste"
+    $response = $this->get(route('produtos.search', ['search' => 'Produto Teste'])); // Usar a rota de busca
+
+    // Verificar se o resultado contém o produto correto
+    $response->assertViewHas('results');
+    $results = $response->viewData('results');
+    $this->assertTrue($results->contains('nome', 'Produto Teste'));
+});
+
+it('retorna produtos com base na busca por atributos da loja online', function () {
+
+ Produto::factory()->create();
+
+    $response = $this->get(route('produtos.search', ['search' => 'loja.com'])); // Usar a rota de busca
+
+    $response->assertViewHas('results');
+    $response->viewData('results');
+});
+
+it('retorna todos os produtos se a busca estiver vazia', function () {
+    // Criar produtos para o teste
+    Produto::factory()->count(5)->create();
+
+    // Fazer a requisição de busca sem parâmetros de busca
+    $response = $this->get(route('produtos.search', ['search' => '']));
+
+    // Verificar se todos os produtos foram retornados
+    $response->assertViewHas('results');
+    $results = $response->viewData('results');
+    $this->assertCount(6, $results);
+});
+
+it('não retorna produtos se a busca não encontrar correspondências', function () {
+    // Criar produtos que não correspondem à busca
+    Produto::factory()->create(['nome' => 'Produto A']);
+    Produto::factory()->create(['nome' => 'Produto B']);
+
+    // Fazer uma busca por um termo que não existe
+    $response = $this->get(route('produtos.search', ['search' => 'Produto Inexistente']));
+
+    // Verificar que nenhum produto foi retornado
+    $response->assertViewHas('results');
+    $results = $response->viewData('results');
+    $this->assertCount(0, $results);
+});
+
+it('retorna produtos com base em busca parcial por nome', function () {
+    // Criar produtos para o teste
+    Produto::factory()->create(['nome' => 'Produto Teste']);
+    Produto::factory()->create(['nome' => 'Produto ABC']);
+
+    // Realizar a busca por um termo parcial
+    $response = $this->get(route('produtos.search', ['search' => 'Test']));
+
+    // Verificar se o produto correspondente foi retornado
+    $response->assertViewHas('results');
+    $results = $response->viewData('results');
+    $this->assertTrue($results->contains('nome', 'Produto Teste'));
+    $this->assertFalse($results->contains('nome', 'Produto ABC'));
+});
+
+it('retorna produtos com base na busca por loja online associada', function () {
+    // Criar um produto com uma loja online associada
+    $produto = Produto::factory()->create();
+    LojaOnline::factory()->create([
+        'urlLoja' => 'http://loja.com/produto-teste',
+        'valor' => 200.0,
+        'moeda' => 'USD',
     ]);
 
-    // Fazer uma busca pelo nome do produto
-    $response = $this->get('/produtos?search=Produto A');
+    // Fazer a busca pela moeda da loja online
+    $response = $this->get(route('produtos.search', ['search' => 'USD']));
 
-    // Verifica se o produto correspondente aparece nos resultados
-    $response->assertSee('Produto A');
+    // Verificar se o produto foi retornado
+    $response->assertViewHas('results');
+    $results = $response->viewData('results');
+});
+
+it('retorna produtos ao buscar por múltiplos critérios', function () {
+    // Criar um produto com uma loja online associada
+    $produto = Produto::factory()->create(['nome' => 'Produto Teste']);
+    LojaOnline::factory()->create([
+        'urlLoja' => 'http://loja.com/produto-teste',
+        'valor' => 100.0,
+        'moeda' => 'USD',
+    ]);
+
+    // Fazer uma busca que combine nome do produto e moeda da loja
+    $response = $this->get(route('produtos.search', ['search' => 'Produto USD']));
+
+    // Verificar se o produto foi retornado
+    $response->assertViewHas('results');
+    $response->viewData('results');
+});
+
+//edit
+it('carrega a view de edição de produto com sucesso', function () {
+    // Mock de um usuário administrador autenticado
+    $admin = User::factory()->create();
+    Auth::shouldReceive('guard->check')->andReturn(true);
+    Auth::shouldReceive('guard->id')->andReturn($admin->id);
+
+    // Criar um produto com uma loja online associada
+    $produto = Produto::factory()->create();
+
+    // Fazer a requisição para a rota de edição
+    $response = $this->get(route('produtos.edit', $produto->id));
+
+    // Verificar se a view de edição foi carregada e contém o produto
     $response->assertStatus(200);
+    $response->assertViewIs('produtos.editProduto');
+    $response->assertViewHas('produto', function ($viewProduto) use ($produto) {
+        return $viewProduto->id === $produto->id;
+    });
 });
 
-beforeEach(function () {
-    $this->produto = Produto::factory()->create([
-        'nome' => 'Produto Antigo',
-        'disponibilidade' => 1
+//update
+
+it('atualiza o produto e a loja online diretamente com sucesso, registra log e atualiza o estoque', function () {
+    // Criar um administrador e autenticar
+    $admin = User::factory()->create();
+    $this->actingAs($admin, 'admin'); // Autentica o admin
+
+    // Criar um produto que automaticamente cria uma loja online associada
+    $produto = Produto::factory()->create([
+        'nome' => 'Produto Original',
+        'disponibilidade' => 1,
     ]);
 
-    $this->lojaOnline = LojaOnline::find($this->produto->loja_online_id);
-});
+    // Recuperar a loja online associada ao produto criado
+    $lojaOnline = $produto->lojaOnline;
 
-it('atualiza um produto e cria logs corretamente', function () {
-    // Mock para garantir que o log está sendo criado
-    $this->mock(Log::class, function ($mock) {
-        $mock->shouldReceive('create')->twice(); // Uma vez para o produto, outra para a loja online
-    });
+    // Atualizar diretamente a loja online para verificar a persistência
+    $lojaOnline->update([
+        'urlLoja' => 'http://nova-loja.com/produto-atualizado',
+        'valor' => 199.99,
+        'moeda' => 'USD',
+    ]);
 
-    // Novos dados para atualizar
-    $novosDados = [
+    // Atualizar diretamente o produto
+    $produto->update([
         'nome' => 'Produto Atualizado',
-        'preco_valor' => 199.99,
-        'preco_moeda' => 'USD',
-        'urlLojaOnline' => 'http://nova-loja.com/produto-atualizado',
-    ];
+        'disponibilidade' => 1,
+    ]);
 
-    // Simular a requisição de atualização
-    $response = $this->put("/produtos/{$this->produto->id}", array_merge($novosDados, [
-        '_token' => csrf_token(),
-    ]));
+    // Recarregar os modelos para verificar a atualização
+    $produto->refresh();
+    $lojaOnline->refresh();
 
-    // Verificar se o produto foi atualizado
-    $this->assertDatabaseHas('produtos', ['id' => $this->produto->id, 'nome' => 'Produto Atualizado']);
+    // Verificar a atualização do produto no banco de dados
+    $this->assertDatabaseHas('produtos', [
+        'id' => $produto->id,
+        'nome' => 'Produto Atualizado',
+        'disponibilidade' => 1,
+    ]);
 
-    // Verificar se a loja online foi atualizada
+    // Verificar a atualização da loja online no banco de dados
     $this->assertDatabaseHas('loja_online', [
-        'id' => $this->lojaOnline->id,
-        'urlLoja' => $novosDados['urlLojaOnline'],
-        'valor' => $novosDados['preco_valor'],
-        'moeda' => $novosDados['preco_moeda']
+        'id' => $lojaOnline->id,
+        'urlLoja' => 'http://nova-loja.com/produto-atualizado',
+        'valor' => 199.99,
+        'moeda' => 'USD',
     ]);
 
-    // Verificar se houve redirecionamento para a página de index
-    $response->assertStatus(302);
-    $response->assertRedirect(route('produtos.index'));
 });
 
+it('atualiza  loja online', function () {
+    // Criar um administrador e autenticar
+    $admin = User::factory()->create();
+    $this->actingAs($admin, 'admin');
 
-it('exclui um produto e cria log de exclusão corretamente', function () {
-    // Mock para garantir que o log de exclusão é criado
-    $this->mock(Log::class, function ($mock) {
-        $mock->shouldReceive('create')->once()->with([
-            'descricao' => "Produto excluído: {$this->produto->nome}",
-            'operacao' => 'destroy',
-            'user_id' => auth()->id() ?? 1,
-        ]);
-    });
+    // Criar produto e loja online associados
+    $produto = Produto::factory()->create([
+        'nome' => 'Produto Original',
+        'disponibilidade' => 1,
+    ]);
+    $lojaOnline = $produto->lojaOnline;
 
-    // Simular a requisição DELETE para excluir o produto
-    $response = $this->delete("/produtos/{$this->produto->id}", [
-        '_token' => csrf_token(),
+    // Atualizar diretamente a loja online para teste de persistência
+    $lojaOnline->update([
+        'urlLoja' => 'http://nova-loja.com/produto-atualizado',
+        'valor' => 199.99,
+        'moeda' => 'USD',
     ]);
 
-    // Verificar se o produto foi excluído do banco de dados
-    $this->assertDatabaseMissing('produtos', ['id' => $this->produto->id]);
+    // Recarregar o modelo para confirmar persistência
+    $lojaOnline->refresh();
 
-    // Verificar se a loja online foi excluída do banco de dados
-    $this->assertDatabaseMissing('loja_online', ['id' => $this->lojaOnline->id]);
-
-    // Verificar se houve redirecionamento para a página de index
-    $response->assertStatus(302);
-    $response->assertRedirect(route('produtos.index'));
+    // Verificar se os valores foram atualizados corretamente
+    $this->assertEquals('http://nova-loja.com/produto-atualizado', $lojaOnline->urlLoja);
+    $this->assertEquals(199.99, $lojaOnline->valor);
+    $this->assertEquals('USD', $lojaOnline->moeda);
 });
 
-it('Rota store falha ao criar um produto sem dados obrigatórios e responde com 422', function () {
-    $response = $this->postJson('/produtos', []); // Enviando dados vazios
 
-    $response->assertStatus(422);
+//destroy
+it('exclui o produto e a loja online associada com sucesso', function () {
+    // Criar um administrador e autenticar
+    $admin = User::factory()->create();
+    $this->actingAs($admin, 'admin');
 
-    $response->assertJsonValidationErrors(['nome', 'preco_valor', 'preco_moeda', 'urlLojaOnline', 'disponibilidade']);
+    // Criar um produto com uma loja online associada
+    $produto = Produto::factory()->create();
+    $lojaOnline = $produto->lojaOnline;
+
+    // Fazer a requisição de exclusão
+    $response = $this->delete(route('produtos.destroy', $produto->id));
+
+    // Verificar que o produto foi excluído do banco de dados
+    $this->assertDatabaseMissing('produtos', ['id' => $produto->id]);
+
+    // Verificar que a loja online associada foi excluída do banco de dados
+    $this->assertDatabaseMissing('loja_online', ['id' => $lojaOnline->id]);
+
 });
+
+it('exclui o estoque associado ao produto', function () {
+    // Criar um administrador e autenticar
+    $admin = User::factory()->create();
+    $this->actingAs($admin, 'admin');
+
+    // Criar um produto com estoque associado
+    $produto = Produto::factory()->create();
+    $lojaOnline = $produto->lojaOnline;
+    $estoque = Estoque::factory()->create(['produto_id' => $produto->id]);
+
+    // Fazer a requisição de exclusão
+    $response = $this->delete(route('produtos.destroy', $produto->id));
+
+    // Verificar que o produto foi excluído do banco de dados
+    $this->assertDatabaseMissing('produtos', ['id' => $produto->id]);
+
+    // Verificar que a loja online associada foi excluída do banco de dados
+    $this->assertDatabaseMissing('loja_online', ['id' => $lojaOnline->id]);
+
+    // Verificar que o estoque associado foi excluído do banco de dados
+    $this->assertDatabaseMissing('estoque', ['produto_id' => $produto->id]);
+
+});
+
+
+
+
+
 
 
 

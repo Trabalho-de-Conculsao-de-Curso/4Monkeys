@@ -1,15 +1,15 @@
 import sqlite3
 from abc import ABC, abstractmethod
-from scraper.settings import DB_NAME
+from scraper.settings import DB_NAME  # Importa o caminho do banco de dados
 from scraper.database import salvar_log_no_banco  # Importa a função de logging
-
 
 class VerificadorProdutos(ABC):
     def processar_produtos(self):
         self.verificar_e_atualizar_disponibilidade_no_banco()
 
     def verificar_e_atualizar_disponibilidade_no_banco(self):
-        conn = sqlite3.connect('../database/database.sqlite')
+        # Use a variável DB_NAME para conectar ao banco de dados
+        conn = sqlite3.connect(DB_NAME)
         cursor = conn.cursor()
 
         cursor.execute('''

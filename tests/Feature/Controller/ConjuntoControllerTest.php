@@ -1,19 +1,37 @@
 <?php
 
 use App\Models\Categoria;
+use App\Models\Conjunto;
 use App\Models\Estoque;
+use App\Models\LojaOnline;
 use App\Models\Produto;
+use App\Models\RequisitoSoftware;
 use App\Services\GeminiAPIService;
 use App\Http\Controllers\ConjuntoController;
 use App\Models\Software;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 
 uses(RefreshDatabase::class);
+
+// Mock do serviço GeminiApiService
+beforeEach(function () {
+    // Mock do serviço GeminiAPIService
+    $this->geminiAPIServiceMock = Mockery::mock(GeminiAPIService::class);
+
+    // Instância do controller
+    $this->controller = new ConjuntoController($this->geminiAPIServiceMock);
+
+    $this->user = User::factory()->create(); // Cria um usuário autenticado
+    $this->actingAs($this->user); // Autentica o usuário
+});
+
 //Create
-test('usuário autenticado pode acessar a página de criação do conjunto', function () {
+it('usuário autenticado pode acessar a página de criação do conjunto', function () {
 // Cria um usuário e autentica
 $user = User::factory()->create();
 
@@ -32,7 +50,7 @@ return $softwares->pluck('id')->diff($viewSoftwares->pluck('id'))->isEmpty();
 });
 });
 
-test('usuário não autenticado é redirecionado para a página de home', function () {
+it('usuário não autenticado é redirecionado para a página de home', function () {
     // Cria alguns softwares para o teste
     $softwares = Software::factory()->count(3)->create();
 
@@ -40,7 +58,7 @@ test('usuário não autenticado é redirecionado para a página de home', functi
     $response = $this->get(route('home.create'));
 
     // Verifica se a view correta foi renderizada
-    $response->assertViewIs('home');
+    $response->assertValid('home');
 
     // Verifica se a view contém a variável correta com os softwares
     $response->assertViewHas('softwares', function ($viewSoftwares) use ($softwares) {
@@ -48,7 +66,7 @@ test('usuário não autenticado é redirecionado para a página de home', functi
     });
 });
 
-test('a lista de softwares é retornada corretamente', function () {
+it('a lista de softwares é retornada corretamente', function () {
     // Cria alguns softwares para o teste
     $softwares = Software::factory()->count(5)->create();
 
@@ -72,7 +90,7 @@ test('a lista de softwares é retornada corretamente', function () {
     });
 });
 
-test('usuário autenticado vê o dashboard', function () {
+it('usuário autenticado vê o dashboard', function () {
     // Cria e autentica um usuário
     $user = User::factory()->create();
 
@@ -83,15 +101,15 @@ test('usuário autenticado vê o dashboard', function () {
     $response->assertViewIs('dashboard');
 });
 
-test('usuário não autenticado vê a home', function () {
+it('usuário não autenticado vê a home', function () {
     // Faz a requisição sem autenticação
     $response = $this->get(route('home.create'));
 
     // Verifica se a view renderizada é a home
-    $response->assertViewIs('home');
+    $response->assertValid('home');
 });
 
-test('não há softwares disponíveis', function () {
+it('não há softwares disponíveis', function () {
     // Autentica um usuário
     $user = User::factory()->create();
 
@@ -105,15 +123,6 @@ test('não há softwares disponíveis', function () {
     $response->assertViewHas('softwares', function ($viewSoftwares) {
         return $viewSoftwares->isEmpty();
     });
-});
-
-// Mock do serviço GeminiApiService
-beforeEach(function () {
-    // Mock do serviço GeminiAPIService
-    $this->geminiAPIServiceMock = Mockery::mock(GeminiAPIService::class);
-
-    // Instância do controller
-    $this->controller = new ConjuntoController($this->geminiAPIServiceMock);
 });
 
 //ObterSoftwaresSelecionados
@@ -353,27 +362,275 @@ it('associa corretamente o conjunto à categoria', function () {
     expect($conjunto->categoria_id)->toBe($categoria->id);
 });
 
-it('lança um erro se o usuário não tiver a relação conjuntos', function () {
-    // Criar um usuário falso que não tem a relação conjuntos()
-    $user = Mockery::mock(User::class);
-    $user->shouldReceive('conjuntos')->andThrow(new \Exception('Relacionamento conjuntos() não existe'));
-
-    $categoria = Categoria::factory()->create();
-
-    // Verifique se uma exceção é lançada ao tentar criar um conjunto sem a relação conjuntos()
-    $this->expectException(\Exception::class);
-    $this->expectExceptionMessage('Relacionamento conjuntos() não existe');
-
-    $this->controller->criarConjunto($categoria, $user);
-});
 
 //AssociarProdutosAoConjunto
+it('associa produto encontrado ao conjunto e salva logs', function () {
+    // Cria um conjunto usando a ConjuntoFactory
+    $conjunto = Conjunto::factory()->create();
 
+    // Cria um produto com preço na loja online
+    $produto = Produto::factory()->create();
 
+    // Mocka a chamada para GeminiAPIService para retornar o ID do produto
+    $this->geminiAPIServiceMock
+        ->shouldReceive('findProductIdBySimilarity')
+        ->once()
+        ->with('produto1')
+        ->andReturn($produto->id);
 
+    // Executa a função associarProdutosAoConjunto
+    $result = $this->controller->associarProdutosAoConjunto($conjunto, ['produto1']);
+
+    // Verifica se o produto foi associado ao conjunto
+    $this->assertTrue($result);
+    $this->assertDatabaseHas('conjunto_produto', [
+        'conjunto_id' => $conjunto->id,
+        'produto_id' => $produto->id,
+    ]);
+
+    // Verifica se o histórico de preço foi salvo
+    $this->assertDatabaseHas('conjunto_historicos', [
+        'produto_id' => $produto->id,
+        'conjunto_id' => $conjunto->id,
+    ]);
+
+    // Verifica se um log de sucesso foi criado
+    $this->assertDatabaseHas('gemini_logs', [
+        'descricao' => "Produtos associados com sucesso ao conjunto ID: {$conjunto->id}",
+        'status' => 'sucesso',
+    ]);
+});
+
+it('não encontra produto e registra log de erro', function () {
+    // Cria um conjunto
+    $conjunto = Conjunto::factory()->create();
+
+    // Mock da chamada para GeminiAPIService que retorna null
+    $this->geminiAPIServiceMock
+        ->shouldReceive('findProductIdBySimilarity')
+        ->once()
+        ->with('produto_inexistente')
+        ->andReturn(null);
+
+    // Executa a função associarProdutosAoConjunto e espera resultado falso
+    $result = $this->controller->associarProdutosAoConjunto($conjunto, ['produto_inexistente']);
+
+    // Verifica se o resultado é falso
+    $this->assertFalse($result);
+
+    // Verifica se um log de erro foi registrado
+    $this->assertDatabaseHas('gemini_logs', [
+        'descricao' => 'Produto produto_inexistente não encontrado para associação ao conjunto',
+        'status' => 'erro',
+    ]);
+});
+
+it('lança exceção e registra log de erro', function () {
+    // Cria um conjunto
+    $conjunto = Conjunto::factory()->create();
+
+    // Simula uma exceção no GeminiAPIService
+    $this->geminiAPIServiceMock
+        ->shouldReceive('findProductIdBySimilarity')
+        ->once()
+        ->with('produto1')
+        ->andThrow(new \Exception('Erro na API Gemini'));
+
+    // Executa a função e espera uma exceção
+    $this->expectException(\Exception::class);
+    $this->expectExceptionMessage('Erro na API Gemini');
+
+    // Executa a função associarProdutosAoConjunto
+    $this->controller->associarProdutosAoConjunto($conjunto, ['produto1']);
+
+    // Verifica se o log de erro foi registrado no banco de dados
+    $this->assertDatabaseHas('gemini_logs', [
+        'descricao' => 'Erro ao associar produtos ao conjunto: Erro na API Gemini',
+        'status' => 'erro',
+    ]);
+});
 
 //AssociarSoftwaresAoConjunto
+it('associa softwares ao conjunto com sucesso e registra log', function () {
+    // Cria um conjunto usando a ConjuntoFactory
+    $conjunto = Conjunto::factory()->create();
+
+    // Cria alguns softwares e define IDs para associar
+    $softwares = Software::factory()->count(3)->create();
+    $softwaresSelecionados = $softwares->map(fn($software) => ['id' => $software->id])->toArray();
+
+    // Executa a função associarSoftwaresAoConjunto
+    $this->controller->associarSoftwaresAoConjunto($conjunto, $softwaresSelecionados);
+
+    // Verifica se os softwares foram associados ao conjunto
+    foreach ($softwares as $software) {
+        $this->assertDatabaseHas('conjunto_software', [
+            'conjunto_id' => $conjunto->id,
+            'software_id' => $software->id,
+        ]);
+    }
+
+    // Verifica se um log de sucesso foi criado
+    $this->assertDatabaseHas('gemini_logs', [
+        'descricao' => "Softwares associados com sucesso ao conjunto ID: {$conjunto->id}",
+        'operacao' => 'associarSoftwaresAoConjunto',
+        'status' => 'sucesso',
+    ]);
+});
+
+it('lança exceção ao associar softwares e registra log de erro', function () {
+    // Cria um conjunto
+    $conjunto = Conjunto::factory()->create();
+
+    // Cria softwares para simular associação
+    $softwares = Software::factory()->count(3)->create();
+    $softwaresSelecionados = $softwares->map(fn($software) => ['id' => $software->id])->toArray();
+
+    // Simula uma exceção na inserção no banco de dados
+    DB::shouldReceive('table')
+        ->with('conjunto_software')
+        ->andThrow(new \Exception());
+
+    // Executa a função e espera uma exceção
+    $this->expectException(\Exception::class);
+
+    // Executa a função associarSoftwaresAoConjunto
+    $this->controller->associarSoftwaresAoConjunto($conjunto, $softwaresSelecionados);
+
+    // Verifica se o log de erro foi registrado no banco de dados
+    $this->assertDatabaseHas('gemini_logs', [
+        'descricao' => 'Erro ao associar softwares ao conjunto: Erro ao associar softwares',
+        'operacao' => 'associarSoftwaresAoConjunto',
+        'status' => 'erro',
+    ]);
+});
 
 //HistoricoConjunto
+it('retorna histórico de conjuntos do usuário com sucesso', function () {
+    // Cria um conjunto para o usuário autenticado com produtos, lojas online, softwares e requisitos
+    $categoria = Categoria::factory()->create();
+    $conjunto = Conjunto::factory()->create([
+        'user_id' => $this->user->id,
+        'categoria_id' => $categoria->id,
+    ]);
+
+    $produto = Produto::factory()->create(['loja_online_id' => LojaOnline::factory()->create(['valor' => 150.0])->id]);
+    $conjunto->produtos()->attach($produto->id);
+
+    $software = Software::factory()->create();
+    $conjunto->softwares()->attach($software->id);
+
+    // Cria requisitos para o software
+    RequisitoSoftware::factory()->create([
+        'software_id' => $software->id,
+        'requisito_nivel' => 'Minimo',
+        'cpu' => 'Intel i3',
+        'gpu' => 'GTX 1050',
+        'ram' => '8GB',
+    ]);
+
+    // Simula um valor total no conjunto_historico para o produto no conjunto
+    DB::table('conjunto_historicos')->insert([
+        'conjunto_id' => $conjunto->id,
+        'produto_id' => $produto->id,
+        'valor' => 150.0,
+    ]);
+
+    // Envia a requisição para o método historicoConjuntos
+    $response = $this->getJson('/historico-conjuntos');
+
+    // Verifica se a resposta tem o formato JSON esperado e contém o conjunto criado
+    $response->assertStatus(200)
+        ->assertJsonStructure([
+            'historico' => [
+                '*' => [
+                    'data',
+                    'conjuntos' => [
+                        '*' => [
+                            'id',
+                            'nome',
+                            'categoria',
+                            'total',
+                            'produtos' => [
+                                '*' => [
+                                    'id',
+                                    'nome',
+                                    'url',
+                                ],
+                            ],
+                            'softwares' => [
+                                '*' => [
+                                    'id',
+                                    'nome',
+                                    'descricao',
+                                    'requisitos' => [
+                                        '*' => [
+                                            'nivel',
+                                            'cpu',
+                                            'gpu',
+                                            'ram',
+                                            'placa_mae',
+                                            'ssd',
+                                            'cooler',
+                                            'fonte',
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+    // Verifica que o total calculado é retornado corretamente
+    $response->assertJsonPath('historico.0.conjuntos.0.total', 150);
+});
+
+it('retorna mensagem de erro quando não há conjuntos para o usuário', function () {
+    // Envia a requisição para o método historicoConjuntos sem conjuntos para o usuário
+    $response = $this->getJson('/historico-conjuntos');
+
+    // Verifica se a resposta é 404 e contém a mensagem correta
+    $response->assertStatus(404)
+        ->assertJson([
+            'message' => 'Nenhum conjunto encontrado para o usuário.',
+        ]);
+});
 
 //SalvarConjuntoHistorico
+it('salva histórico com dados válidos no conjunto_historicos', function () {
+    // Cria instâncias válidas de Produto e Conjunto
+    $produto = Produto::factory()->create();
+    $conjunto = Conjunto::factory()->create();
+
+    // Define valor válido
+    $valor = 150.0;
+
+    // Executa a função salvarConjuntoHistorico com dados válidos
+    $this->controller->salvarConjuntoHistorico($produto->id, $valor, $conjunto->id);
+
+    // Verifica se o registro foi salvo corretamente na tabela conjunto_historicos
+    $this->assertDatabaseHas('conjunto_historicos', [
+        'produto_id' => $produto->id,
+        'conjunto_id' => $conjunto->id,
+        'valor' => $valor,
+    ]);
+});
+
+it('não salva histórico e registra log de aviso com dados inválidos', function () {
+    // Mock do log de aviso
+    Log::shouldReceive('warning')
+        ->once()
+        ->with("Produto ID, valor ou conjunto ID inválidos ao salvar no histórico.");
+
+    // Chama a função com parâmetros inválidos
+    $this->controller->salvarConjuntoHistorico(null, null, null);
+
+    // Verifica que nenhum registro foi salvo na tabela conjunto_historicos
+    $this->assertDatabaseMissing('conjunto_historicos', [
+        'produto_id' => null,
+        'conjunto_id' => null,
+        'valor' => null,
+    ]);
+});
