@@ -16,4 +16,7 @@ class LogRobo extends Model
         'pagina',
         'mensagem',
         ];
+
+    public $timestamps = true;
+    const UPDATED_AT = null;
 }

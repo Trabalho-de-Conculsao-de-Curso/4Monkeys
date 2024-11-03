@@ -48,6 +48,17 @@ class SoftwareController extends Controller
         return view('softwares.createSoftware');
     }
 
+    public function show(Request $request)
+    {
+        $search = $request->input('search');
+        $results = Software::where('nome', 'like', "%$search%")
+            ->orWhere('descricao', 'like', "%$search%")
+            ->orWhere('peso', 'like', "%$search%")
+            ->get();
+
+        return view('softwares.searchSoftware', compact('results'));
+    }
+
     public function store(StoreSoftwareRequest $request)
     {
         try {
@@ -129,7 +140,6 @@ class SoftwareController extends Controller
         }
     }
 
-
     public function edit($id)
     {
         try {
@@ -156,8 +166,6 @@ class SoftwareController extends Controller
             return redirect()->route('softwares.index')->with('error', 'Erro ao acessar o software para edição.');
         }
     }
-
-
 
     public function update(UpdateSoftwareRequest $request, $id)
     {
