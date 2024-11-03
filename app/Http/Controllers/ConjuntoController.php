@@ -23,14 +23,6 @@ class ConjuntoController extends Controller
         $this->geminiAPIService = $geminiAPIService;
     }
 
-    public function index()
-    {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
         // Obtem todos os softwares
@@ -50,7 +42,7 @@ class ConjuntoController extends Controller
     {
         $softwaresSelecionados = $this->obterSoftwaresSelecionados($request);
         $produtos = $this->obterTodosProdutos();
-        $user = auth()->user(); // Obtém o usuário autenticado'
+        $user = auth()->user(); // Obtém o usuário autenticado
 
         do {
             DB::beginTransaction();
@@ -58,10 +50,11 @@ class ConjuntoController extends Controller
             try {
                 $produtoNaoEncontrado = false;
                 $generatedConjuntoIds = [];
-                $conjuntos = []; // Array para armazenar conjuntos com seus totais
+                $conjuntos = []; // Array para armazenar conjuntos com seus totais e detalhes
 
+                Log::info("Chamando Gemini API para recomendações...");
                 $recommendations = $this->geminiAPIService->getRecommendations($softwaresSelecionados, $produtos);
-
+                Log::info("Recomendações obtidas: ", $recommendations);
 
                 foreach ($recommendations['desktops'] as $desktop) {
                     $categoria = $this->buscarCategoriaPorId($desktop['categoria']);
@@ -72,6 +65,8 @@ class ConjuntoController extends Controller
                         break;
                     }
 
+                    Log::info("Detalhes do desktop antes de criar conjunto", ['categoria' => $categoria->nome, 'componentes' => $desktop['componentes']]);
+
                     // Cria o conjunto associado ao usuário autenticado
                     $conjunto = $this->criarConjunto($categoria, $user);
                     $generatedConjuntoIds[] = $conjunto->id;
@@ -80,14 +75,31 @@ class ConjuntoController extends Controller
                         $produtoNaoEncontrado = true;
                         break;
                     }
+
+                    // Associa os softwares selecionados ao conjunto
                     $this->associarSoftwaresAoConjunto($conjunto, $softwaresSelecionados);
 
+                    $componentesDetalhados = [];
+                    foreach ($desktop['componentes'] as $componenteNome => $detalhes) {
+                        $componentesDetalhados[$componenteNome] = [
+                            'nome' => $detalhes['nome'],
+                            'preco' => $detalhes['preco'],
+                            'url' => $detalhes['url']
+                        ];
+                    }
+
+                    $conjuntos[] = [
+                        'categoria' => $categoria->nome,
+                        'componentes' => $componentesDetalhados,
+                        'total' => $desktop['total']
+                    ];
                 }
-                $conjuntos = $recommendations;
+
+                Log::info("Estrutura de conjuntos montada com sucesso.", $conjuntos);
 
                 if (!$produtoNaoEncontrado) {
                     DB::commit();
-                    return view('conjuntos', compact('conjuntos'));
+                    return response()->json($conjuntos); // Retorna como JSON temporariamente para verificar a estrutura
                 } else {
                     DB::rollBack();
                 }
@@ -101,12 +113,11 @@ class ConjuntoController extends Controller
                     'user_id' => auth()->id(),
                 ]);
                 Log::error("Erro ao processar: " . $e->getMessage());
-                return redirect()->back()->withErrors('Erro ao processar a seleção.');
+                return response()->json(['error' => 'Erro ao processar a seleção.', 'details' => $e->getMessage()], 500);
             }
 
         } while ($produtoNaoEncontrado);
     }
-
 
     public function obterSoftwaresSelecionados(Request $request)
     {
@@ -151,12 +162,11 @@ class ConjuntoController extends Controller
         }
     }
 
-
     public function associarProdutosAoConjunto(Conjunto $conjunto, array $componentes)
     {
         try {
-            foreach ($componentes as $componentName) {
-                $productId = $this->geminiAPIService->findProductIdBySimilarity($componentName);
+            foreach ($componentes as $componentDetails) {
+                $productId = $this->geminiAPIService->findProductIdBySimilarity($componentDetails['nome']);
 
                 if ($productId) {
                     $conjunto->produtos()->attach($productId);
@@ -172,7 +182,7 @@ class ConjuntoController extends Controller
                     }
                 } else {
                     GeminiLog::create([
-                        'descricao' => "Produto $componentName não encontrado para associação ao conjunto",
+                        'descricao' => "Produto {$componentDetails['nome']} não encontrado para associação ao conjunto",
                         'operacao' => 'associarProdutosAoConjunto',
                         'status' => 'erro',
                         'user_id' => auth()->id(),
@@ -181,7 +191,6 @@ class ConjuntoController extends Controller
                 }
             }
 
-            // Log consolidado ao final da função, indicando sucesso
             GeminiLog::create([
                 'descricao' => "Produtos associados com sucesso ao conjunto ID: {$conjunto->id}",
                 'operacao' => 'associarProdutosAoConjunto',
@@ -208,7 +217,6 @@ class ConjuntoController extends Controller
                 $conjunto->softwares()->attach($softwareSelecionado['id']);
             }
 
-            // Log consolidado ao final da função, indicando sucesso
             GeminiLog::create([
                 'descricao' => "Softwares associados com sucesso ao conjunto ID: {$conjunto->id}",
                 'operacao' => 'associarSoftwaresAoConjunto',
@@ -328,6 +336,5 @@ class ConjuntoController extends Controller
             Log::warning("Produto ID, valor ou conjunto ID inválidos ao salvar no histórico.");
         }
     }
-
 
 }

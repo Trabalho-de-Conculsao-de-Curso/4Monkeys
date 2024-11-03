@@ -49,7 +49,6 @@ class GeminiAPIService
         }
     }
 
-
     protected function generatePrompt(array $softwares, array $produtos)
     {
 
@@ -159,18 +158,12 @@ class GeminiAPIService
 
     public function calculateTotals($desktops)
     {
-        $totals = [
-            'bronze' => 0,
-            'silver' => 0,
-            'gold' => 0,
-        ];
-
         foreach ($desktops as &$desktop) {
             $category = $desktop['categoria'];
             $components = $desktop['componentes'];
             $total = 0;
 
-            foreach ($components as $componentName) {
+            foreach ($components as $key => $componentName) {
                 // Encontrar o ID do produto baseado no nome ou similaridade
                 $productId = $this->findProductIdBySimilarity($componentName);
 
@@ -180,8 +173,18 @@ class GeminiAPIService
                     if ($produto) {
                         $lojaOnline = LojaOnline::find($produto->loja_online_id);
                         $price = $lojaOnline->valor ?? 0;  // Use o valor da tabela loja_online
+                        $url = $lojaOnline->urlLoja ?? 'URL não disponível';
 
-                        Log::info("Produto: {$produto->nome}, Preço: {$lojaOnline->moeda} $price");
+                        Log::info("Produto: {$produto->nome}, Preço: {$lojaOnline->moeda} $price, URL: $url");
+
+                        // Adiciona preço e URL ao componente
+                        $desktop['componentes'][$key] = [
+                            'nome' => $produto->nome,
+                            'preco' => $price,
+                            'moeda' => $lojaOnline->moeda,
+                            'url' => $url
+                        ];
+
                         $total += $price;
                     } else {
                         Log::warning("Produto com ID $productId não encontrado na tabela produtos.");
@@ -193,12 +196,10 @@ class GeminiAPIService
 
             Log::info("Total para a categoria $category: $total");
             $desktop['total'] = $total; // Atualize o total no array $desktops
-            $totals[$category] = $total;
         }
 
         return [
-            'desktops' => $desktops,
-            'totals' => $totals,
+            'desktops' => $desktops
         ];
     }
 
