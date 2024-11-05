@@ -1,51 +1,90 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <title>Crud das Entidades</title>
-</head>
-<body class="bg-gray-200 font-sans antialiased dark:bg-black dark:text-white/50">
+@extends('layouts.admin')
 
-<div class="container mx-auto p-4">
-    <button class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-xs px-3 py-1.5 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
-        <a href="/usuario-premium">Home</a>
+@section('titulo', 'Criar Usuário Premium')
+
+@section('content')
+
+    @if ($errors->any())
+        <div class="alert alert-danger">
+            <ul>
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
+    <div class="panel-header bg-dark-gradient">
+        <div class="page-inner py-5">
+            <div class="d-flex align-items-left align-items-md-center flex-column flex-md-row">
+                <div>
+                    <h2 class="text-dark pb-2 fw-bold">Criar Usuário Premium</h2>
+                    <h5 class="text-dark op-7 mb-2">Formulário para criar um novo usuário premium</h5>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card mb-4"></div>
+    <button class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-xs px-3 py-1.5 mb-4 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
+        <a href="/usuario-premium">Voltar</a>
     </button>
+    <div class="page-inner mt--5">
+        <div class="row">
+            <div class="col-md-5 mx-auto">
+                <div class="card">
 
-    <form action="/usuario-premium/" method="POST" class="max-w-lg mx-auto bg-white p-6 rounded-lg shadow-md">
-        <h1 class="text-xl font-bold mb-4 text-center">Criar Usuário Premium</h1>
+                    <div class="d-flex align-items-center">
+                        <h4 class="card-title">Criar Conta de Usuário Premium</h4>
+                    </div>
+                    <form method="POST" action="/usuario-premium" class="user p-4">
+                        @csrf
 
-        <div class="mb-4">
-            <label for="nome" class="block text-sm font-medium text-gray-700">Nome</label>
-            <input type="text" name="nome" id="nome" required class="border-2 form-input mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50" value="{{ old('nome') }}">
+                        <div class="form-group">
+                            <input type="text" class="form-control form-control-user" id="nome" name="nome" required placeholder="Nome" value="{{ old('nome') }}">
+                            @error('nome')
+                            <span class="text-danger small">{{ $message }}</span>
+                            @enderror
+                        </div>
+                        <hr>
+
+                        <div class="form-group">
+                            <input type="email" class="form-control form-control-user" id="email" name="email" required placeholder="E-mail" value="{{ old('email') }}">
+                            @error('email')
+                            <span class="text-danger small">{{ $message }}</span>
+                            @enderror
+                        </div>
+                        <hr>
+
+                        <div class="form-group">
+                            <input type="number" class="form-control form-control-user" id="situacao" name="situacao" required placeholder="Situação" value="{{ old('situacao') }}">
+                            @error('situacao')
+                            <span class="text-danger small">{{ $message }}</span>
+                            @enderror
+                        </div>
+                        <hr>
+
+                        <div class="form-group">
+                            <input type="password" class="form-control form-control-user" id="password" name="password" required placeholder="Senha">
+                            @error('password')
+                            <span class="text-danger small">{{ $message }}</span>
+                            @enderror
+                        </div>
+                        <hr>
+
+                        <div class="form-group">
+                            <input type="password" class="form-control form-control-user" id="password_confirmation" name="password_confirmation" required placeholder="Confirme a Senha">
+                        </div>
+                        <hr>
+
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-primary btn-user btn-block">
+                                Registrar
+                            </button>
+                        </div>
+                        <hr>
+                    </form>
+                </div>
+            </div>
         </div>
-
-        <div class="mb-4">
-            <label for="email" class="block text-sm font-medium text-gray-700">E-mail</label>
-            <input type="email" name="email" id="email" required class="border-2 form-input mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"  value="{{ old('email') }}">
-            @error('email')
-            <span>{{ $message }}</span>
-            @enderror
-        </div>
-
-        <div class="mb-4">
-            <label for="situacao" class="block text-sm font-medium text-gray-700">Situação</label>
-            <input type="text" name="situacao" id="situacao" required class="border-2 form-input mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50" value="{{ old('situacao') }}">
-        </div>
-        <div class="mb-4">
-            <label for="password" class="block text-sm font-medium text-gray-700">Senha</label>
-            <input type="password" name="password" id="password" required class="border-2 form-input mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
-        </div>
-
-
-        <div class="flex justify-center">
-            <input type="submit" value="Enviar" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
-            <input type="hidden" name="_token" value="{{ csrf_token() }}">
-        </div>
-
-    </form>
-</div>
-
-</body>
-</html>
+    </div>
+@endsection

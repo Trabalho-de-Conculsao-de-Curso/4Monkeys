@@ -12,7 +12,6 @@
                 @endforeach
             </ul>
         </div>
-
         <br/>
     @endif
 
@@ -26,173 +25,98 @@
             </div>
         </div>
     </div>
-    <div class="card mb-4">
-    </div>  
-
+    <div class="card mb-4"></div>
+    <button class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-xs px-3 py-1.5 mb-4 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
+        <a href="/softwares">Voltar</a>
+    </button>
     <div class="page-inner mt--5">
-        <div class="row">
-            <div class="col-md-5">
+        <div class="row justify-content-center"> <!-- Linha centralizada -->
+            <div class="col-md-6">
                 <div class="card">
                     <div class="card-header">
                         <div class="d-flex align-items-center">
                             <h4 class="card-title">Atualização de cadastro de Softwares</h4>
+
                         </div>
                     </div>
-                    <form action="{{ url("/softwares/$software->id") }}" method="POST" enctype="multipart/form-data">
+                    <form action="{{ url("/softwares/$software->id") }}" method="POST" enctype="multipart/form-data" class="user p-4">
                         @method("PUT")
                         @csrf
-                        <h1 class="text-xl font-bold mb-4">Editar Software</h1>
-        <div class="form-group">
-            <label for="tipo">Tipo do Software: 1 - Jogo, 2 - Trabalho, 3 - Utilitários</label>
-            <br/>
-            <input class="form-control" type="text" class="form-control" name="tipo" id="tipo" value="{{$software->tipo}}" required>
-        </div>
+                        <h1 class="text-xl font-bold mb-4 text-center">Editar Software</h1>
 
-        <div class="form-group">
-            <label for="nome">Nome</label>
-            <br/>
-            <input class="form-control" type="text" name="nome" id="nome" value="{{$software->nome}}" required>
-        </div>
+                        <div class="form-group">
+                            <label for="tipo">Tipo do Software: 1 - Jogo, 2 - Trabalho, 3 - Utilitários</label>
+                            <input type="text" name="tipo" id="tipo" value="{{ $software->tipo }}" required class="form-control form-control-user">
+                        </div>
+                        <hr>
 
-        <div class="form-group">
-            <label for="descricao">Descrição</label>
-            <br/>
-            <input class="form-control" type="text" name="descricao" id="descricao" value="{{$software->descricao}}">
-        </div>
+                        <div class="form-group">
+                            <label for="nome">Nome</label>
+                            <input type="text" name="nome" id="nome" value="{{ $software->nome }}" required class="form-control form-control-user">
+                        </div>
+                        <hr>
 
-        <div class="form-group">
-            <label for="peso">Peso</label>
-            <br/>
-            <input class="form-control" type="number" name="peso" id="peso" value="{{$software->peso}}">
-        </div>
+                        <div class="form-group">
+                            <label for="descricao">Descrição</label>
+                            <input type="text" name="descricao" id="descricao" value="{{ $software->descricao }}" class="form-control form-control-user">
+                        </div>
+                        <hr>
 
-        <div class="form-group">
-            <label for="software_imagem">Upload da Nova Imagem (opcional)</label>
-            <br/>
-            <input class="form-control" type="file" name="software_imagem" id="software_imagem">
-        </div>
+                        <div class="form-group">
+                            <label for="peso">Peso</label>
+                            <input type="number" name="peso" id="peso" value="{{ $software->peso }}" class="form-control form-control-user">
+                        </div>
+                        <hr>
 
-        <div class="form-group">
-            @if($software->imagem)
-                <input type="checkbox" name="remover_imagem" id="remover_imagem">
-                <label for="remover_imagem">Remover imagem atual</label>
-            @endif
-        </div>
+                        <div class="form-group">
+                            <label for="software_imagem">Upload da Nova Imagem (opcional)</label>
+                            <input type="file" name="software_imagem" id="software_imagem" class="form-control form-control-user">
+                        </div>
 
-        <h3>Requisitos Mínimos</h3>
-        <div class="form-group">
-            <label for="cpu_min">CPU</label>
-            <br/>
-            <input class="form-control" type="text" name="cpu_min" id="cpu_min" value="{{ $requisitos['Minimo']['cpu'] }}" required>
-        </div>
-        <div class="form-group">
-            <label for="gpu_min">GPU</label>
-            <br/>
-            <input class="form-control" type="text" name="gpu_min" id="gpu_min" value="{{ $requisitos['Minimo']['gpu'] }}" required>
-        </div>
-        <div class="form-group">
-            <label for="ram_min">RAM</label>
-            <br/>
-            <input class="form-control" type="text" name="ram_min" id="ram_min" value="{{ $requisitos['Minimo']['ram'] }}" required>
-        </div>
-        <div class="form-group">
-            <label for="placa_mae_min">Placa Mãe</label>
-            <br/>
-            <input class="form-control" type="text" name="placa_mae_min" id="placa_mae_min" value="{{ $requisitos['Minimo']['placa_mae'] }}">
-        </div>
-        <div class="form-group">
-            <label for="ssd_min">SSD</label>
-            <br/>
-            <input class="form-control" type="text" name="ssd_min" id="ssd_min" value="{{ $requisitos['Minimo']['ssd'] }}">
-        </div>
-        <div class="form-group">
-            <label for="cooler_min">Cooler</label>
-            <br/>
-            <input class="form-control" type="text" name="cooler_min" id="cooler_min" value="{{ $requisitos['Minimo']['cooler'] }}">
-        </div>
-        <div class="form-group">
-            <label for="fonte_min">Fonte</label>
-            <br/>
-            <input class="form-control" type="text" name="fonte_min" id="fonte_min" value="{{ $requisitos['Minimo']['fonte'] }}">
-        </div>
+                        @if($software->imagem)
+                            <div class="form-group">
+                                <input type="checkbox" name="remover_imagem" id="remover_imagem">
+                                <label for="remover_imagem">Remover imagem atual</label>
+                            </div>
+                        @endif
+                        <hr>
 
-        <h3>Requisitos Médios</h3>
-        <div class="form-group">
-            <label for="cpu_med">CPU</label>
-            <br/>
-            <input class="form-control" type="text" name="cpu_med" id="cpu_med" value="{{ $requisitos['Medio']['cpu'] }}" required>
-        </div>
-        <div class="form-group">
-            <label for="gpu_med">GPU</label>
-            <br/>
-            <input class="form-control" type="text" name="gpu_med" id="gpu_med" value="{{ $requisitos['Medio']['gpu'] }}" required>
-        </div>
-        <div class="form-group">
-            <label for="ram_med">RAM</label>
-            <br/>
-            <input class="form-control" type="text" name="ram_med" id="ram_med" value="{{ $requisitos['Medio']['ram'] }}" required>
-        </div>
-        <div class="form-group">
-            <label for="placa_mae_med">Placa Mãe</label>
-            <br/>
-            <input class="form-control" type="text" name="placa_mae_med" id="placa_mae_med" value="{{ $requisitos['Medio']['placa_mae'] }}">
-        </div>
-        <div class="form-group">
-            <label for="ssd_med">SSD</label>
-            <br/>
-            <input class="form-control" type="text" name="ssd_med" id="ssd_med" value="{{ $requisitos['Medio']['ssd'] }}">
-        </div>
-        <div class="form-group">
-            <label for="cooler_med">Cooler</label>
-            <br/>
-            <input class="form-control" type="text" name="cooler_med" id="cooler_med" value="{{ $requisitos['Medio']['cooler'] }}">
-        </div>
-        <div class="form-group">
-            <label for="fonte_med">Fonte</label>
-            <br/>
-            <input class="form-control" type="text" name="fonte_med" id="fonte_med" value="{{ $requisitos['Medio']['fonte'] }}">
-        </div>
+                        <h3>Requisitos Mínimos</h3>
+                        @foreach(['cpu' => 'CPU', 'gpu' => 'GPU', 'ram' => 'RAM', 'placa_mae' => 'Placa Mãe', 'ssd' => 'SSD', 'cooler' => 'Cooler', 'fonte' => 'Fonte'] as $field => $label)
+                            <div class="form-group">
+                                <label for="{{ $field }}_min">{{ $label }}</label>
+                                <input type="text" name="{{ $field }}_min" id="{{ $field }}_min" value="{{ $requisitos['Minimo'][$field] }}" class="form-control form-control-user" @if(in_array($field, ['cpu', 'gpu', 'ram'])) required @endif>
+                            </div>
+                        @endforeach
+                        <hr>
 
-        <h3>Requisitos Recomendados</h3>
-        <div class="form-group">
-            <label for="cpu_rec">CPU</label>
-            <br/>
-            <input class="form-control" type="text" name="cpu_rec" id="cpu_rec" value="{{ $requisitos['Recomendado']['cpu'] }}" required>
-        </div>
-        <div class="form-group">
-            <label for="gpu_rec">GPU</label>
-            <br/>
-            <input class="form-control" type="text" name="gpu_rec" id="gpu_rec" value="{{ $requisitos['Recomendado']['gpu'] }}" required>
-        </div>
-        <div class="form-group">
-            <label for="ram_rec">RAM</label>
-            <br/>
-            <input class="form-control" type="text" name="ram_rec" id="ram_rec" value="{{ $requisitos['Recomendado']['ram'] }}" required>
-        </div>
-        <div class="form-group">
-            <label for="placa_mae_rec">Placa Mãe</label>
-            <br/>
-            <input class="form-control" type="text" name="placa_mae_rec" id="placa_mae_rec" value="{{ $requisitos['Recomendado']['placa_mae'] }}">
-        </div>
-        <div class="form-group">
-            <label for="ssd_rec">SSD</label>
-            <br/>
-            <input class="form-control" type="text" name="ssd_rec" id="ssd_rec" value="{{ $requisitos['Recomendado']['ssd'] }}">
-        </div>
-        <div class="form-group">
-            <label for="cooler_rec">Cooler</label>
-            <br/>
-            <input class="form-control" type="text" name="cooler_rec" id="cooler_rec" value="{{ $requisitos['Recomendado']['cooler'] }}">
-        </div>
-        <div class="form-group">
-            <label for="fonte_rec">Fonte</label>
-            <br/>
-            <input class="form-control" type="text" name="fonte_rec" id="fonte_rec" value="{{ $requisitos['Recomendado']['fonte'] }}">
-        </div>
+                        <h3>Requisitos Médios</h3>
+                        @foreach(['cpu' => 'CPU', 'gpu' => 'GPU', 'ram' => 'RAM', 'placa_mae' => 'Placa Mãe', 'ssd' => 'SSD', 'cooler' => 'Cooler', 'fonte' => 'Fonte'] as $field => $label)
+                            <div class="form-group">
+                                <label for="{{ $field }}_med">{{ $label }}</label>
+                                <input type="text" name="{{ $field }}_med" id="{{ $field }}_med" value="{{ $requisitos['Medio'][$field] }}" class="form-control form-control-user" @if(in_array($field, ['cpu', 'gpu', 'ram'])) required @endif>
+                            </div>
+                        @endforeach
+                        <hr>
 
-        <div class="form-group">
-            <input type="submit" class="btn btn-primary" value="Editar">
+                        <h3>Requisitos Recomendados</h3>
+                        @foreach(['cpu' => 'CPU', 'gpu' => 'GPU', 'ram' => 'RAM', 'placa_mae' => 'Placa Mãe', 'ssd' => 'SSD', 'cooler' => 'Cooler', 'fonte' => 'Fonte'] as $field => $label)
+                            <div class="form-group">
+                                <label for="{{ $field }}_rec">{{ $label }}</label>
+                                <input type="text" name="{{ $field }}_rec" id="{{ $field }}_rec" value="{{ $requisitos['Recomendado'][$field] }}" class="form-control form-control-user" @if(in_array($field, ['cpu', 'gpu', 'ram'])) required @endif>
+                            </div>
+                        @endforeach
+                        <hr>
+
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-primary btn-user btn-block">
+                                Editar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
-    </form>
-</div>
+    </div>
+
 @endsection
