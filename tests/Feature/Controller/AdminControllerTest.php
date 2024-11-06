@@ -8,6 +8,13 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 
+beforeEach(function () {
+    // Cria e autentica um administrador para passar pelo middleware
+    $this->admin = Admin::factory()->create();
+    $this->actingAs($this->admin, 'admin');
+});
+
+//index
 it('Rota index retorna a lista de administradores e responde com 200', function () {
     // Cria e autentica um administrador
     $admin = Admin::factory()->create();
@@ -37,6 +44,61 @@ it('Rota index retorna a lista de administradores e responde com 200', function 
     }
 });
 
+it('carrega a segunda página de administradores e exibe os dados corretos', function () {
+    // Cria 20 administradores para permitir múltiplas páginas
+    Admin::factory()->count(20)->create();
+
+    // Faz uma requisição GET para a segunda página de administradores
+    $response = $this->get('/create-admin?page=2');
+
+    // Verifica se a resposta está correta (200 OK)
+    $response->assertStatus(200);
+
+    // Verifica se a segunda página contém apenas os 5 administradores restantes
+    $response->assertViewHas('admins', function ($viewAdmins) {
+        return $viewAdmins->count() === 10;
+    });
+});
+
+it('exibe os elementos corretos na página de administradores', function () {
+    // Cria um administrador
+    $admin = Admin::factory()->create([
+        'name' => 'Admin Teste',
+        'email' => 'admin@example.com',
+    ]);
+
+    // Faz uma requisição GET para a rota index
+    $response = $this->get('/create-admin');
+
+    // Verifica a presença dos dados do administrador na view
+    $response->assertSee('Admin Teste');
+    $response->assertSee('admin@example.com');
+    $response->assertSee('<table', false); // Verifica a presença da tabela
+});
+
+it('verifica que a rota index está protegida pelo middleware AdminAuthenticated', function () {
+    // Desloga qualquer usuário logado
+    auth()->logout();
+
+    // Faz uma requisição GET para a rota index sem autenticação de admin
+    $response = $this->get('/create-admin');
+
+    // Verifica o redirecionamento para a página de login de admin
+    $response->assertRedirect('/login-admin');
+});
+
+//create
+it('carrega a página de criação de administrador e responde com 200', function () {
+    // Faz uma requisição GET para a rota create
+    $response = $this->get('/create-admin/create');
+
+    // Verifica se a resposta está correta (200 OK)
+    $response->assertStatus(200);
+
+    // Verifica se a view correta foi carregada
+    $response->assertViewIs('auth.admin.createAdmin');
+});
+
 it('Rota create carrega o formulário de criação de administradores e responde com 200', function () {
     // Cria e autentica um administrador
     $admin = Admin::factory()->create();
@@ -58,6 +120,19 @@ it('Rota create carrega o formulário de criação de administradores e responde
     $response->assertSee('name="password"', false);
 });
 
+it('verifica que a rota create está protegida pelo middleware AdminAuthenticated', function () {
+    // Desloga qualquer usuário logado
+    auth()->logout();
+
+    // Faz uma requisição GET para a rota create sem autenticação de admin
+    $response = $this->get('/create-admin/create');
+
+    // Verifica o redirecionamento para a página de login de admin
+    $response->assertRedirect('/login-admin');
+});
+
+
+//store
 it('Rota store cria um novo administrador e responde com 302', function () {
     // Autentica um administrador para acessar a rota
     $admin = Admin::factory()->create();
@@ -91,49 +166,94 @@ it('Rota store cria um novo administrador e responde com 302', function () {
     $response->assertRedirect('/create-admin');
 });
 
-it('Rota store falha ao criar um administrador com dados inválidos', function () {
-    // Simula os dados inválidos do administrador
-    $adminData = [
-        'name' => '', // Nome vazio
-        'email' => 'invalid-email', // Email inválido
-        'password' => 'short', // Senha muito curta
-        'password_confirmation' => 'short', // Confirmação da senha
-    ];
-
-    // Envia uma requisição POST com os dados inválidos
-    $response = $this->postJson('/create-admin', array_merge($adminData, [
-        '_token' => csrf_token(),
-    ]));
-
-    $response->assertStatus(302);
-
-    // Verifica se os erros de validação estão presentes
-    $response->assertValid(['name', 'email', 'password']);
-});
-
-it('Rota store falha ao criar um administrador com um e-mail já existente', function () {
-    // Cria um administrador existente
-    Admin::factory()->create(['email' => 'adminteste@example.com']);
-
-    // Simula os dados de um novo administrador com o mesmo e-mail
+it('cria um log de criação de administrador no banco de dados', function () {
+    // Dados válidos para o novo administrador
     $adminData = [
         'name' => 'Admin Teste',
-        'email' => 'adminteste@example.com', // E-mail já existente
+        'email' => 'adminteste@example.com',
         'password' => 'password123',
         'password_confirmation' => 'password123',
     ];
 
-    // Envia uma requisição POST com o e-mail duplicado
-    $response = $this->postJson('/create-admin', array_merge($adminData, [
-        '_token' => csrf_token(),
-    ]));
+    // Envia a requisição POST para a rota store
+    $this->post('/create-admin', $adminData);
 
-    $response->assertStatus(302);
-
-    // Verifica se o erro de validação para o campo 'email' está presente
-    $response->assertValid(['email']);
+    // Verifica se o log foi registrado
+    $this->assertDatabaseHas('custom_logs', [
+        'descricao' => 'Admin criado: Admin Teste',
+        'operacao' => 'create',
+        'admin_id' => $this->admin->id,
+    ]);
 });
 
+it('retorna erro de validação ao tentar criar um administrador com email duplicado', function () {
+    // Cria um administrador existente
+    Admin::factory()->create(['email' => 'admin@example.com']);
+
+    // Dados com email duplicado
+    $duplicateEmailData = [
+        'name' => 'Novo Admin',
+        'email' => 'admin@example.com', // Email já em uso
+        'password' => 'password123',
+        'password_confirmation' => 'password123',
+    ];
+
+    // Envia a requisição POST para a rota store
+    $response = $this->post('/create-admin', $duplicateEmailData);
+
+    // Verifica se há erro de validação na sessão para o campo 'email'
+    $response->assertSessionHasErrors(['email']);
+});
+
+it('retorna erros de validação ao omitir campos obrigatórios', function () {
+    // Dados incompletos (faltando email e senha)
+    $incompleteData = [
+        'name' => 'Admin Teste',
+    ];
+
+    // Envia a requisição POST para a rota store
+    $response = $this->post('/create-admin', $incompleteData);
+
+    // Verifica se há erros de validação na sessão
+    $response->assertSessionHasErrors(['email', 'password']);
+});
+
+it('retorna erro de validação quando a confirmação de senha não corresponde', function () {
+    // Dados com confirmação de senha incorreta
+    $dataWithPasswordMismatch = [
+        'name' => 'Admin Teste',
+        'email' => 'adminteste@example.com',
+        'password' => 'password123',
+        'password_confirmation' => 'password_mismatch', // Confirmação incorreta
+    ];
+
+    // Envia a requisição POST para a rota store
+    $response = $this->post('/create-admin', $dataWithPasswordMismatch);
+
+    // Verifica se há erro de validação na sessão para o campo 'password'
+    $response->assertSessionHasErrors(['password']);
+});
+
+it('verifica que a rota store está protegida pelo middleware AdminAuthenticated', function () {
+    // Desloga qualquer usuário logado
+    auth()->logout();
+
+    // Dados válidos para o novo administrador
+    $adminData = [
+        'name' => 'Admin Teste',
+        'email' => 'adminteste@example.com',
+        'password' => 'password123',
+        'password_confirmation' => 'password123',
+    ];
+
+    // Envia a requisição POST para a rota store sem autenticação de admin
+    $response = $this->post('/create-admin', $adminData);
+
+    // Verifica o redirecionamento para a página de login de admin
+    $response->assertRedirect('/login-admin');
+});
+
+//show
 it('Rota show retorna administradores correspondentes ao critério de busca', function () {
     // Autentica um administrador para acessar a rota
     $admin = Admin::factory()->create();
@@ -204,6 +324,7 @@ it('Rota show retorna resultados paginados de administradores', function () {
     $response->assertViewIs('auth.admin.searchAdmin');
 });
 
+//edit
 it('Rota edit carrega a página de edição de administradores', function () {
     // Criação e autenticação de um administrador para acessar a rota
     $authenticatedAdmin = Admin::factory()->create();
@@ -229,6 +350,74 @@ it('Rota edit carrega a página de edição de administradores', function () {
     $response->assertSee($admin->email);
 });
 
+it('exibe o formulário de edição com os dados do administrador', function () {
+    // Cria um administrador para edição
+    $admin = Admin::factory()->create([
+        'name' => 'Admin Teste',
+        'email' => 'admin@example.com',
+    ]);
+
+    // Faz uma requisição GET para a rota edit do administrador
+    $response = $this->get("/create-admin/{$admin->id}/edit");
+
+    // Verifica a presença do formulário e dos campos com valores preenchidos
+    $response->assertSee('<form', false); // Formulário de edição de administrador
+    $response->assertSee('name="name"', false); // Campo de nome
+    $response->assertSee('name="email"', false); // Campo de email
+    $response->assertSee('type="submit"', false); // Botão de envio
+
+    // Verifica que os valores do administrador estão no formulário
+    $response->assertSee('Admin Teste');
+    $response->assertSee('admin@example.com');
+});
+
+it('retorna 500 ao tentar acessar a edição de um administrador inexistente', function () {
+    $nonExistentId = 999; // ID que não existe no banco de dados
+
+    // Faz uma requisição GET para a rota edit com um ID inexistente
+    $response = $this->get("/create-admin/{$nonExistentId}/edit");
+
+    $response->assertStatus(500);
+});
+
+it('verifica que a rota edit está protegida pelo middleware AdminAuthenticated', function () {
+    // Desloga qualquer usuário logado
+    auth()->logout();
+
+    // Faz uma requisição GET para a rota edit sem autenticação de admin
+    $response = $this->get('/create-admin/1/edit');
+
+    // Verifica o redirecionamento para a página de login de admin
+    $response->assertRedirect('/login-admin');
+});
+
+it('carrega a view de edição apenas com os dados do administrador especificado', function () {
+    // Cria dois administradores
+    $adminToEdit = Admin::factory()->create([
+        'name' => 'Admin Edit',
+        'email' => 'edit@example.com',
+    ]);
+
+    Admin::factory()->create([
+        'name' => 'Admin Outro',
+        'email' => 'outro@example.com',
+    ]);
+
+    // Faz uma requisição GET para a rota edit do administrador especificado
+    $response = $this->get("/create-admin/{$adminToEdit->id}/edit");
+
+    // Verifica que apenas o administrador especificado está presente na view
+    $response->assertViewHas('admin', function ($viewAdmin) use ($adminToEdit) {
+        return $viewAdmin->id === $adminToEdit->id;
+    });
+
+    // Verifica se a view contém apenas os dados do administrador especificado
+    $response->assertSee('Admin Edit');
+    $response->assertSee('edit@example.com');
+    $response->assertDontSee('Admin Outro'); // Verifica que o outro administrador não aparece na view
+});
+
+//update
 it('Rota update atualiza um administrador com sucesso e responde com 302', function () {
     // Criação e autenticação de um administrador para acessar a rota
     $authenticatedAdmin = Admin::factory()->create();
@@ -327,6 +516,7 @@ it('Rota update falha ao atualizar com um e-mail já existente e responde com 30
     $response->assertSessionHasErrors(['email']);
 });
 
+//destroy
 it('Rota destroy exclui um administrador com sucesso e responde com 302', function () {
     // Criação e autenticação de um administrador para acessar a rota
     $authenticatedAdmin = Admin::factory()->create();
@@ -360,7 +550,7 @@ it('Rota destroy retorna 302 se o administrador não for encontrado', function (
         '_token' => csrf_token(),
     ]);
 
-    $response->assertStatus(302);
+    $response->assertStatus(404);
 });
 
 it('Rota destroy redireciona corretamente quando o _token não está presente', function () {

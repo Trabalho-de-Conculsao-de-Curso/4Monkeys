@@ -9,28 +9,17 @@ use Illuminate\Validation\Rule;
 
 class PremiumController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-
         $usuarios = User::paginate(10); // Paginar 10 usuários por página
         return view('premium.index', compact('usuarios'));
     }
 
-
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
         return view('premium.createPremium');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         $request->validate([
@@ -59,9 +48,6 @@ class PremiumController extends Controller
             ->with('success', 'Usuário criado com sucesso!');
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(Request $request)
     {
         $search = $request->input('search');
@@ -77,18 +63,12 @@ class PremiumController extends Controller
         return view('premium.searchPremium', compact('results'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit($id)
     {
         $usuarios = User::all()->find($id);
         return view('premium.editPremium', compact('usuarios'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, $id)
     {
         // Validação dos dados
@@ -120,10 +100,6 @@ class PremiumController extends Controller
             ->with('success', 'Usuário atualizado com sucesso!');
     }
 
-
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy($id)
     {
         if (request()->has('_token')){
