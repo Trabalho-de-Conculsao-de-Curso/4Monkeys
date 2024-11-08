@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AdminDashboardController;
+use App\Http\Controllers\AvaliacaoController;
 use App\Http\Controllers\ChartController;
 use App\Http\Controllers\ConjuntoLocalController;
 use App\Http\Controllers\FreeConjuntoController;
@@ -31,6 +32,10 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::post('/selecionar', [ConjuntoController::class, 'selecionar'])->name('home.selecionar');
     Route::get('/historico-conjuntos', [ConjuntoController::class, 'historicoConjuntos']);
+    Route::post('/avaliar', [AvaliacaoController::class, 'store'])->name('avaliar.store');
+    Route::get('/avaliar/create', [AvaliacaoController::class, 'create'])->name('avaliar.create');
+    Route::get('/avaliar', [AvaliacaoController::class, 'index'])->name('avaliar.index');
+
 });
 
 

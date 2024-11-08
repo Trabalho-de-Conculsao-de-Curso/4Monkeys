@@ -90,7 +90,10 @@
         <div class="sidebar-card d-none d-lg-flex">
             <img class="sidebar-card-illustration mb-2" src="img/undraw_rocket.svg" alt="...">
             <p class="text-center mb-2"><strong>Você ja é um parceiro</strong> aproveite todas as funcionalidades</p>
-            <a class="btn btn-success btn-sm" href="https://startbootstrap.com/theme/sb-admin-pro">Avaliar</a>
+            <a class="btn btn-success btn-sm" href="/avaliar/create">Avaliar</a>
         </div>
     </ul>
+
 </div>
+
+

@@ -33,6 +33,7 @@
                 <nav class="sb-sidenav-menu-nested nav accordion" id="sidenavAccordionPages">
                     <a class="nav-link" href="{{url('create-admin')}}">Administradores</a>
                     <a class="nav-link" href="{{url('usuario-premium')}}">Usuários Premium</a>
+                    <a class="nav-link" href="{{url('avaliar')}}">Avaliações</a>
                 </nav>
             </div>
             <div class="sb-sidenav-menu-heading">Logs e Tabelas</div>
