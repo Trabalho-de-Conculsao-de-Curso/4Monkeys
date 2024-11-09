@@ -122,12 +122,12 @@ class GeminiAPIService
                         'user_id' => auth()->id(),
                     ]);
 
-                    throw new \Exception('Erro ao decodificar a resposta JSON: ' . json_last_error_msg());
+                    return redirect()->back()->with('json_error', true);
                 }
             }
         }
 
-        throw new \Exception('Resposta da API do Gemini não está no formato esperado');
+        return redirect()->back()->with('format_error', true);
     }
 
     public function findProductIdBySimilarity($componentName)

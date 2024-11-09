@@ -47,7 +47,8 @@ class ConjuntoController extends Controller
         do {
             DB::beginTransaction();
 
-            try {
+
+            try  {
                 $produtoNaoEncontrado = false;
                 $generatedConjuntoIds = [];
                 $conjuntos = []; // Array para armazenar conjuntos com seus totais e detalhes

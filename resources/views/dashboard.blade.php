@@ -4,7 +4,7 @@
 
 <div class="mt-10">
     <!-- Formulário Principal -->
-    <form id="software-selection-form" action="{{ auth()->check() ? route('free.selecionar') : route('free.selecionar') }}" method="POST" class="relative p-6 bg-white border border-gray-800 rounded-lg shadow">
+    <form id="software-selection-form" action="{{ auth()->check() ? route('home.selecionar') : route('free.selecionar') }}" method="POST" class="relative p-6 bg-white border border-gray-800 rounded-lg shadow">
         @csrf
         <h2 class="mb-6 text-4xl font-bold text-center text-transparent concert-one-regular bg-gradient-to-r from-orange-500 via-pink-400 to-blue-300 bg-clip-text animate-fade-in">
             Selecionar Softwares

@@ -60,7 +60,7 @@ function toggleDetails(id, description) {
     }
 }
 
-function typeWriterEffect(elementId, text, speed = 50) {
+function typeWriterEffect(elementId, text, speed = 20) {
     const element = document.getElementById(elementId);
     element.innerHTML = '';
     let i = 0;
@@ -87,4 +87,5 @@ function showAlert(message) {
         alertBox.classList.add('hidden');
     }, 3000);
 }
+
 
