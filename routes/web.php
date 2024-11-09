@@ -49,7 +49,7 @@ Route::resource('/usuario-premium', PremiumController::class)->middleware(AdminA
 
 Route::get('/login-admin', [AdminController::class, 'showLoginForm'])->name('admin.login');
 Route::post('/login-admin', [AdminController::class, 'login']);
-Route::resource('/create-admin', AdminController::class)->middleware(AdminAuthenticated::class);
+Route::resource('/create-admin', AdminController::class);//->middleware(AdminAuthenticated::class);
 Route::post('/admin/logout', function () {
     auth()->guard('admin')->logout();  // Faz o logout usando o guard 'admin'
     return redirect('/');  // Redireciona para a página de login do admin (ou outra rota que você definir)

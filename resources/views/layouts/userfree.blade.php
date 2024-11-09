@@ -20,7 +20,10 @@
         <p>Você pode selecionar no máximo 3 softwares.</p>
     </div>
 
+    
+
     <div id="layoutSidenav" class="d-flex">
+        @include('layouts.free.sidebar')
         <div id="layoutSidenav_content" class="flex-grow-1">
             @include('layouts.free.navbar')
             <main>

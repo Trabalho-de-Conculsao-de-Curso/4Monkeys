@@ -1,7 +1,7 @@
 <div id="wrapper">
     <ul class="navbar-nav bg-purple-600 sidebar sidebar-dark accordion h-full" id="accordionSidebar">
         <!-- Sidebar - Brand -->
-        <a class="sidebar-brand d-flex align-items-center justify-content-center py-4" href="index.html">
+        <a class="sidebar-brand d-flex align-items-center justify-content-center py-4" href="{{url('dashboard')}}">
             <div class="sidebar-brand-icon rotate-n-15">
                 <i class="fas fa-crown"></i>
             </div>
@@ -62,6 +62,8 @@
             complemento
         </div>
 
+        
+
         <li class="nav-item">
             <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePages"
                 aria-expanded="true" aria-controls="collapsePages">
@@ -70,10 +72,7 @@
             </a>
             <div id="collapsePages" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
                 <div class="bg-white py-2 collapse-inner rounded">
-                    <h6 class="collapse-header">Lojas</h6>
-                    <a class="collapse-item" href="https://www.kabum.com.br/">Kabum</a>
-                    <a class="collapse-item" href="https://patoloco.com.br/">Pato Loco</a>
-                    <a class="collapse-item" href="premium/404.html">Terabyte</a>
+                    
                     <hr>
                     <div class="collapse-divider"></div>
                     <a class="collapse-header" href="404.html">De uma sugestão</a>
@@ -90,10 +89,7 @@
         <div class="sidebar-card d-none d-lg-flex">
             <img class="sidebar-card-illustration mb-2" src="img/undraw_rocket.svg" alt="...">
             <p class="text-center mb-2"><strong>Você ja é um parceiro</strong> aproveite todas as funcionalidades</p>
-            <a class="btn btn-success btn-sm" href="/avaliar/create">Avaliar</a>
+            <a class="btn btn-success btn-sm" href="{{url('avaliar/create')}}">Avaliar</a>
         </div>
     </ul>
-
 </div>
-
-

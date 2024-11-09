@@ -100,7 +100,8 @@ class ConjuntoController extends Controller
 
                 if (!$produtoNaoEncontrado) {
                     DB::commit();
-                    return response()->json($conjuntos); // Retorna como JSON temporariamente para verificar a estrutura
+                    //return response()->json($conjuntos); // Retorna como JSON temporariamente para verificar a estrutura
+                    return view('conjuntos', compact('conjuntos'));
                 } else {
                     DB::rollBack();
                 }
@@ -317,7 +318,11 @@ class ConjuntoController extends Controller
         }
 
         // Retornar o histórico em formato JSON
-        return response()->json([
+        /*return response()->json([
+            'historico' => $historico,
+        ]);*/
+
+        return view('historico', [
             'historico' => $historico,
         ]);
     }
