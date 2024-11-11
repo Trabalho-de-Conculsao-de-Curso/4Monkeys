@@ -2,8 +2,6 @@
 
 @section('content free')
 
-
-
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const checkboxes = document.querySelectorAll('input[name="softwares[]"]');

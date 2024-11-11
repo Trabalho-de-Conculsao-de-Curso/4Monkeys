@@ -247,13 +247,6 @@ class ConjuntoController extends Controller
             ->with(['produtos.lojaOnline', 'softwares']) // Carregar produtos com suas lojas online e softwares relacionados
             ->get();
 
-        // Verificar se há conjuntos retornados
-        if ($conjuntos->isEmpty()) {
-            return response()->json([
-                'message' => 'Nenhum conjunto encontrado para o usuário.',
-            ], 404);
-        }
-
         // Agrupar os conjuntos pela data de criação
         $agrupadosPorData = $conjuntos->groupBy(function ($conjunto) {
             return $conjunto->created_at->format('Y-m-d H:i:s'); // Agrupar por data de criação completa

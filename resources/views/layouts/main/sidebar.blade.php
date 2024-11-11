@@ -34,36 +34,15 @@
                 <div class="bg-white  collapse-inner rounded">
                     <h6 class="collapse-header">Opções:</h6>
                     <a class="collapse-item" href="historico-conjuntos">Meus Setups</a>
-                    <a class="collapse-item" href="cards.html">Dicas 4monkeys</a>
+                    
                 </div>
             </div>
         </li>
-
-
-        <li class="nav-item">
-            <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUtilities"
-                aria-expanded="true" aria-controls="collapseUtilities">
-                <i class="fas fa-fw fa-wrench"></i>
-                <span>Serviços</span>
-            </a>
-            <div id="collapseUtilities" class="collapse" aria-labelledby="headingUtilities"
-                data-parent="#accordionSidebar">
-                <div class="bg-white py-2 collapse-inner rounded">
-                    <h6 class="collapse-header">Opções:</h6>
-                    <a class="collapse-item" href="utilities-color.html">Pergunta Técnica</a>
-
-                </div>
-            </div>
-        </li>
-
         <hr class="sidebar-divider bg-white">
 
         <div class="sidebar-heading text-white">
             complemento
         </div>
-
-        
-
         <li class="nav-item">
             <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePages"
                 aria-expanded="true" aria-controls="collapsePages">

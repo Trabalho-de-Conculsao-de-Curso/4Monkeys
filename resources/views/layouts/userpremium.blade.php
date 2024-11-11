@@ -7,9 +7,9 @@
 
     <title>{{ config('app.name') }}</title>
     <!-- Tailwind CSS -->
-<script src="https://cdn.tailwindcss.com"></script>
-<!-- Scripts do Bootstrap -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Scripts do Bootstrap -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <!-- Custom fonts for this template-->
     <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
@@ -20,19 +20,20 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="{{ asset('premium/filled-card.css') }}" rel="stylesheet" />
 </head>
-<body id="page-top" class="bg-slate-100">
+<body id="page-top" class="bg-slate-100 min-h-screen flex flex-col">
+
     <div id="selectionAlert" class="hidden fixed top-10 left-1/2 transform -translate-x-1/2 p-4 bg-purple-600 text-white rounded-md shadow-lg z-50 w-80 text-center">
         <p>Você pode selecionar no máximo 3 softwares.</p>
     </div>
 
 
-    <div id="layoutSidenav" class="d-flex">
+    <div id="layoutSidenav" class="d-flex flex-grow-1">
         @include('layouts.main.sidebar')
 
         <div id="layoutSidenav_content" class="flex-grow-1">
             @include('layouts.main.navbar')
             <main>
-                <div class="container-fluid px-4">
+                <div class="container-fluid px-4 flex-grow-1">
                     @yield('content premium')
                 </div>
             </main>
@@ -50,5 +51,20 @@
     <script src="premium/demo/chart-pie-demo.js"></script>
     <script src="{{ asset('premium/scripts.js') }}"></script>
     <script src="{{ asset('premium/jstelainicial.js') }}"></script>
+
+    <script src="{{ asset('premium/avaliacao.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            @if(session('json_error'))
+            // Abre o modal de erro JSON
+            new bootstrap.Modal(document.getElementById('jsonErrorModal')).show();
+            @endif
+
+            @if(session('format_error'))
+            // Abre o modal de erro de formato de resposta
+            new bootstrap.Modal(document.getElementById('formatErrorModal')).show();
+            @endif
+        });
+    </script>
 </body>
 </html>

@@ -78,4 +78,5 @@ Route::get('/produtos/search', [ProdutoController::class, 'show'])->name('produt
 Route::get('/softwares/search', [SoftwareController::class, 'show'])->name('softwares.search');
 
 
+
 require __DIR__.'/auth.php';
