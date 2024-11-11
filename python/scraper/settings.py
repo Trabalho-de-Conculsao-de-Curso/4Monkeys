@@ -8,7 +8,6 @@ urls_para_processar = [
     {"url": "https://patoloco.com.br/produtos/placas-mae", "filters": None},
     {"url": "https://patoloco.com.br/produtos/memorias", "filters": None},
     {"url": "https://patoloco.com.br/produtos/ssd", "filters": None},
-    {"url": "https://patoloco.com.br/produtos/ssd-m2", "filters": None},
     {"url": "https://patoloco.com.br/produtos/coolers-e-watercoolers", "filters": None},
     {"url": "https://patoloco.com.br/produtos/fontes", "filters": None},
     {"url": "https://www.kabum.com.br/hardware/placa-de-video-vga",
@@ -51,4 +50,13 @@ urls_para_processar = [
                  "facet_filters": "eyJrYWJ1bV9wcm9kdWN0IjpbInRydWUiXSwiaGFzX29mZmVyIjpbInRydWUiXX0=",
                  "sort": "most_searched"
              }},
+           {"url": "https://www.gkinfostore.com.br/fonte", "filters": None},
+            {"url": "https://www.gkinfostore.com.br/placa-de-video", "filters": None},
+            {"url": "https://www.gkinfostore.com.br/processador", "filters": None},
+            {"url": "https://www.gkinfostore.com.br/placa-mae", "filters": None},
+            {"url": "https://www.gkinfostore.com.br/memoria", "filters": None},
+            {"url": "https://www.gkinfostore.com.br/ssd", "filters": None},
+            {"url": "https://www.gkinfostore.com.br/cooler", "filters": None},
+
+
 ]

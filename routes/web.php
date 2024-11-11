@@ -34,7 +34,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/historico-conjuntos', [ConjuntoController::class, 'historicoConjuntos']);
     Route::post('/avaliar', [AvaliacaoController::class, 'store'])->name('avaliar.store');
     Route::get('/avaliar/create', [AvaliacaoController::class, 'create'])->name('avaliar.create');
-    Route::get('/avaliar', [AvaliacaoController::class, 'index'])->name('avaliar.index');
+
 
 });
 
@@ -46,10 +46,13 @@ Route::post('/conjunto-produtos', [ConjuntoLocalController::class, 'getConjuntoP
 Route::resource('/produtos', ProdutoController::class)->middleware(AdminAuthenticated::class);
 Route::resource('/softwares', SoftwareController::class)->middleware(AdminAuthenticated::class);
 Route::resource('/usuario-premium', PremiumController::class)->middleware(AdminAuthenticated::class);
+Route::get('/api/desktops-by-day', [AdminDashboardController::class, 'getDesktopsByDay'])->middleware(AdminAuthenticated::class);
 
+
+Route::get('/avaliar', [AvaliacaoController::class, 'index'])->name('avaliar.index')->middleware(AdminAuthenticated::class);
 Route::get('/login-admin', [AdminController::class, 'showLoginForm'])->name('admin.login');
 Route::post('/login-admin', [AdminController::class, 'login']);
-Route::resource('/create-admin', AdminController::class);//->middleware(AdminAuthenticated::class);
+Route::resource('/create-admin', AdminController::class)->middleware(AdminAuthenticated::class);
 Route::post('/admin/logout', function () {
     auth()->guard('admin')->logout();  // Faz o logout usando o guard 'admin'
     return redirect('/');  // Redireciona para a página de login do admin (ou outra rota que você definir)
