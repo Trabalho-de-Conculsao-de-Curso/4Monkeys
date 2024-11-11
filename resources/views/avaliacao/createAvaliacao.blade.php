@@ -1,6 +1,7 @@
 @extends('layouts.userpremium')
 
 @section('content premium')
+
 <body></body>
 <div class="flex min-h-screen flex-col">
     

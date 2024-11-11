@@ -277,11 +277,18 @@ class ConjuntoController extends Controller
                     'nome' => $conjunto->nome,
                     'categoria' => $conjunto->categoria_id,
                     'total' => $totalConjunto, // Adiciona o total calculado
-                    'produtos' => $conjunto->produtos->map(function ($produto) {
+                    'produtos' => $conjunto->produtos->map(function ($produto) use ($conjunto) {
+                        // Busca o valor específico do produto no conjunto_historicos
+                        $valorProduto = DB::table('conjunto_historicos')
+                            ->where('conjunto_id', $conjunto->id)
+                            ->where('produto_id', $produto->id)
+                            ->value('valor'); // Pega o valor específico do produto
+
                         return [
                             'id' => $produto->id,
                             'nome' => $produto->nome,
                             'url' => $produto->lojaOnline->urlLoja ?? 'URL não disponível', // Adiciona a URL da loja online
+                            'valor' => $valorProduto, // Adiciona o valor específico do produto
                         ];
                     }),
                     'softwares' => $conjunto->softwares->map(function ($software) {
@@ -306,8 +313,10 @@ class ConjuntoController extends Controller
                 ];
             }
 
+
             // Adicionar o histórico do conjunto por data à lista geral
             $historico[] = $historicoPorData;
+
         }
 
         // Retornar o histórico em formato JSON

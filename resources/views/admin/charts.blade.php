@@ -22,7 +22,7 @@
             <div class="card mb-4">
                 <div class="card-header">
                     <i class="fas fa-chart-bar me-1"></i>
-                    Receita de usuários por mês
+                    Quantidade de Softwares
                 </div>
                 <div class="card-body"><canvas id="myBarChart" width="100%" height="50"></canvas></div>
                 <div class="card-footer small text-muted">Updated yesterday at 11:59 PM</div>
@@ -70,10 +70,10 @@ document.addEventListener('DOMContentLoaded', function () {
         new Chart(ctxBar, {
             type: 'bar',
             data: {
-                labels: ['Total de Softwares'], 
+                labels: ['Total de Softwares'],
                 datasets: [{
                     label: 'Quantidade de Softwares',
-                    data: [total], 
+                    data: [total],
                     backgroundColor: 'rgba(75, 192, 192, 0.2)',
                     borderColor: 'rgba(75, 192, 192, 1)',
                     borderWidth: 1
@@ -81,7 +81,7 @@ document.addEventListener('DOMContentLoaded', function () {
             },
             options: {
                 scales: {
-                    y: { 
+                    y: {
                         beginAtZero: true
                     }
                 },
@@ -89,7 +89,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     tooltip: {
                         callbacks: {
                             label: function(tooltipItem) {
-                                return `Total de Softwares: ${tooltipItem.raw}`; 
+                                return `Total de Softwares: ${tooltipItem.raw}`;
                             }
                         }
                     }

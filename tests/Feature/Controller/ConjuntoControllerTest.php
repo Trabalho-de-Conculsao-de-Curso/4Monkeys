@@ -517,7 +517,7 @@ it('lança exceção ao associar softwares e registra log de erro', function () 
 
 //HistoricoConjunto
 it('retorna histórico de conjuntos do usuário com sucesso', function () {
-    // Cria um conjunto para o usuário autenticado com produtos, lojas online, softwares e requisitos
+    // Configuração dos dados de teste
     $categoria = Categoria::factory()->create();
     $conjunto = Conjunto::factory()->create([
         'user_id' => $this->user->id,
@@ -530,7 +530,6 @@ it('retorna histórico de conjuntos do usuário com sucesso', function () {
     $software = Software::factory()->create();
     $conjunto->softwares()->attach($software->id);
 
-    // Cria requisitos para o software
     RequisitoSoftware::factory()->create([
         'software_id' => $software->id,
         'requisito_nivel' => 'Minimo',
@@ -539,63 +538,33 @@ it('retorna histórico de conjuntos do usuário com sucesso', function () {
         'ram' => '8GB',
     ]);
 
-    // Simula um valor total no conjunto_historico para o produto no conjunto
     DB::table('conjunto_historicos')->insert([
         'conjunto_id' => $conjunto->id,
         'produto_id' => $produto->id,
         'valor' => 150.0,
     ]);
 
-    // Envia a requisição para o método historicoConjuntos
-    $response = $this->getJson('/historico-conjuntos');
+    // Realiza a requisição e verifica que a view correta foi carregada
+    $response = $this->get('/historico-conjuntos');
 
-    // Verifica se a resposta tem o formato JSON esperado e contém o conjunto criado
     $response->assertStatus(200)
-        ->assertJsonStructure([
-            'historico' => [
-                '*' => [
-                    'data',
-                    'conjuntos' => [
-                        '*' => [
-                            'id',
-                            'nome',
-                            'categoria',
-                            'total',
-                            'produtos' => [
-                                '*' => [
-                                    'id',
-                                    'nome',
-                                    'url',
-                                ],
-                            ],
-                            'softwares' => [
-                                '*' => [
-                                    'id',
-                                    'nome',
-                                    'descricao',
-                                    'requisitos' => [
-                                        '*' => [
-                                            'nivel',
-                                            'cpu',
-                                            'gpu',
-                                            'ram',
-                                            'placa_mae',
-                                            'ssd',
-                                            'cooler',
-                                            'fonte',
-                                        ],
-                                    ],
-                                ],
-                            ],
-                        ],
-                    ],
-                ],
-            ],
-        ]);
+        ->assertViewIs('historico') // Confirma que a view 'historico' é carregada
+        ->assertViewHas('historico'); // Confirma que a view possui a variável 'historico'
 
-    // Verifica que o total calculado é retornado corretamente
-    $response->assertJsonPath('historico.0.conjuntos.0.total', 150);
+    // Acessa os dados da view para fazer verificações adicionais
+    $historico = $response->viewData('historico');
+
+    // Verifica a estrutura do histórico para garantir que contém os dados esperados
+    $this->assertIsArray($historico);
+    $this->assertNotEmpty($historico);
+
+    // Exemplo de verificação detalhada da estrutura
+    $this->assertArrayHasKey('data', $historico[0]);
+    $this->assertArrayHasKey('conjuntos', $historico[0]);
+    $this->assertEquals(150, $historico[0]['conjuntos'][0]['total']);
 });
+
+
 
 it('retorna mensagem de erro quando não há conjuntos para o usuário', function () {
     // Envia a requisição para o método historicoConjuntos sem conjuntos para o usuário

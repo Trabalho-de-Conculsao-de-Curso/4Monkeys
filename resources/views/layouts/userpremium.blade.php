@@ -26,41 +26,6 @@
         <p>Você pode selecionar no máximo 3 softwares.</p>
     </div>
 
-    <!-- Modal para erro de JSON -->
-    <div class="modal fade" id="jsonErrorModal" tabindex="-1" aria-labelledby="jsonErrorModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="jsonErrorModalLabel">Erro ao Decodificar JSON</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    Ocorreu um erro ao tentar decodificar a resposta JSON. Por favor, verifique a resposta ou tente novamente mais tarde.
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal para erro de formato de resposta -->
-    <div class="modal fade" id="formatErrorModal" tabindex="-1" aria-labelledby="formatErrorModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="formatErrorModalLabel">Erro de Formato de Resposta</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    A resposta da API do Gemini não está no formato esperado. Por favor, contate o suporte para mais informações.
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <div id="layoutSidenav" class="d-flex flex-grow-1">
         @include('layouts.main.sidebar')
@@ -86,6 +51,7 @@
     <script src="premium/demo/chart-pie-demo.js"></script>
     <script src="{{ asset('premium/scripts.js') }}"></script>
     <script src="{{ asset('premium/jstelainicial.js') }}"></script>
+
     <script src="{{ asset('premium/avaliacao.js') }}"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
