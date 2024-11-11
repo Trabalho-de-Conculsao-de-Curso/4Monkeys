@@ -2,7 +2,7 @@
     
     <ul class="h-full bg-purple-600 navbar-nav sidebar sidebar-dark accordion" id="accordionSidebar">
          <!-- Sidebar - Brand -->
-         <a class="sidebar-brand d-flex align-items-center justify-content-center py-4" href="{{url('dashboard')}}">
+         <a class="sidebar-brand d-flex align-items-center justify-content-center py-4" href="{{url('/')}}">
             <div class="sidebar-brand-icon rotate-n-15">
                 <i class="fas fa-gift"></i>
             </div>

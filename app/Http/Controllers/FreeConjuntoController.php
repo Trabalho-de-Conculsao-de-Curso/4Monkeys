@@ -59,9 +59,16 @@ class FreeConjuntoController extends Controller
         }
 
         // Retorna a resposta em formato JSON
-        return response()->json([
-            'software_mais_pesado' => $softwareMaisPesado,
+        //dd($response);
+        /*return response()->json([
+            //'software_mais_pesado' => $softwareMaisPesado,
+            'requisitos' => $response
+        ]);*/
+        //dd($software_mais_pesado);
+        return view('conjuntosFree', [
+            //'software_mais_pesado' => $softwareMaisPesado,
             'requisitos' => $response
         ]);
+        
     }
 }

@@ -14,6 +14,12 @@
     <link href="{{ asset('premium/sb-admin-2.min.css') }}" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="{{ asset('premium/filled-card.css') }}" rel="stylesheet" />
+    <style>
+        html, body {
+    height: 100%;
+    margin: 0;
+}
+    </style>
 </head>
 <body id="page-top" class="bg-slate-100">
     <div id="selectionAlert" class="fixed z-50 hidden p-4 text-center text-white transform -translate-x-1/2 bg-purple-600 rounded-md shadow-lg top-10 left-1/2 w-80">
@@ -31,8 +37,9 @@
                     @yield('content free')
                 </div>
             </main>
-            @include('layouts.free.footer')
+            {{--@include('layouts.free.footer')--}}
         </div>
+        
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

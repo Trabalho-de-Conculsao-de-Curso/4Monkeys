@@ -48,6 +48,6 @@
     </div>
     <div class="sb-sidenav-footer">
         <div class="small">Logado como:</div>
-        Mateus Ferreira
+        {{ Auth::user()->name }}
     </div>
 </nav>
