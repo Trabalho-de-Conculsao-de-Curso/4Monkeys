@@ -60,7 +60,7 @@
         <div class="card-header d-flex justify-content-between">
             <div>
                 <i class="fas fa-table me-1"></i>
-                Tabela de Logs
+                Tabela de Logs Gemini
             </div>
             <a href="{{ route('logs.export') }}" class="btn btn-sm btn-primary">Exportar CSV</a>
         </div>

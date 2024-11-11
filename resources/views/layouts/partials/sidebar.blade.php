@@ -48,6 +48,7 @@
     </div>
     <div class="sb-sidenav-footer">
         <div class="small">Logado como:</div>
-        {{ Auth::user()->name }}
+        {{ Auth::guard('admin')->user()->name }}
+
     </div>
 </nav>

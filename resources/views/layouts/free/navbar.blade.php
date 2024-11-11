@@ -4,6 +4,7 @@
         <span class="text-lg font-semibold">Assine a versão Premium e tenha acesso a recursos exclusivos!</span>
         <!-- Atualizado para o novo formato do Bootstrap 5 -->
         <a href="{{url('register')}}" class="ml-4 text-yellow-400 hover:text-yellow-300" >Assinar</a>
+        <a href="{{url('login')}}" class="ml-4 text-yellow-400 hover:text-yellow-300" >Ja possui uma conta?</a>
     </div>
 
     <nav class="bg-white shadow navbar navbar-expand navbar-light topbar static-top mt-11">
@@ -12,7 +13,7 @@
             <i class="fa fa-bars"></i>
         </button>
         <div class="topbar-divider d-none d-sm-block"></div>
-        
+
         <!-- Topbar Search -->
         <div class="my-2 mr-auto d-none d-sm-inline-block form-inline ml-md-3 my-md-0 mw-100 navbar-search">
             <i class="fa-sharp fa-regular fa-monkey"></i>
@@ -21,7 +22,7 @@
             </div>
         </div>
         <i class="fa-sharp fa-regular fa-monkey"></i>
-        
+
         <!-- Topbar Navbar -->
         <ul class="ml-auto navbar-nav">
             <div class="topbar-divider d-none d-sm-block"></div>
@@ -65,13 +66,14 @@
                     <!-- Conteúdo da Modal -->
                     <p>Informações detalhadas sobre o usuário premium aparecerão aqui.</p>
                 </div>
-                
+
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
                 </div>
             </div>
         </div>
     </div>
+
 </div>
 
 <!-- Scripts do Bootstrap 5 -->

@@ -14,10 +14,18 @@
 @endphp
 
 <body class="bg-gray-50 p-8 font-sans">
+
 <h1 class="text-4xl font-bold text-gray-800 mb-8 flex items-center space-x-2">
     <i class="fas fa-tachometer-alt text-indigo-600"></i>
     <span>Histórico</span>
 </h1>
+@if (empty($historico) || count($historico) === 0)
+    <!-- Mensagem quando não há histórico -->
+    <div class="bg-white border border-gray-300 rounded-lg shadow-md p-4 mb-10 text-center">
+        <p class="text-lg font-semibold">Você não possui histórico de setups gerados.</p>
+        <a href="{{ route('dashboard') }}" class="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 mt-4 inline-block">Clique aqui para gerar um Desktop</a>
+    </div>
+@else
 <div class="space-y-6">
     @foreach ($historico as $item)
         <div class="bg-white border border-gray-200 rounded-xl shadow-lg p-6">
@@ -69,6 +77,7 @@
             </div>
         </div>
     @endforeach
+    @endif
 </div>
 </body>
 
