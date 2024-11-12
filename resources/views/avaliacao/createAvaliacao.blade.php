@@ -2,9 +2,10 @@
 
 @section('content premium')
 
+
 <body></body>
 <div class="flex min-h-screen flex-col">
-    
+
     <div class="flex-grow">
         <div class="bg-white rounded p-2 mt-3">
             <div class="">
@@ -21,10 +22,10 @@
                                 @for($i = 1; $i <= 5; $i++)
                                     <!-- Radio buttons (hidden, but still functional) -->
                                     <input type="radio" id="star{{ $i }}" name="rating" value="{{ $i }}" class="hidden star-radio">
-                                    
+
                                     <!-- Labels styled as stars -->
-                                    <label for="star{{ $i }}" title="{{ $i }} estrela{{ $i > 1 ? 's' : '' }}" 
-                                           class="cursor-pointer text-4xl text-gray-400 hover:text-yellow-400 transition-colors star-label" 
+                                    <label for="star{{ $i }}" title="{{ $i }} estrela{{ $i > 1 ? 's' : '' }}"
+                                           class="cursor-pointer text-4xl text-gray-400 hover:text-yellow-400 transition-colors star-label"
                                            data-index="{{ $i }}">
                                         &#9733;
                                     </label>

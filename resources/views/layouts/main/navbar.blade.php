@@ -10,20 +10,20 @@
         class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
         <i class="fa-sharp fa-regular fa-monkey"></i>
         <div class="input-group">
-            <img src="{{ asset('img/logo4.svg') }}" alt="Logo" class="logo-size">
+            <img src="http://127.0.0.1:8000/images/logoEsc.jpg" class="w-40 " alt="Logo Login">
         </div>
     </div>
     <i class="fa-sharp fa-regular fa-monkey"></i>
     <!-- Topbar Navbar -->
     <ul class="navbar-nav ml-auto">
 
-        
+
         <li class="nav-item dropdown no-arrow d-sm-none">
             <a class="nav-link dropdown-toggle" href="#" id="searchDropdown" role="button"
                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 <i class="fas fa-search fa-fw"></i>
             </a>
-            
+
             <div class="dropdown-menu dropdown-menu-right p-3 shadow animated--grow-in"
                 aria-labelledby="searchDropdown">
                 <form class="form-inline mr-auto w-100 navbar-search">
@@ -43,7 +43,7 @@
 
         <div class="topbar-divider d-none d-sm-block"></div>
 
-       
+
         <li class="nav-item dropdown no-arrow">
             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -51,7 +51,7 @@
                 <img class="img-profile rounded-circle"
                     src="img/undraw_profile.svg">
             </a>
-            
+
             <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
                 aria-labelledby="userDropdown">
                 <a class="dropdown-item" href="{{ url('profile')}}">
@@ -60,17 +60,17 @@
                 </a>
                 <div class="dropdown-divider"></div>
                 <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
-                    
+
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
-                    
+
                         <a class="dropdown-item flex items-center" href="{{ route('logout') }}"
                            onclick="event.preventDefault(); this.closest('form').submit();">
                             <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
                             {{ __('Sair') }}
                         </a>
                     </form>
-                    
+
                 </a>
             </div>
         </li>

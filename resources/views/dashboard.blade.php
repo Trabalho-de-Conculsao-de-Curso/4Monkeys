@@ -1,6 +1,12 @@
 @extends('layouts.userpremium')
 
 @section('content premium')
+    <!-- dashboard.blade.php -->
+    @if(session('error'))
+        <div class="alert alert-danger">
+            {{ session('error') }}
+        </div>
+    @endif
 
 <div class="flex min-h-screen">
     <div class="flex-1">
@@ -18,7 +24,7 @@
                 </h2>
                 <div id="software-selection-content" class="flex justify-between space-x-4 min-h-[400px] relative">
                     <!-- Spinner dentro da div dos softwares (oculto inicialmente) -->
-                    
+
                     <!-- Coluna de Jogos -->
                     <div class="flex-1">
                         <h3 class="mb-6 text-4xl font-bold text-center text-transparent concert-one-regular bg-gradient-to-r from-orange-500 via-pink-400 to-blue-300 bg-clip-text animate-fade-in">
@@ -105,14 +111,14 @@
 <script>
     function showSpinner(event) {
     event.preventDefault(); // Impede o envio imediato do formulário
-    
+
     // Exibe o spinner
     document.getElementById('loading-spinner').classList.remove('hidden');
-    
+
     // Esconde o conteúdo do formulário, incluindo o título e a div
     document.getElementById('software-selection-content').classList.add('hidden');
     document.querySelector('.relative').classList.add('hidden'); // Esconde a div do título e do conteúdo
-    
+
     // Esconde o botão de envio
     document.getElementById('submit-button-container').classList.add('hidden');
 

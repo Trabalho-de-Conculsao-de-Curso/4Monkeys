@@ -82,9 +82,37 @@
 
             type();  // Inicia a função de digitação
         }
+
+
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const form = document.getElementById("software-selection-form");
+            const loadingSpinner = document.getElementById("loading-spinner");
+
+            form.addEventListener("submit", function (event) {
+                // Previne o envio imediato do formulário
+                event.preventDefault();
+
+                // Esconde todos os elementos do formulário e exibe apenas o spinner
+                form.classList.add("hidden"); // Esconde o formulário completo
+                loadingSpinner.classList.remove("hidden"); // Exibe o spinner
+
+                // Atraso de 3 segundos antes de enviar o formulário
+                setTimeout(function () {
+                    form.submit(); // Envia o formulário após o atraso
+                }, 3000);
+            });
+        });
+
     </script>
 
 <div class="mt-10">
+    <div id="loading-spinner" class="hidden absolute inset-0 flex items-center justify-center bg-opacity-50  z-50">
+        <div class="flex flex-col items-center">
+            <div class="w-16 h-16 border-4 border-t-transparent border-purple-500 rounded-full animate-spin"></div>
+            <p class="mt-4 text-2xl text-purple-500">Seu Desktop está sendo gerado...</p>
+        </div>
+    </div>
     <!-- Formulário Principal -->
     <form id="software-selection-form" action="{{ auth()->check() ? route('free.selecionar') : route('free.selecionar') }}" method="POST" class="relative p-6 bg-white border border-gray-800 rounded-lg shadow">
         @csrf
@@ -167,8 +195,10 @@
         </div>
         <!-- Botão de Submissão -->
         <div class="flex justify-center mt-6">
-            <button type="submit" class="px-8 py-4 text-2xl text-white transition duration-300 ease-in-out transform rounded-lg shadow-lg concert-one-regular bg-gradient-to-r from-purple-700 via-pink-600 to-rose-600 hover:bg-gradient-to-r hover:from-purple-600 hover:via-pink-500 hover:to-rose-500 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-purple-300">
-                Selecionar Softwares
+            <button type="submit" class="px-8 py-4 text-2xl text-white transition duration-300 ease-in-out transform rounded-lg shadow-lg concert-one-regular bg-gradient-to-r from-purple-700 via-pink-600 to-rose-600 hover:bg-gradient-to-r hover:from-purple-600 hover:via-pink-500 hover:to-rose-500 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-purple-300 flex items-center" id="submitButton">
+                <span id="buttonText">Selecionar Softwares</span>
+                <!-- Spinner -->
+                <div id="spinner" class="hidden w-6 h-6 ml-2 border-4 border-t-transparent border-white rounded-full animate-spin"></div>
             </button>
         </div>
     </form>

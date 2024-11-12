@@ -38,20 +38,20 @@ class ConjuntoController extends Controller
         return view('home', compact('softwares'));
     }
 
+
+
     public function selecionar(Request $request)
     {
         $softwaresSelecionados = $this->obterSoftwaresSelecionados($request);
         $produtos = $this->obterTodosProdutos();
-        $user = auth()->user(); // Obtém o usuário autenticado
+        $user = auth()->user();
 
         do {
             DB::beginTransaction();
 
-
-            try  {
+            try {
                 $produtoNaoEncontrado = false;
-                $generatedConjuntoIds = [];
-                $conjuntos = []; // Array para armazenar conjuntos com seus totais e detalhes
+                $conjuntos = [];
 
                 Log::info("Chamando Gemini API para recomendações...");
                 $recommendations = $this->geminiAPIService->getRecommendations($softwaresSelecionados, $produtos);
@@ -66,18 +66,13 @@ class ConjuntoController extends Controller
                         break;
                     }
 
-                    Log::info("Detalhes do desktop antes de criar conjunto", ['categoria' => $categoria->nome, 'componentes' => $desktop['componentes']]);
-
-                    // Cria o conjunto associado ao usuário autenticado
                     $conjunto = $this->criarConjunto($categoria, $user);
-                    $generatedConjuntoIds[] = $conjunto->id;
 
                     if (!$this->associarProdutosAoConjunto($conjunto, $desktop['componentes'])) {
                         $produtoNaoEncontrado = true;
                         break;
                     }
 
-                    // Associa os softwares selecionados ao conjunto
                     $this->associarSoftwaresAoConjunto($conjunto, $softwaresSelecionados);
 
                     $componentesDetalhados = [];
@@ -96,11 +91,8 @@ class ConjuntoController extends Controller
                     ];
                 }
 
-                Log::info("Estrutura de conjuntos montada com sucesso.", $conjuntos);
-
                 if (!$produtoNaoEncontrado) {
                     DB::commit();
-                    //return response()->json($conjuntos); // Retorna como JSON temporariamente para verificar a estrutura
                     return view('conjuntos', compact('conjuntos'));
                 } else {
                     DB::rollBack();
@@ -108,18 +100,24 @@ class ConjuntoController extends Controller
 
             } catch (\Exception $e) {
                 DB::rollBack();
+
                 GeminiLog::create([
                     'descricao' => 'Erro na comunicação com a API do Gemini: ' . $e->getMessage(),
                     'operacao' => 'getRecommendations',
                     'status' => 'erro',
                     'user_id' => auth()->id(),
                 ]);
+
                 Log::error("Erro ao processar: " . $e->getMessage());
-                return response()->json(['error' => 'Erro ao processar a seleção.', 'details' => $e->getMessage()], 500);
+
+                // Redireciona para a rota dashboard com uma mensagem de erro
+                return redirect()->route('dashboard')->with('error', 'Erro ao processar a seleção. Por favor, tente novamente.');
             }
 
         } while ($produtoNaoEncontrado);
     }
+
+
 
     public function obterSoftwaresSelecionados(Request $request)
     {

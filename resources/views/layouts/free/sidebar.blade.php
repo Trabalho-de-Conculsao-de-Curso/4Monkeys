@@ -3,10 +3,10 @@
     <ul class="h-full bg-purple-600 navbar-nav sidebar sidebar-dark accordion" id="accordionSidebar">
          <!-- Sidebar - Brand -->
 
-        <div class="sidebar-brand-icon p-4">
-            <img src="http://127.0.0.1:8000/images/logoLogin.jpg" class="w-80 h-45 mr-8" alt="Logo Login">
+        <div class="sidebar-brand-icon p-1">
+            <img src="http://127.0.0.1:8000/images/logoNav.jpg" class="w-80 h-45 mr-8" alt="Logo Login">
         </div>
-         <a class="sidebar-brand d-flex align-items-center justify-content-center py-4" href="{{url('/')}}">
+         <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{{url('/')}}">
             <div class="sidebar-brand-text mx-3">Free Version</div>
         </a>
 

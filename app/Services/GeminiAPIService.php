@@ -28,7 +28,26 @@ class GeminiAPIService
             $response = $client->geminiPro()->generateContent($prompt);
 
             if ($response) {
-                $recommendations = $this->parseResponse($response);
+                // Extrai o JSON do texto da resposta
+                $content = $response->candidates[0]->content->parts[0]->text ?? null;
+
+                // Se o conteúdo está vazio, lança uma exceção
+                if (!$content) {
+                    throw new \Exception('Resposta vazia da API do Gemini');
+                }
+
+                // Remove quebras de linha e caracteres indesejados que podem quebrar o JSON
+                $content = preg_replace('/```json|```/', '', trim($content));
+
+                // Tenta decodificar o conteúdo JSON
+                $recommendations = json_decode($content, true);
+
+                // Verifica se a decodificação foi bem-sucedida e contém "desktops"
+                if (json_last_error() !== JSON_ERROR_NONE || !isset($recommendations['desktops'])) {
+                    $errorMessage = 'Formato de resposta inválido da API do Gemini: ' . json_last_error_msg();
+                    throw new \Exception($errorMessage);
+                }
+
                 $totals = $this->calculateTotals($recommendations['desktops']);
 
                 // Log de sucesso
@@ -44,10 +63,20 @@ class GeminiAPIService
                 throw new \Exception('Resposta inesperada da API do Gemini');
             }
         } catch (\Exception $e) {
+            // Log de erro e lançamento de exceção para tratamento no controlador
+            GeminiLog::create([
+                'descricao' => 'Erro ao obter recomendações: ' . $e->getMessage(),
+                'operacao' => 'getRecommendations',
+                'status' => 'erro',
+                'user_id' => auth()->id(),
+            ]);
 
-            throw new \Exception('Erro ao tentar obter recomendações do Gemini: ' . $e->getMessage());
+            // Lança uma exceção personalizada para que o controlador trate o redirecionamento
+            throw new \Exception('Erro ao obter recomendações: ' . $e->getMessage());
         }
     }
+
+
 
     protected function generatePrompt(array $softwares, array $produtos)
     {
@@ -158,6 +187,7 @@ class GeminiAPIService
 
     public function calculateTotals($desktops)
     {
+
         foreach ($desktops as &$desktop) {
             $category = $desktop['categoria'];
             $components = $desktop['componentes'];

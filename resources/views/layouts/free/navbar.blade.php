@@ -18,7 +18,7 @@
         <div class="my-2 mr-auto d-none d-sm-inline-block form-inline ml-md-3 my-md-0 mw-100 navbar-search">
             <i class="fa-sharp fa-regular fa-monkey"></i>
             <div class="input-group">
-                <img src="{{ asset('img/logo4.svg') }}" alt="Logo" class="logo-size">
+                <img src="http://127.0.0.1:8000/images/logoEsc.jpg" class="w-40 " alt="Logo Login">
             </div>
         </div>
         <i class="fa-sharp fa-regular fa-monkey"></i>
