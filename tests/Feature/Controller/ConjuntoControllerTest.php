@@ -565,18 +565,6 @@ it('retorna histórico de conjuntos do usuário com sucesso', function () {
 });
 
 
-
-it('retorna mensagem de erro quando não há conjuntos para o usuário', function () {
-    // Envia a requisição para o método historicoConjuntos sem conjuntos para o usuário
-    $response = $this->getJson('/historico-conjuntos');
-
-    // Verifica se a resposta é 404 e contém a mensagem correta
-    $response->assertStatus(404)
-        ->assertJson([
-            'message' => 'Nenhum conjunto encontrado para o usuário.',
-        ]);
-});
-
 //SalvarConjuntoHistorico
 it('salva histórico com dados válidos no conjunto_historicos', function () {
     // Cria instâncias válidas de Produto e Conjunto

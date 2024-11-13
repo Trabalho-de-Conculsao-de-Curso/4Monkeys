@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Admin;
 use App\Models\Estoque;
 use App\Models\Produto;
 use App\Models\LojaOnline;
@@ -195,24 +196,36 @@ it('retorna produtos ao buscar por múltiplos critérios', function () {
 
 //edit
 it('carrega a view de edição de produto com sucesso', function () {
-    // Mock de um usuário administrador autenticado
-    $admin = User::factory()->create();
-    Auth::shouldReceive('guard->check')->andReturn(true);
-    Auth::shouldReceive('guard->id')->andReturn($admin->id);
+    $admin = Admin::factory()->create();
+    $this->actingAs($admin, 'admin');
 
-    // Criar um produto com uma loja online associada
-    $produto = Produto::factory()->create();
+    // Cria um produto e loja online
+    $produto = Produto::factory()->hasLojaOnline()->create();
 
-    // Fazer a requisição para a rota de edição
+    // Acessa a rota de edição com um ID válido
     $response = $this->get(route('produtos.edit', $produto->id));
 
-    // Verificar se a view de edição foi carregada e contém o produto
+    // Verifica que a view correta foi carregada e contém os dados do produto
     $response->assertStatus(200);
     $response->assertViewIs('produtos.editProduto');
-    $response->assertViewHas('produto', function ($viewProduto) use ($produto) {
-        return $viewProduto->id === $produto->id;
-    });
+    $response->assertViewHas('produto', $produto);
 });
+
+it('log criado quando produto não encontrado', function () {
+    $admin = Admin::factory()->create();
+    $this->actingAs($admin, 'admin');
+
+    // Acessa a rota de edição com um ID inexistente para gerar um erro
+    $this->get(route('produtos.edit', 999)); // 999 é um ID não existente
+
+    // Verifica se uma entrada de log foi criada no banco de dados
+    $this->assertDatabaseHas('custom_logs', [
+        'descricao' => 'No query results for model [App\\Models\\Produto] 999', // Mensagem de erro esperada
+        'operacao' => 'edit',
+        'admin_id' => $admin->id,
+    ]);
+});
+
 
 //update
 
