@@ -23,14 +23,6 @@ class ConjuntoController extends Controller
         $this->geminiAPIService = $geminiAPIService;
     }
 
-    public function index()
-    {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
         // Obtem todos os softwares
@@ -46,22 +38,24 @@ class ConjuntoController extends Controller
         return view('home', compact('softwares'));
     }
 
+
+
     public function selecionar(Request $request)
     {
         $softwaresSelecionados = $this->obterSoftwaresSelecionados($request);
         $produtos = $this->obterTodosProdutos();
-        $user = auth()->user(); // Obtém o usuário autenticado'
+        $user = auth()->user();
 
         do {
             DB::beginTransaction();
 
             try {
                 $produtoNaoEncontrado = false;
-                $generatedConjuntoIds = [];
-                $conjuntos = []; // Array para armazenar conjuntos com seus totais
+                $conjuntos = [];
 
+                Log::info("Chamando Gemini API para recomendações...");
                 $recommendations = $this->geminiAPIService->getRecommendations($softwaresSelecionados, $produtos);
-
+                Log::info("Recomendações obtidas: ", $recommendations);
 
                 foreach ($recommendations['desktops'] as $desktop) {
                     $categoria = $this->buscarCategoriaPorId($desktop['categoria']);
@@ -72,18 +66,30 @@ class ConjuntoController extends Controller
                         break;
                     }
 
-                    // Cria o conjunto associado ao usuário autenticado
                     $conjunto = $this->criarConjunto($categoria, $user);
-                    $generatedConjuntoIds[] = $conjunto->id;
 
                     if (!$this->associarProdutosAoConjunto($conjunto, $desktop['componentes'])) {
                         $produtoNaoEncontrado = true;
                         break;
                     }
+
                     $this->associarSoftwaresAoConjunto($conjunto, $softwaresSelecionados);
 
+                    $componentesDetalhados = [];
+                    foreach ($desktop['componentes'] as $componenteNome => $detalhes) {
+                        $componentesDetalhados[$componenteNome] = [
+                            'nome' => $detalhes['nome'],
+                            'preco' => $detalhes['preco'],
+                            'url' => $detalhes['url']
+                        ];
+                    }
+
+                    $conjuntos[] = [
+                        'categoria' => $categoria->nome,
+                        'componentes' => $componentesDetalhados,
+                        'total' => $desktop['total']
+                    ];
                 }
-                $conjuntos = $recommendations;
 
                 if (!$produtoNaoEncontrado) {
                     DB::commit();
@@ -94,18 +100,23 @@ class ConjuntoController extends Controller
 
             } catch (\Exception $e) {
                 DB::rollBack();
+
                 GeminiLog::create([
                     'descricao' => 'Erro na comunicação com a API do Gemini: ' . $e->getMessage(),
                     'operacao' => 'getRecommendations',
                     'status' => 'erro',
                     'user_id' => auth()->id(),
                 ]);
+
                 Log::error("Erro ao processar: " . $e->getMessage());
-                return redirect()->back()->withErrors('Erro ao processar a seleção.');
+
+                // Redireciona para a rota dashboard com uma mensagem de erro
+                return redirect()->route('dashboard')->with('error', 'Erro ao processar a seleção. Por favor, tente novamente.');
             }
 
         } while ($produtoNaoEncontrado);
     }
+
 
 
     public function obterSoftwaresSelecionados(Request $request)
@@ -151,12 +162,11 @@ class ConjuntoController extends Controller
         }
     }
 
-
     public function associarProdutosAoConjunto(Conjunto $conjunto, array $componentes)
     {
         try {
-            foreach ($componentes as $componentName) {
-                $productId = $this->geminiAPIService->findProductIdBySimilarity($componentName);
+            foreach ($componentes as $componentDetails) {
+                $productId = $this->geminiAPIService->findProductIdBySimilarity($componentDetails['nome']);
 
                 if ($productId) {
                     $conjunto->produtos()->attach($productId);
@@ -172,7 +182,7 @@ class ConjuntoController extends Controller
                     }
                 } else {
                     GeminiLog::create([
-                        'descricao' => "Produto $componentName não encontrado para associação ao conjunto",
+                        'descricao' => "Produto {$componentDetails['nome']} não encontrado para associação ao conjunto",
                         'operacao' => 'associarProdutosAoConjunto',
                         'status' => 'erro',
                         'user_id' => auth()->id(),
@@ -181,7 +191,6 @@ class ConjuntoController extends Controller
                 }
             }
 
-            // Log consolidado ao final da função, indicando sucesso
             GeminiLog::create([
                 'descricao' => "Produtos associados com sucesso ao conjunto ID: {$conjunto->id}",
                 'operacao' => 'associarProdutosAoConjunto',
@@ -208,7 +217,6 @@ class ConjuntoController extends Controller
                 $conjunto->softwares()->attach($softwareSelecionado['id']);
             }
 
-            // Log consolidado ao final da função, indicando sucesso
             GeminiLog::create([
                 'descricao' => "Softwares associados com sucesso ao conjunto ID: {$conjunto->id}",
                 'operacao' => 'associarSoftwaresAoConjunto',
@@ -236,13 +244,6 @@ class ConjuntoController extends Controller
             ->orderBy('created_at', 'asc') // Ordenar por data de criação
             ->with(['produtos.lojaOnline', 'softwares']) // Carregar produtos com suas lojas online e softwares relacionados
             ->get();
-
-        // Verificar se há conjuntos retornados
-        if ($conjuntos->isEmpty()) {
-            return response()->json([
-                'message' => 'Nenhum conjunto encontrado para o usuário.',
-            ], 404);
-        }
 
         // Agrupar os conjuntos pela data de criação
         $agrupadosPorData = $conjuntos->groupBy(function ($conjunto) {
@@ -274,11 +275,18 @@ class ConjuntoController extends Controller
                     'nome' => $conjunto->nome,
                     'categoria' => $conjunto->categoria_id,
                     'total' => $totalConjunto, // Adiciona o total calculado
-                    'produtos' => $conjunto->produtos->map(function ($produto) {
+                    'produtos' => $conjunto->produtos->map(function ($produto) use ($conjunto) {
+                        // Busca o valor específico do produto no conjunto_historicos
+                        $valorProduto = DB::table('conjunto_historicos')
+                            ->where('conjunto_id', $conjunto->id)
+                            ->where('produto_id', $produto->id)
+                            ->value('valor'); // Pega o valor específico do produto
+
                         return [
                             'id' => $produto->id,
                             'nome' => $produto->nome,
                             'url' => $produto->lojaOnline->urlLoja ?? 'URL não disponível', // Adiciona a URL da loja online
+                            'valor' => $valorProduto, // Adiciona o valor específico do produto
                         ];
                     }),
                     'softwares' => $conjunto->softwares->map(function ($software) {
@@ -303,12 +311,18 @@ class ConjuntoController extends Controller
                 ];
             }
 
+
             // Adicionar o histórico do conjunto por data à lista geral
             $historico[] = $historicoPorData;
+
         }
 
         // Retornar o histórico em formato JSON
-        return response()->json([
+        /*return response()->json([
+            'historico' => $historico,
+        ]);*/
+
+        return view('historico', [
             'historico' => $historico,
         ]);
     }
@@ -328,6 +342,5 @@ class ConjuntoController extends Controller
             Log::warning("Produto ID, valor ou conjunto ID inválidos ao salvar no histórico.");
         }
     }
-
 
 }

@@ -7,11 +7,6 @@
                 <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
                 Dashboard
             </a>
-
-            <a class="nav-link" href="{{url('admin/category')}}">
-                <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
-                Categoria
-            </a>
             <div class="sb-sidenav-menu-heading">Administrar</div>
             <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseLayouts" aria-expanded="false" aria-controls="collapseLayouts">
                 <div class="sb-nav-link-icon"><i class="fas fa-columns"></i></div>
@@ -33,6 +28,7 @@
                 <nav class="sb-sidenav-menu-nested nav accordion" id="sidenavAccordionPages">
                     <a class="nav-link" href="{{url('create-admin')}}">Administradores</a>
                     <a class="nav-link" href="{{url('usuario-premium')}}">Usuários Premium</a>
+                    <a class="nav-link" href="{{url('avaliar')}}">Avaliações</a>
                 </nav>
             </div>
             <div class="sb-sidenav-menu-heading">Logs e Tabelas</div>
@@ -52,6 +48,7 @@
     </div>
     <div class="sb-sidenav-footer">
         <div class="small">Logado como:</div>
-        Mateus Ferreira
+        {{ Auth::guard('admin')->user()->name }}
+
     </div>
 </nav>

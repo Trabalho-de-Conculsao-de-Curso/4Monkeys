@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AdminDashboardController;
+use App\Http\Controllers\AvaliacaoController;
 use App\Http\Controllers\ChartController;
 use App\Http\Controllers\ConjuntoLocalController;
 use App\Http\Controllers\FreeConjuntoController;
@@ -31,6 +32,10 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::post('/selecionar', [ConjuntoController::class, 'selecionar'])->name('home.selecionar');
     Route::get('/historico-conjuntos', [ConjuntoController::class, 'historicoConjuntos']);
+    Route::post('/avaliar', [AvaliacaoController::class, 'store'])->name('avaliar.store');
+    Route::get('/avaliar/create', [AvaliacaoController::class, 'create'])->name('avaliar.create');
+
+
 });
 
 
@@ -41,7 +46,10 @@ Route::post('/conjunto-produtos', [ConjuntoLocalController::class, 'getConjuntoP
 Route::resource('/produtos', ProdutoController::class)->middleware(AdminAuthenticated::class);
 Route::resource('/softwares', SoftwareController::class)->middleware(AdminAuthenticated::class);
 Route::resource('/usuario-premium', PremiumController::class)->middleware(AdminAuthenticated::class);
+Route::get('/api/desktops-by-day', [AdminDashboardController::class, 'getDesktopsByDay'])->middleware(AdminAuthenticated::class);
 
+
+Route::get('/avaliar', [AvaliacaoController::class, 'index'])->name('avaliar.index')->middleware(AdminAuthenticated::class);
 Route::get('/login-admin', [AdminController::class, 'showLoginForm'])->name('admin.login');
 Route::post('/login-admin', [AdminController::class, 'login']);
 Route::resource('/create-admin', AdminController::class)->middleware(AdminAuthenticated::class);
@@ -68,6 +76,7 @@ Route::get('/api/charts-data', [ChartController::class, 'getChartData']);
 //rotas para teste
 Route::get('/produtos/search', [ProdutoController::class, 'show'])->name('produtos.search');
 Route::get('/softwares/search', [SoftwareController::class, 'show'])->name('softwares.search');
+
 
 
 require __DIR__.'/auth.php';

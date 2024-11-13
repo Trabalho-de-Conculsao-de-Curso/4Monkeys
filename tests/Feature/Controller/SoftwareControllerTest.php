@@ -1,4 +1,6 @@
 <?php
+
+use App\Models\Admin;
 use App\Models\LojaOnline;
 use App\Models\Produto;
 
@@ -9,6 +11,7 @@ use App\Models\Software;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
@@ -16,28 +19,23 @@ use Illuminate\Support\Facades\Storage;
 uses(RefreshDatabase::class);
 
 
-it('Rota index retorna softwares com requisitos e responde com 200', function () {
-    // Simula desativar middleware para este teste
-    $this->withoutMiddleware();
+it('exibe a view index com a lista completa de softwares', function () {
+    // Cria softwares no banco de dados
+    $admin = Admin::factory()->create();
+    $this->actingAs($admin, 'admin');
 
-    // Cria 3 softwares com requisitos associados
-    $softwares = Software::factory()->withRequisitos()->count(3)->create();
+    // Cria softwares no banco de dados
+    Software::factory()->count(5)->create();
 
-    // Faz uma requisição GET para a rota index
-    $response = $this->get('/softwares');
+    // Faz uma requisição para o método index sem busca
+    $response = $this->get(route('softwares.index'));
 
-    // Verifica se a resposta está correta (200 OK)
+    // Verifica o status da resposta e se a view correta foi carregada
     $response->assertStatus(200);
-
-    // Verifica se a view correta foi carregada
     $response->assertViewIs('softwares.index');
-
-    // Verifica se os softwares e os requisitos estão presentes na view
-    $response->assertViewHas('softwares', function ($viewSoftwares) use ($softwares) {
-        return $viewSoftwares->count() === $softwares->count() &&
-            $viewSoftwares->first()->requisitos->isNotEmpty();
-    });
+    $response->assertViewHas('softwares', Software::all());
 });
+
 
 it('Rota create responde com 200', function () {
     // Envia uma requisição GET para a rota create

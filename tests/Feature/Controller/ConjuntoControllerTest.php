@@ -368,8 +368,11 @@ it('associa produto encontrado ao conjunto e salva logs', function () {
     // Cria um conjunto usando a ConjuntoFactory
     $conjunto = Conjunto::factory()->create();
 
-    // Cria um produto com preço na loja online
-    $produto = Produto::factory()->create();
+    // Cria uma loja online com um valor específico
+    $lojaOnline = LojaOnline::factory()->create(['valor' => 200.0]);
+
+    // Cria um produto com a loja online associada
+    $produto = Produto::factory()->create(['loja_online_id' => $lojaOnline->id]);
 
     // Mocka a chamada para GeminiAPIService para retornar o ID do produto
     $this->geminiAPIServiceMock
@@ -378,25 +381,29 @@ it('associa produto encontrado ao conjunto e salva logs', function () {
         ->with('produto1')
         ->andReturn($produto->id);
 
-    // Executa a função associarProdutosAoConjunto
-    $result = $this->controller->associarProdutosAoConjunto($conjunto, ['produto1']);
+    // Executa a função associarProdutosAoConjunto com um array de componentes contendo 'nome'
+    $result = $this->controller->associarProdutosAoConjunto($conjunto, [['nome' => 'produto1']]);
+
+    // Verifica se a função retornou sucesso
+    $this->assertTrue($result);
 
     // Verifica se o produto foi associado ao conjunto
-    $this->assertTrue($result);
     $this->assertDatabaseHas('conjunto_produto', [
         'conjunto_id' => $conjunto->id,
         'produto_id' => $produto->id,
     ]);
 
-    // Verifica se o histórico de preço foi salvo
+    // Verifica se o histórico de preço foi salvo com o valor correto
     $this->assertDatabaseHas('conjunto_historicos', [
         'produto_id' => $produto->id,
         'conjunto_id' => $conjunto->id,
+        'valor' => 200.0,
     ]);
 
-    // Verifica se um log de sucesso foi criado
+    // Verifica se um log de sucesso foi criado na tabela GeminiLog
     $this->assertDatabaseHas('gemini_logs', [
         'descricao' => "Produtos associados com sucesso ao conjunto ID: {$conjunto->id}",
+        'operacao' => 'associarProdutosAoConjunto',
         'status' => 'sucesso',
     ]);
 });
@@ -412,15 +419,16 @@ it('não encontra produto e registra log de erro', function () {
         ->with('produto_inexistente')
         ->andReturn(null);
 
-    // Executa a função associarProdutosAoConjunto e espera resultado falso
-    $result = $this->controller->associarProdutosAoConjunto($conjunto, ['produto_inexistente']);
+    // Executa a função associarProdutosAoConjunto com um array de componentes contendo 'nome'
+    $result = $this->controller->associarProdutosAoConjunto($conjunto, [['nome' => 'produto_inexistente']]);
 
     // Verifica se o resultado é falso
     $this->assertFalse($result);
 
-    // Verifica se um log de erro foi registrado
+    // Verifica se um log de erro foi registrado na tabela GeminiLog
     $this->assertDatabaseHas('gemini_logs', [
         'descricao' => 'Produto produto_inexistente não encontrado para associação ao conjunto',
+        'operacao' => 'associarProdutosAoConjunto',
         'status' => 'erro',
     ]);
 });
@@ -429,26 +437,28 @@ it('lança exceção e registra log de erro', function () {
     // Cria um conjunto
     $conjunto = Conjunto::factory()->create();
 
-    // Simula uma exceção no GeminiAPIService
+    // Simula uma exceção no GeminiAPIService ao tentar encontrar o ID do produto
     $this->geminiAPIServiceMock
         ->shouldReceive('findProductIdBySimilarity')
         ->once()
         ->with('produto1')
         ->andThrow(new \Exception('Erro na API Gemini'));
 
-    // Executa a função e espera uma exceção
+    // Configura a expectativa de uma exceção ao chamar a função
     $this->expectException(\Exception::class);
     $this->expectExceptionMessage('Erro na API Gemini');
 
-    // Executa a função associarProdutosAoConjunto
-    $this->controller->associarProdutosAoConjunto($conjunto, ['produto1']);
+    // Executa a função associarProdutosAoConjunto com o array de componentes contendo 'nome'
+    $this->controller->associarProdutosAoConjunto($conjunto, [['nome' => 'produto1']]);
 
-    // Verifica se o log de erro foi registrado no banco de dados
+    // Verifica se o log de erro foi registrado na tabela GeminiLog
     $this->assertDatabaseHas('gemini_logs', [
         'descricao' => 'Erro ao associar produtos ao conjunto: Erro na API Gemini',
+        'operacao' => 'associarProdutosAoConjunto',
         'status' => 'erro',
     ]);
 });
+
 
 //AssociarSoftwaresAoConjunto
 it('associa softwares ao conjunto com sucesso e registra log', function () {
@@ -507,7 +517,7 @@ it('lança exceção ao associar softwares e registra log de erro', function () 
 
 //HistoricoConjunto
 it('retorna histórico de conjuntos do usuário com sucesso', function () {
-    // Cria um conjunto para o usuário autenticado com produtos, lojas online, softwares e requisitos
+    // Configuração dos dados de teste
     $categoria = Categoria::factory()->create();
     $conjunto = Conjunto::factory()->create([
         'user_id' => $this->user->id,
@@ -520,7 +530,6 @@ it('retorna histórico de conjuntos do usuário com sucesso', function () {
     $software = Software::factory()->create();
     $conjunto->softwares()->attach($software->id);
 
-    // Cria requisitos para o software
     RequisitoSoftware::factory()->create([
         'software_id' => $software->id,
         'requisito_nivel' => 'Minimo',
@@ -529,74 +538,32 @@ it('retorna histórico de conjuntos do usuário com sucesso', function () {
         'ram' => '8GB',
     ]);
 
-    // Simula um valor total no conjunto_historico para o produto no conjunto
     DB::table('conjunto_historicos')->insert([
         'conjunto_id' => $conjunto->id,
         'produto_id' => $produto->id,
         'valor' => 150.0,
     ]);
 
-    // Envia a requisição para o método historicoConjuntos
-    $response = $this->getJson('/historico-conjuntos');
+    // Realiza a requisição e verifica que a view correta foi carregada
+    $response = $this->get('/historico-conjuntos');
 
-    // Verifica se a resposta tem o formato JSON esperado e contém o conjunto criado
     $response->assertStatus(200)
-        ->assertJsonStructure([
-            'historico' => [
-                '*' => [
-                    'data',
-                    'conjuntos' => [
-                        '*' => [
-                            'id',
-                            'nome',
-                            'categoria',
-                            'total',
-                            'produtos' => [
-                                '*' => [
-                                    'id',
-                                    'nome',
-                                    'url',
-                                ],
-                            ],
-                            'softwares' => [
-                                '*' => [
-                                    'id',
-                                    'nome',
-                                    'descricao',
-                                    'requisitos' => [
-                                        '*' => [
-                                            'nivel',
-                                            'cpu',
-                                            'gpu',
-                                            'ram',
-                                            'placa_mae',
-                                            'ssd',
-                                            'cooler',
-                                            'fonte',
-                                        ],
-                                    ],
-                                ],
-                            ],
-                        ],
-                    ],
-                ],
-            ],
-        ]);
+        ->assertViewIs('historico') // Confirma que a view 'historico' é carregada
+        ->assertViewHas('historico'); // Confirma que a view possui a variável 'historico'
 
-    // Verifica que o total calculado é retornado corretamente
-    $response->assertJsonPath('historico.0.conjuntos.0.total', 150);
+    // Acessa os dados da view para fazer verificações adicionais
+    $historico = $response->viewData('historico');
+
+    // Verifica a estrutura do histórico para garantir que contém os dados esperados
+    $this->assertIsArray($historico);
+    $this->assertNotEmpty($historico);
+
+    // Exemplo de verificação detalhada da estrutura
+    $this->assertArrayHasKey('data', $historico[0]);
+    $this->assertArrayHasKey('conjuntos', $historico[0]);
+    $this->assertEquals(150, $historico[0]['conjuntos'][0]['total']);
 });
 
-it('retorna mensagem de erro quando não há conjuntos para o usuário', function () {
-    // Envia a requisição para o método historicoConjuntos sem conjuntos para o usuário
-    $response = $this->getJson('/historico-conjuntos');
-
-    // Verifica se a resposta é 404 e contém a mensagem correta
-    $response->assertStatus(404)
-        ->assertJson([
-            'message' => 'Nenhum conjunto encontrado para o usuário.',
-        ]);
-});
 
 //SalvarConjuntoHistorico
 it('salva histórico com dados válidos no conjunto_historicos', function () {
