@@ -46,12 +46,54 @@ php artisan migrate
 php artisan db:seed
 ```
 ```
+php artisan storage:link
+```
+```
+chmod 777 database/database.sqlite
+```
+```
 npm run dev
 ```
 No outro terminal execute
 ```
 php artisan serve
 ```
+
+🚨Para a geração de desktops funcionar é preciso estar logado e usar uma API do gemini no .env em GEMINI_API_KEY
+
+### Scraping no Docker
+Em um terminal como root na raiz do projeto execute os seguintes comandos para criar do zero um ambiente virtual
+```
+rm -rf python/venv
+```
+```
+apk add python3 py3-pip
+```
+```
+source python/venv/bin/activate
+```
+agora para instalar as dependência para fazer o scraping
+```
+pip install beautifulsoup4 requests
+```
+```
+pip install schedule
+```
+Use para evitar problemas de permisão no banco
+```
+chmod -R 777 database/database.sqlite
+```
+🚨 python/scraper/settings.py COLOCAR O CAMINHO ABSOLUTO DO BANCO
+
+Agora para rodar o scraper no diretório python rode
+```
+python3 -m scraper.main
+```
+E para rodar o verificador
+```
+python3 -m verificador-main
+```
+
 
 ### 🔧 Instalação de depencias iniciais em Sistema Operacional Windows
 ### 📋 Pré-requisitos
