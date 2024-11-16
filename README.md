@@ -8,13 +8,55 @@ Essas instruções permitirão que você obtenha uma cópia do projeto em opera�
 
 Consulte **[Implantação](#-implanta%C3%A7%C3%A3o)** para saber como implantar o projeto.
 
+
+
+### 🐳 Instalação com Docker
+No diretório raiz do projeto monte a imagem
+```
+docker build -t 4monkeys-image .
+```
+
+Ainda no na raiz do projeto
+```
+docker run --rm -u $(id -u) -it --name 4monkeys-app --network=host -p 8000:8000 -v $(pwd):/usr/src/4monkeys -w /usr/src/4monkeys 4monkeys-image bash
+```
+
+Para evitar problemas de permissão abra um novo terminal e execute
+```
+docker exec -it --user root 4monkeys-app /bin/sh
+```
+
+No terminal como root execute os seguintes comandos
+```
+composer install
+```
+```
+npm install
+```
+```
+cp .env.example .env
+```
+```
+php artisan key:generate
+```
+```
+php artisan migrate
+```
+```
+php artisan db:seed
+```
+```
+npm run dev
+```
+No outro terminal execute
+```
+php artisan serve
+```
+
+### 🔧 Instalação de depencias iniciais em Sistema Operacional Windows
 ### 📋 Pré-requisitos
 
 Versão minima do PHP 8.0
-
-
-### 🔧 Instalação de depencias iniciais em Sistema Operacional Windows
-
 Dependencias necessarias para Desenvolvimento do Sistema.
 
 Instalar Composer:
