@@ -70,6 +70,9 @@ rm -rf python/venv
 apk add python3 py3-pip
 ```
 ```
+python3 -m venv python/venv
+```
+```
 source python/venv/bin/activate
 ```
 agora para instalar as dependência para fazer o scraping
