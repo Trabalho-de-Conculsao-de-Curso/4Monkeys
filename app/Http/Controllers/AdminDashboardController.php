@@ -18,7 +18,7 @@ class AdminDashboardController extends Controller
             $userCount = User::count();
 
             // Quantidade de operações "criarConjunto" na tabela gemini_logs para o "Success Card"
-            $createConjuntoCount = GeminiLog::where('operacao', 'criarConjunto')->count();
+            $createConjuntoCount = GeminiLog::where('operacao', 'criarConjunto')->count()/3;
 
             $errorCount = GeminiLog::where('status', 'erro')->count();
 
