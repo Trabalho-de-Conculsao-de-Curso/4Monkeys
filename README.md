@@ -94,7 +94,7 @@ python3 -m scraper.main
 ```
 E para rodar o verificador
 ```
-python3 -m verificador-main
+python3 -m verificador.main
 ```
 
 
