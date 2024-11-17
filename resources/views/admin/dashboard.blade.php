@@ -65,7 +65,7 @@
             <a href="{{ route('logs.export') }}" class="btn btn-sm btn-primary">Exportar CSV</a>
         </div>
         <div class="card-body">
-            <table id="logTable" class="table table-striped table-bordered">
+            <table id="datatablesSimple">
                 <thead>
                 <tr>
                     <th>ID do Usuário</th>
@@ -76,6 +76,16 @@
                     <th>Data Alteração</th>
                 </tr>
                 </thead>
+                <tfoot>
+                <tr>
+                    <th>ID do Usuário</th>
+                    <th>Descrição</th>
+                    <th>Operação</th>
+                    <th>Status</th>
+                    <th>Data Criação</th>
+                    <th>Data Alteração</th>
+                </tr>
+                </tfoot>
                 <tbody>
                 @foreach ($logs as $log)
                     <tr>
@@ -83,25 +93,19 @@
                         <td>{{ $log->descricao }}</td>
                         <td>{{ $log->operacao }}</td>
                         <td>{{ $log->status }}</td>
-                        <td>{{ $log->created_at->format('d/m/Y H:i') }}</td>
-                        <td>{{ $log->updated_at->format('d/m/Y H:i') }}</td>
+                        <td>{{ $log->created_at ? $log->created_at->format('d/m/Y H:i') : '-' }}</td>
+                        <td>{{ $log->updated_at ? $log->updated_at->format('d/m/Y H:i') : '-' }}</td>
                     </tr>
                 @endforeach
                 </tbody>
             </table>
-
-            <!-- Paginação -->
-            <div class="mt-4">
-                {{ $logs->links() }}
-            </div>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
-    <script src="js/scripts.js"></script>
+
+
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js" crossorigin="anonymous"></script>
     <script src="assets/demo/chart-area-demo.js"></script>
     <script src="assets/demo/chart-bar-demo.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/umd/simple-datatables.min.js" crossorigin="anonymous"></script>
-    <script src="js/datatables-simple-demo.js"></script>
 @endsection
