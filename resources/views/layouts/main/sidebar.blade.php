@@ -75,7 +75,9 @@
         </div>
 
         <div class="sidebar-brand-icon size-23 mt-28">
-            <img src="http://127.0.0.1:8000/images/logoNav.jpg" class="w-80 h-45 mr-8" alt="Logo Login">
+            <a href="/dashboard">
+                <img src="http://127.0.0.1:8000/images/logoNav.jpg" class="w-80 h-45 mr-8" alt="Logo Login">
+            </a>
         </div>
     </ul>
 
