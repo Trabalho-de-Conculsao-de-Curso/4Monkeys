@@ -34,8 +34,6 @@ Route::middleware('auth')->group(function () {
     Route::get('/historico-conjuntos', [ConjuntoController::class, 'historicoConjuntos']);
     Route::post('/avaliar', [AvaliacaoController::class, 'store'])->name('avaliar.store');
     Route::get('/avaliar/create', [AvaliacaoController::class, 'create'])->name('avaliar.create');
-
-
 });
 
 
@@ -65,7 +63,7 @@ Route::get('/tables', [LogController::class, 'index'])->name('auth.admin.logs');
 Route::get('/logs/export', [LogController::class, 'export'])->name('logs.export');
 Route::get('/charts', function () {
     return view('admin.charts');
-})->name('admin.charts');
+})->name('admin.charts')->middleware(AdminAuthenticated::class);
 
 Route::get('/api/charts-data', [ChartController::class, 'getChartData']);
 
